@@ -156,11 +156,11 @@
 <!--            <artifactId>springfox-swagger-ui</artifactId>-->
 <!--            <version>2.4.0</version>-->
 <!--        </dependency>-->
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <version>1.5.22</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.swagger</groupId>-->
+<!--            <artifactId>swagger-annotations</artifactId>-->
+<!--            <version>1.5.22</version>-->
+<!--        </dependency>-->
         <!-- springloaded -->
         <!-- https://mvnrepository.com/artifact/org.springframework/springloaded -->
         <dependency>

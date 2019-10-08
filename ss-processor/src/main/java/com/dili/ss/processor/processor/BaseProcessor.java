@@ -30,7 +30,6 @@
 //                  不见满街漂亮妹，哪个归得程序员？
 package com.dili.ss.processor.processor;
 
-import com.sun.tools.javac.api.JavacTrees;
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.TreeMaker;
@@ -57,7 +56,7 @@ import java.util.Properties;
 public abstract class BaseProcessor extends AbstractProcessor {
 
     protected Messager messager;
-    protected JavacTrees trees;
+//    protected JavacTrees trees;
     protected TreeMaker treeMaker;
     protected Names names;
     protected Filer filer;
@@ -70,7 +69,7 @@ public abstract class BaseProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         this.messager = processingEnv.getMessager();
-        this.trees = JavacTrees.instance(processingEnv);
+//        this.trees = JavacTrees.instance(processingEnv);
         Context context = ((JavacProcessingEnvironment) processingEnv).getContext();
         this.treeMaker = TreeMaker.instance(context);
         this.names = Names.instance(context);
