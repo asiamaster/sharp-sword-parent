@@ -53,7 +53,7 @@ public class ReturnTypeHandlerFactory {
             return strategy.convert(value);
         } catch (Exception e) {
             //转换失败返原值
-            e.printStackTrace();
+//            e.printStackTrace();
             return value;
         }
     }
