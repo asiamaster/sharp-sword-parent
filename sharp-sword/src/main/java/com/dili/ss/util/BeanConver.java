@@ -152,7 +152,11 @@ public class BeanConver {
             String propertyName = descriptor.getName();
             if (!"class".equals(propertyName)) {
                 Method readMethod = descriptor.getReadMethod();
-                Object result = readMethod.invoke(bean, new Object[0]);
+                Object result = null;
+                try {
+                    result = readMethod.invoke(bean, new Object[0]);
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                }
                 if (result != null) {
                     returnMap.put(propertyName, result);
                 }

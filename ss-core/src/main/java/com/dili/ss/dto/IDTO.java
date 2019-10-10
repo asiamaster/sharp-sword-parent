@@ -5,6 +5,7 @@ import org.apache.commons.collections.map.HashedMap;
 
 import javax.persistence.Transient;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
@@ -62,26 +63,31 @@ public interface IDTO extends Serializable {
 	 * @param key
 	 * @return
 	 */
-	default Object mget(String key){return null;};
+	default Object mget(String key){return null;}
 
 	/**
 	 * meta取所有值
 	 * @return
 	 */
-	default Map<String, Object> mget(){return new HashedMap();};
+	default Map<String, Object> mget(){return new HashedMap();}
 
 	/**
 	 * meta设值
 	 * @param key
 	 * @param value
 	 */
-	default void mset(String key, Object value){};
+	default void mset(String key, Object value){}
 
 	/**
 	 * meta设值
 	 * @return
 	 */
-	default void mset(Map<String, Object> metadata){};
+	default void mset(Map<String, Object> metadata){}
 
-
+	/**
+	 * 获取所有属性
+	 * @return
+	 */
+	@Transient
+	default Map<String, Field> getFields(){return null;}
 }
