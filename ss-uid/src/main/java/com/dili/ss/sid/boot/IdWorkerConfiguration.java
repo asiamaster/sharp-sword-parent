@@ -105,6 +105,10 @@ public class IdWorkerConfiguration {
 
     private Long getDataCenterId(){
         int[] ints = StringUtils.toCodePoints(SystemUtils.getHostName());
+        if(ints == null){
+            System.out.println("未取到HostName!datacenterId为1");
+            return 1L;
+        }
         int sums = 0;
         for (int i: ints) {
             sums += i;

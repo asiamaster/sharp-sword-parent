@@ -1,11 +1,11 @@
 package com.dili.ss.redis.service;
 
 import com.alibaba.fastjson.JSON;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @ConditionalOnExpression("'${redis.enable}'=='true'")
 public class RedisUtil {
     @SuppressWarnings("rawtypes")
-    @Autowired
+    @Resource(name="redisTemplate")
     protected RedisTemplate redisTemplate;
 
     /**

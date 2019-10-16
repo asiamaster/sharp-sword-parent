@@ -168,7 +168,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.version}</version>
+<!--            <version>${mysql.version}</version>-->
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.mybatis/mybatis-typehandlers-jsr310 -->
         <dependency>

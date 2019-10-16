@@ -1,5 +1,6 @@
 package com.dili.ss.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.dili.ss.util.POJOUtils;
 import org.apache.commons.collections.map.HashedMap;
 
@@ -88,6 +89,7 @@ public interface IDTO extends Serializable {
 	 * 获取所有属性
 	 * @return
 	 */
+	@JSONField(serialize=false)
 	@Transient
 	default Map<String, Field> getFields(){return null;}
 }
