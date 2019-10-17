@@ -162,13 +162,13 @@ public class ExportUtils {
         }
     }
 
-	/**
-	 * 构建数据列
-	 * @param exportParam
-	 * @param workbook
-	 * @param sheet
-	 * @param request
-	 */
+    /**
+     * 构建数据列
+     * @param exportParam
+     * @param workbook
+     * @param sheet
+     * @param request
+     */
     private void buildData(ExportParam exportParam, SXSSFWorkbook workbook, Sheet sheet, HttpServletRequest request){
         //渲染数据列
         CellStyle dataColumnStyle = getDataColumnStyle(workbook);//获取列头样式对象
@@ -183,20 +183,20 @@ public class ExportUtils {
 
         //如果只查一次，就不启线程了，直接在主线程查
         if(queryCount == 1) {
-	        JSONArray rowDatas = new ExportDataThread(0, exportParam.getQueryParams(), basePath + url, request).queryThreadData();
-	        buildSingleData(0, exportParam.getColumns(), rowDatas, sheet, dataColumnStyle);
+            JSONArray rowDatas = new ExportDataThread(0, exportParam.getQueryParams(), basePath + url, request).queryThreadData();
+            buildSingleData(0, exportParam.getColumns(), rowDatas, sheet, dataColumnStyle);
         }else {
-	        //分别进行取数
-	        List<Future<JSONArray>> futures = new ArrayList<>(queryCount);
-	        for (int current = 0; current < queryCount; current++) {
-		        Map<String, String> queryParams =  new HashMap<>();
-		        //注意这里直接使用exportParam.getQueryParams()会产生多线程并发缺陷，所有深putAll进行半深拷贝
-		        //然而putAll也不完全是深拷贝，但它的性能优于字节拷贝，它只能深拷贝基本类型，不过这里也只有基本类型
-		        queryParams.putAll(exportParam.getQueryParams());
-		        Future<JSONArray> future = executor.submit(new ExportDataThread(current, queryParams, basePath + url, request));
-		        futures.add(future);
-	        }
-	        int current = 0;
+            //分别进行取数
+            List<Future<JSONArray>> futures = new ArrayList<>(queryCount);
+            for (int current = 0; current < queryCount; current++) {
+                Map<String, String> queryParams =  new HashMap<>();
+                //注意这里直接使用exportParam.getQueryParams()会产生多线程并发缺陷，所有深putAll进行半深拷贝
+                //然而putAll也不完全是深拷贝，但它的性能优于字节拷贝，它只能深拷贝基本类型，不过这里也只有基本类型
+                queryParams.putAll(exportParam.getQueryParams());
+                Future<JSONArray> future = executor.submit(new ExportDataThread(current, queryParams, basePath + url, request));
+                futures.add(future);
+            }
+            int current = 0;
             try {
                 for (Future<JSONArray> future : futures) {
                     JSONArray rowDatas = future.get();
@@ -211,86 +211,86 @@ public class ExportUtils {
     }
 
     //构建单次数据
-	private void buildSingleData(int current, List<List<Map<String, Object>>> columns, JSONArray rowDatas, Sheet sheet, CellStyle dataColumnStyle){
-		Integer headerRowCount = columns.size();
-		//迭代数据
-		for(int i=0; i<rowDatas.size(); i++ ){
-			JSONObject rowDataMap = (JSONObject)rowDatas.get(i);
-			Row row = sheet.createRow(current * FETCH_COUNT + i + headerRowCount);
-			//直接取最后一行的列头信息
-			List<Map<String, Object>> headers = columns.get(columns.size()-1);
-			int index = 0;
-			//迭代列头
-			for(int j=0; j<headers.size(); j++){
-				Map<String, Object> headerMap = headers.get(j);
-				//隐藏的列不导出
-				if(headerMap.get("hidden")!=null && headerMap.get("hidden").equals(true)){
-					continue;
-				}
-				Cell cell = row.createCell(index);
-				cell.setCellStyle(dataColumnStyle);
-				Object value = rowDataMap.get(headerMap.get("field"));
-				//判断是否有值提供者需要转义(此功能已经在datagrid的查询中封装，这里不需要处理了)
+    private void buildSingleData(int current, List<List<Map<String, Object>>> columns, JSONArray rowDatas, Sheet sheet, CellStyle dataColumnStyle){
+        Integer headerRowCount = columns.size();
+        //迭代数据
+        for(int i=0; i<rowDatas.size(); i++ ){
+            JSONObject rowDataMap = (JSONObject)rowDatas.get(i);
+            Row row = sheet.createRow(current * FETCH_COUNT + i + headerRowCount);
+            //直接取最后一行的列头信息
+            List<Map<String, Object>> headers = columns.get(columns.size()-1);
+            int index = 0;
+            //迭代列头
+            for(int j=0; j<headers.size(); j++){
+                Map<String, Object> headerMap = headers.get(j);
+                //隐藏的列不导出
+                if(headerMap.get("hidden")!=null && headerMap.get("hidden").equals(true)){
+                    continue;
+                }
+                Cell cell = row.createCell(index);
+                cell.setCellStyle(dataColumnStyle);
+                Object value = rowDataMap.get(headerMap.get("field"));
+                //判断是否有值提供者需要转义(此功能已经在datagrid的查询中封装，这里不需要处理了)
 //                if(headerMap.containsKey("provider")){
 //                    value = valueProviderUtils.setDisplayText(headerMap.get("provider").toString(), value, null);
 //                }
-				cell.setCellValue(value == null ? null : value.toString());
-				index++;
-			}
-		}
-	}
-
-	/**
-	 * 导出一部分数据
-	 */
-	private class ExportDataThread implements Callable {
-    	int current;
-		Map<String, String> queryParams;
-	    String exportUrl;
-		HttpServletRequest request;
-
-	    ExportDataThread(int current, Map<String, String> queryParams, String exportUrl, HttpServletRequest request) {
-	    	this.current = current;
-	    	this.queryParams = queryParams;
-	    	this.exportUrl = exportUrl;
-	    	this.request = request;
-	    }
-
-	    @Override
-	    public JSONArray call() {
-		    return queryThreadData();
-	    }
-
-	    //构建每个线程导出的数据
-	    private JSONArray queryThreadData(){
-		    queryParams.put("page", String.valueOf(current+1));
-		    queryParams.put("rows", String.valueOf(FETCH_COUNT));
-		    String json = syncExecute(exportUrl, queryParams, "POST", request);
-		    //简单判断是JSONArray的话，就是不分页的list查询，总数直接取JSONArray
-		    if(json.trim().startsWith("[") && json.trim().endsWith("]")){
-			    return JSON.parseArray(json);
-		    }else {
-			    return (JSONArray) JSON.parseObject(json).get("rows");
-		    }
-	    }
+                cell.setCellValue(value == null ? null : value.toString());
+                index++;
+            }
+        }
     }
 
-	/**
-	 * 获取当前需要导出的总数
-	 * @param url
-	 * @param queryParams
-	 * @param request   为了数据权限
-	 * @return
-	 */
-	private int getCount(String url, Map<String, String> queryParams, HttpServletRequest request){
+    /**
+     * 导出一部分数据
+     */
+    private class ExportDataThread implements Callable {
+        int current;
+        Map<String, String> queryParams;
+        String exportUrl;
+        HttpServletRequest request;
+
+        ExportDataThread(int current, Map<String, String> queryParams, String exportUrl, HttpServletRequest request) {
+            this.current = current;
+            this.queryParams = queryParams;
+            this.exportUrl = exportUrl;
+            this.request = request;
+        }
+
+        @Override
+        public JSONArray call() {
+            return queryThreadData();
+        }
+
+        //构建每个线程导出的数据
+        private JSONArray queryThreadData(){
+            queryParams.put("page", String.valueOf(current+1));
+            queryParams.put("rows", String.valueOf(FETCH_COUNT));
+            String json = syncExecute(exportUrl, queryParams, "POST", request);
+            //简单判断是JSONArray的话，就是不分页的list查询，总数直接取JSONArray
+            if(json.trim().startsWith("[") && json.trim().endsWith("]")){
+                return JSON.parseArray(json);
+            }else {
+                return (JSONArray) JSON.parseObject(json).get("rows");
+            }
+        }
+    }
+
+    /**
+     * 获取当前需要导出的总数
+     * @param url
+     * @param queryParams
+     * @param request   为了数据权限
+     * @return
+     */
+    private int getCount(String url, Map<String, String> queryParams, HttpServletRequest request){
         queryParams.put("page", "1");
         queryParams.put("rows", "1");
         String json = syncExecute(url, queryParams, "POST", request);
         //简单判断是JSONArray的话，就是不分页的list查询，总数直接取JSONArray的长度
         if(json.trim().startsWith("[") && json.trim().endsWith("]")){
-        	return JSON.parseArray(json).size();
+            return JSON.parseArray(json).size();
         }else {
-	        return (int) JSON.parseObject(json).get("total");
+            return (int) JSON.parseObject(json).get("total");
         }
     }
 
@@ -309,20 +309,28 @@ public class ExportUtils {
             Row row = sheet.createRow(i);
             int colspanAdd = 0;
             int index = 0;
-            for (int j = 0; j < rowColumns.size(); j++) {
+            //迭代生成每一列，如果有hidden或者title为null的，则跳过
+            Iterator<Map<String, Object>> it = rowColumns.iterator();
+            //列号
+            int columnIndex=0;
+            while(it.hasNext()){
+                columnIndex++;
+//            for (int j = 0; j < rowColumns.size(); j++) {
                 //列头信息
-                Map<String, Object> columnMap = rowColumns.get(j);
+                Map<String, Object> columnMap = it.next();
                 //隐藏的列不导出
                 if(columnMap.get("hidden")!=null && columnMap.get("hidden").equals(true)){
-                	continue;
+                    it.remove();
+                    continue;
                 }
                 if(columnMap.get("title") == null){
+                    it.remove();
                     continue;
                 }
                 String headerTitle = columnMap.get("title").toString().replaceAll("\\n", "").trim();
                 //最后一行的列头，适应宽度
                 if( i == exportParam.getColumns().size() - 1){
-                    sheet.setColumnWidth(j, headerTitle.getBytes().length*2*256);
+                    sheet.setColumnWidth(columnIndex, headerTitle.getBytes().length*2*256);
 //                    sheet.autoSizeColumn(j, true);
                 }
                 Cell cell = row.createCell(index+colspanAdd);               //创建列头对应个数的单元格
@@ -339,36 +347,36 @@ public class ExportUtils {
                         colspanAdd = colspanAdd + colspan - 1;
                     }
                 }
-	            index++;
+                index++;
             }
         }
     }
 
-	/**
-	 * 同步调用远程方法
-	 * @param url
-	 * @param paramObj
-	 * @param httpMethod
-	 * @param request   为了数据权限
-	 * @return
-	 */
+    /**
+     * 同步调用远程方法
+     * @param url
+     * @param paramObj
+     * @param httpMethod
+     * @param request   为了数据权限
+     * @return
+     */
     private String syncExecute(String url, Object paramObj, String httpMethod, HttpServletRequest request){
         Response resp = null;
         try{
             Map<String, String> headersMap = new HashMap<>();
 //            headersMap.put("Content-Type", "application/json;charset=utf-8");
 //	            传入权限的SessionConstants.SESSION_ID(值为SessionId，需要注意和权限系统同步，毕竟框架不依赖权限系统)
-	        if(request != null) {
-		        Enumeration<String> enumeration = request.getHeaderNames();
+            if(request != null) {
+                Enumeration<String> enumeration = request.getHeaderNames();
 //		            param.put("SessionId", request.getHeader("SessionId"));
-		        while(enumeration.hasMoreElements()) {
-			        String key = enumeration.nextElement();
+                while(enumeration.hasMoreElements()) {
+                    String key = enumeration.nextElement();
                     if(key.trim().equalsIgnoreCase("Accept-Encoding")) {
                         continue;
                     }
-			        headersMap.put(key, request.getHeader(key));
-		        }
-	        }
+                    headersMap.put(key, request.getHeader(key));
+                }
+            }
 
             if("POST".equalsIgnoreCase(httpMethod)){
                 JSONObject paramJo = (JSONObject)JSONObject.toJSON(paramObj);
@@ -389,12 +397,12 @@ public class ExportUtils {
                             JSONObject valueJo = (JSONObject)entry.getValue();
                             //解决spring mvc参数注入@ModelAttribute Domain domain时，metadata作为Map类型的注入问题
                             for(Map.Entry<String,Object> tmpEntry:valueJo.entrySet()) {
-                            	if(tmpEntry.getValue() == null) continue;
+                                if(tmpEntry.getValue() == null) continue;
                                 param.put(entry.getKey() + "[" +tmpEntry.getKey()+"]", tmpEntry.getValue().toString());
                             }
                         }else {
-                        	//避免为空(null)的值(value)在okhttp调用时报错，这里就不传入了
-	                        if(entry.getValue() == null) continue;
+                            //避免为空(null)的值(value)在okhttp调用时报错，这里就不传入了
+                            if(entry.getValue() == null) continue;
 //                            String value = entry.getValue() == null ? null : entry.getValue().toString();
                             param.put(entry.getKey(),entry.getValue().toString());
                         }
@@ -406,24 +414,24 @@ public class ExportUtils {
 //                        .mediaType(MediaType.parse("application/json; charset=utf-8"))
 //                        .mediaType(MediaType.parse("application/x-www-form-urlencoded; charset=UTF-8"))
                         .build()
-		                //3小时过期
-		                .connTimeOut(1000L*60L*60L*3)
-		                .readTimeOut(1000L*60L*60L*3)
-		                .writeTimeOut(1000L*60L*60L*3)
+                        //3小时过期
+                        .connTimeOut(1000L*60L*60L*3)
+                        .readTimeOut(1000L*60L*60L*3)
+                        .writeTimeOut(1000L*60L*60L*3)
                         .execute();
             }else{ //GET方式
                 resp = OkHttpUtils
                         .get().headers(headersMap)
                         .url(url).params((Map)JSON.toJSON(paramObj))
                         .build()
-		                //3小时过期
-		                .connTimeOut(1000L*60L*60L*3)
-		                .readTimeOut(1000L*60L*60L*3)
-		                .writeTimeOut(1000L*60L*60L*3)
+                        //3小时过期
+                        .connTimeOut(1000L*60L*60L*3)
+                        .readTimeOut(1000L*60L*60L*3)
+                        .writeTimeOut(1000L*60L*60L*3)
                         .execute();
             }
             if(resp.isSuccessful()){
-	            log.info(String.format("远程调用["+url+"]成功,code:[%s], message:[%s]", resp.code(),resp.message()));
+                log.info(String.format("远程调用["+url+"]成功,code:[%s], message:[%s]", resp.code(),resp.message()));
                 return resp.body().string();
 //                String retVal = new String(resp.body().bytes(), "UTF-8");
 //                log.info("==============================================================");
