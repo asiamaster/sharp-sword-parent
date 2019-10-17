@@ -309,20 +309,28 @@ public class ExportUtils {
             Row row = sheet.createRow(i);
             int colspanAdd = 0;
             int index = 0;
-            for (int j = 0; j < rowColumns.size(); j++) {
+            //迭代生成每一列，如果有hidden或者title为null的，则跳过
+            Iterator<Map<String, Object>> it = rowColumns.iterator();
+            //列号
+            int columnIndex=0;
+            while(it.hasNext()){
+                columnIndex++;
+//            for (int j = 0; j < rowColumns.size(); j++) {
                 //列头信息
-                Map<String, Object> columnMap = rowColumns.get(j);
+                Map<String, Object> columnMap = it.next();
                 //隐藏的列不导出
                 if(columnMap.get("hidden")!=null && columnMap.get("hidden").equals(true)){
+                    it.remove();
                 	continue;
                 }
                 if(columnMap.get("title") == null){
+                    it.remove();
                     continue;
                 }
                 String headerTitle = columnMap.get("title").toString().replaceAll("\\n", "").trim();
                 //最后一行的列头，适应宽度
                 if( i == exportParam.getColumns().size() - 1){
-                    sheet.setColumnWidth(j, headerTitle.getBytes().length*2*256);
+                    sheet.setColumnWidth(columnIndex, headerTitle.getBytes().length*2*256);
 //                    sheet.autoSizeColumn(j, true);
                 }
                 Cell cell = row.createCell(index+colspanAdd);               //创建列头对应个数的单元格
