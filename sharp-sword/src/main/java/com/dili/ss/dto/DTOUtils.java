@@ -46,7 +46,7 @@ public class DTOUtils {
 	/**
 	 * 将DTOInstance或其代理对象统一还原回DTO对象
 	 *
-	 * @param obj DTO、DTO代理或DTO Instance
+	 * @param obj
 	 * @return 如果不是DTO对象实例或其代理对象，则返回null;
 	 */
 	public static DTO go(Object obj) {
@@ -55,7 +55,7 @@ public class DTOUtils {
 
 	/**
 	 * 获取DTO或实例的代理对象，支持默认方法
-	 * @param obj   DTO、DTO代理或DTO Instance
+	 * @param obj
 	 * @param withDef 是否支持默认接口方法
 	 * @return
 	 */
@@ -264,6 +264,16 @@ public class DTOUtils {
 	 * @return
 	 */
 	public static <T extends IDTO> T newInstance(Class<T> dtoClz) {
+		return newInstance(dtoClz, true);
+	}
+
+	/**
+	 * 根据创建DTO实例对象
+	 * @param dtoClz <T extends IDTO>接口
+	 * @param genDef 是否根据@FieldDef的defValue生成默认值
+	 * @return
+	 */
+	public static <T extends IDTO> T newInstance(Class<T> dtoClz, boolean genDef) {
 		Class<? extends IDTO> clazz = DTOInstance.cache.get(dtoClz);
 		try {
 			if(clazz == null){
@@ -271,7 +281,9 @@ public class DTOUtils {
 			}
 			T t = (T) clazz.newInstance();
 			//		 加入缺省值
-			generateDefaultValue(t.aget(), dtoClz);
+			if(genDef) {
+				generateDefaultValue(t.aget(), dtoClz);
+			}
 			return t;
 		} catch (InstantiationException e) {
 			return newDTO(dtoClz);
@@ -507,6 +519,20 @@ public class DTOUtils {
 	 * @return
 	 */
 	public static <T extends IDTO> T link(T master, IDTO second, Class<T> masterClazz) {
+		return link(master, second, masterClazz, false);
+	}
+
+	/**
+	 * 将两个DTO代理对象连接起来<br>
+	 * 要求两个DTO的字段没有重复的,有重复的则以master为准
+	 *
+	 * @param <T>
+	 * @param master
+	 * @param second
+	 * @param masterClazz
+	 * @return
+	 */
+	public static <T extends IDTO> T link(T master, IDTO second, Class<T> masterClazz, boolean isInstance) {
 		if (second == null) {
 			return master;
 		}
@@ -515,7 +541,7 @@ public class DTOUtils {
 		}
 		DTO temp = go(second);
 		temp.putAll(go(master));
-		return as(second, masterClazz);
+		return isInstance ? asInstance(second, masterClazz) : as(second, masterClazz);
 	}
 
 	//  ===================================  内部方法  ===================================
@@ -805,7 +831,7 @@ public class DTOUtils {
 	}
 
 	/**
-	 * 根据Meta生成默认值
+	 * 根据Meta(@FieldDef的defValue)生成默认值
 	 *
 	 * @param dtoData
 	 * @param proxyClz

@@ -264,6 +264,16 @@ public class DTOUtils {
 	 * @return
 	 */
 	public static <T extends IDTO> T newInstance(Class<T> dtoClz) {
+		return newInstance(dtoClz, true);
+	}
+
+	/**
+	 * 根据创建DTO实例对象
+	 * @param dtoClz <T extends IDTO>接口
+	 * @param genDef 是否根据@FieldDef的defValue生成默认值
+	 * @return
+	 */
+	public static <T extends IDTO> T newInstance(Class<T> dtoClz, boolean genDef) {
 		Class<? extends IDTO> clazz = DTOInstance.cache.get(dtoClz);
 		try {
 			if(clazz == null){
@@ -271,7 +281,9 @@ public class DTOUtils {
 			}
 			T t = (T) clazz.newInstance();
 			//		 加入缺省值
-			generateDefaultValue(t.aget(), dtoClz);
+			if(genDef) {
+				generateDefaultValue(t.aget(), dtoClz);
+			}
 			return t;
 		} catch (InstantiationException e) {
 			return newDTO(dtoClz);
@@ -819,7 +831,7 @@ public class DTOUtils {
 	}
 
 	/**
-	 * 根据Meta生成默认值
+	 * 根据Meta(@FieldDef的defValue)生成默认值
 	 *
 	 * @param dtoData
 	 * @param proxyClz
