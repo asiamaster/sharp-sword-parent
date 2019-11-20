@@ -119,7 +119,7 @@
         <!-- spring boot 基类  -->
 		<dependency>
 			<groupId>com.dili</groupId>
-			<artifactId>ss-core</artifactId>
+			<artifactId>ss-uid</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
         <!-- 集成tk-mapper -->
@@ -222,7 +222,7 @@
         <dependency>
             <groupId>com.dili</groupId>
             <artifactId>commons</artifactId>
-            <version>1.0.17-SNAPSHOT</version>
+            <version>1.0.18-SNAPSHOT</version>
         </dependency>
     
     </dependencies>
