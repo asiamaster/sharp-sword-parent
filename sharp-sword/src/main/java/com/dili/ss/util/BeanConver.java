@@ -152,6 +152,10 @@ public class BeanConver {
             String propertyName = descriptor.getName();
             if (!"class".equals(propertyName)) {
                 Method readMethod = descriptor.getReadMethod();
+                //可能该属性并没有getter方法
+                if(readMethod == null){
+                    continue;
+                }
                 Object result = null;
                 try {
                     result = readMethod.invoke(bean, new Object[0]);
