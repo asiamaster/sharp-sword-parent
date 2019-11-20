@@ -1,6 +1,7 @@
 package com.dili.ss.domain;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class EasyuiPageOutput {
 
     @Override
     public String toString() {
-        return JSON.toJSONString(this);
+        return JSON.toJSONString(this, SerializerFeature.IgnoreErrorGetter);
     }
 
     public List getFooter() {
