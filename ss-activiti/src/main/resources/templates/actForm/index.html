@@ -42,8 +42,8 @@
         <!-- 表格 -->
         <div region="center" style="width:100%;" height="auto">
             <!-- =========================================================表格========================================================= -->
-            <table class="easyui-datagrid" title="ActForm列表" id="grid" fitColumns="true" noheader="true" order="desc"
-                   pagination="true" pageSize="30" pageNumber="1" pagePosition="top" rownumbers="false" remoteSort="true"
+            <table class="easyui-datagrid" title="ActForm列表" id="grid" fitColumns="true" noheader="true" order="desc" pageList="[50,100,200]"
+                   pagination="true" pageSize="50" pageNumber="1" pagePosition="top" rownumbers="false" remoteSort="true"
                    loadMsg="数据加载中..." singleSelect="true" method="post" multiSort="false" sortName="created"
                    align="center" fit="true" striped="true" idField="id" data-options="onDblClickRow:openUpdate">
                 <thead>
@@ -267,7 +267,7 @@
                 }
             ]
         });
-            $('#grid').datagrid('getPanel').removeClass('lines-both lines-no lines-right lines-bottom').addClass("lines-bottom");
+            // $('#grid').datagrid('getPanel').removeClass('lines-both lines-no lines-right lines-bottom').addClass("lines-bottom");
             queryGrid();
         })
     </script>

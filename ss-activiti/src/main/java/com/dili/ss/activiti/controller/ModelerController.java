@@ -43,12 +43,19 @@ public class ModelerController implements ModelDataJsonConstants {
     /**
      * 创建模型页面
      * 需要传参closeUrl, 指定关闭时的页面跳转URL
+     * @param name
+     * @param key
+     * @param description
+     * @param category
      * @param request
-     * @param response
      */
-    @RequestMapping(value = "/create.html", method = {RequestMethod.GET})
-    public String createModel(HttpServletRequest request, HttpServletResponse response, RedirectAttributes attr) throws IOException {
-        Model model = activitiService.createModel("modelKey", "modelName", "description", null);
+    @RequestMapping(value = "/create.html", method = {RequestMethod.POST, RequestMethod.GET})
+    public String createModel(@RequestParam("name") String name,
+                              @RequestParam(value="key", required=false) String key,
+                              @RequestParam(value="description", required=false) String description,
+                              @RequestParam(value="category", required=false) String category,
+                              HttpServletRequest request, RedirectAttributes attr) throws IOException {
+        Model model = activitiService.createModel(key, name, description, category);
         attr.addAttribute("modelId", model.getId());
         attr.addAttribute("closeUrl", request.getParameter("closeUrl"));
         return "redirect:"+request.getContextPath()+"/modeler.html";

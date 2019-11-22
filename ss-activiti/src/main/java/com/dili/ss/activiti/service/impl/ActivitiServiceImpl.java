@@ -12,7 +12,6 @@ import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.editor.language.json.converter.BpmnJsonConverter;
-import org.activiti.editor.language.json.converter.BpmnJsonConverterUtil;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.impl.RepositoryServiceImpl;
@@ -102,7 +101,7 @@ public class ActivitiServiceImpl implements ActivitiService {
     public Model createModel(ActModelVO actModelVO) throws UnsupportedEncodingException {
         //初始化一个空模型
         Model model = repositoryService.newModel();
-        model.setKey(actModelVO.getKey());
+        model.setKey(StringUtils.defaultString(actModelVO.getKey()));
         model.setName(actModelVO.getName());
         model.setCategory(actModelVO.getCategory());
         model.setVersion(Integer.parseInt(String.valueOf(repositoryService.createModelQuery().modelKey(model.getKey()).count()+1)));
