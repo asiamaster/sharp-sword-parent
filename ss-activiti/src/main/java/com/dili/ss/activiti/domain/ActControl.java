@@ -5,12 +5,9 @@ import com.dili.ss.dto.IMybatisForceParams;
 import com.dili.ss.metadata.FieldEditor;
 import com.dili.ss.metadata.annotation.EditMode;
 import com.dili.ss.metadata.annotation.FieldDef;
-import java.util.Date;
+
 import javax.persistence.*;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import java.util.Date;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -133,4 +130,11 @@ public interface ActControl extends IBaseDomain, IMybatisForceParams {
     Date getCreated();
 
     void setCreated(Date created);
+
+    @Column(name = "`modified`")
+    @FieldDef(label="修改时间")
+    @EditMode(editor = FieldEditor.Datetime, required = false)
+    Date getModified();
+
+    void setModified(Date modified);
 }

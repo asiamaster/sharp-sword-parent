@@ -1,7 +1,9 @@
 <form id="form"  method="post" fit="true">
     <input name="id" id="id" type="hidden">
-    <input name="_processDefinitionId" id="_processDefinitionId" type="hidden">
-    <input name="_taskId" id="_taskId" type="hidden" >
+    <input name="processDefinitionId" id="processDefinitionId" type="hidden">
+    <input name="taskId" id="taskId" type="hidden" >
+    <input name="formKey" id="formKey" type="hidden" >
+    <input name="redirectUrl" id="redirectUrl" type="hidden" >
 
     <table style="padding:10px;" width="360px">
         <% for (actControl in actControls){ %>
@@ -14,7 +16,7 @@
                 <input class="easyui-textbox" name="${actControl.name}" id="${actControl.controlId}" style="${actControl.style!"width:100%"};" <% if(actControl.required == true){ %> required="true" <%}%> <% if(actControl.writable == false){ %> readonly="true" <%}%>
                        data-options="labelAlign:'right',labelWidth:90,label:'${actControl.label}' <%if(actControl.minLength != null && actControl.maxLength != null){%>, validType:'length[${actControl.minLength},${actControl.maxLength}]'<%}%>" />
                 <%}else if(actControl.type == 'combobox'){%>
-                <input name="${actControl.name}" id="${actControl.controlId}" style="${actControl.style!"width:100%"};" editable="false" panelWidth="auto" panelHeight="auto" <% if(actControl.required == true){ %> required="true" <%}%> <% if(actControl.writable == false){ %> readonly="true" <%}%>
+                <input name="${actControl.name}" id="${actControl.controlId}" style="<%if(isEmpty(actControl.style)){%>width:100%;<%}else{%>${actControl.style}<%}%>" editable="false" panelWidth="auto" panelHeight="auto" <% if(actControl.required == true){ %> required="true" <%}%> <% if(actControl.writable == false){ %> readonly="true" <%}%>
                        data-options="labelAlign:'right',labelWidth:90,label:'${actControl.label}'"/>
                 <%
                     var metaObj;

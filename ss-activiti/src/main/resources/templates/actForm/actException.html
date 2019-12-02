@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <title>document</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />    
+    <meta name="author" content="Teaism">
+    <link rel="stylesheet" href="" />
+    <style>
+        .error-page {
+            margin-top: calc(20% - 180px);
+            width: 500px;
+            text-align: center;
+            margin-left:  auto;
+            margin-right:  auto;
+        }
+        .guide .primary-btn {
+            padding: 5px 20px;
+            background-color: #118bde;
+            text-align: center;
+            vertical-align: middle;
+            color: #fff;
+            text-decoration: none;
+        }
+       
+    </style>
+    <script type="text/javascript">
+
+    </script>
+</head>
+<body>
+    <div class="error-page">
+        <div>
+            <img src="${contextPath}/common/image/error-404.png" alt="">
+        </div>
+        <h2>${msg}</h2>
+        <div class="guide">
+            <a href="#" onclick="history.go(-1)" class="primary-btn dili-btn">返回上一页</a>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+
+        </div>
+    </div>
+</body>
+</html>

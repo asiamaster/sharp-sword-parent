@@ -5,12 +5,9 @@ import com.dili.ss.dto.IMybatisForceParams;
 import com.dili.ss.metadata.FieldEditor;
 import com.dili.ss.metadata.annotation.EditMode;
 import com.dili.ss.metadata.annotation.FieldDef;
-import java.util.Date;
+
 import javax.persistence.*;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import java.util.Date;
 
 /**
  * 由MyBatis Generator工具自动生成
@@ -35,26 +32,34 @@ public interface ActForm extends IBaseDomain, IMybatisForceParams {
 
     void setFormKey(String formKey);
 
-    @Column(name = "`callback`")
-    @FieldDef(label="回调方法", maxLength = 20)
+    @Column(name = "`def_key`")
+    @FieldDef(label="任务定义key", maxLength = 50)
+    @EditMode(editor = FieldEditor.Text, required = true)
+    String getDefKey();
+
+    void setDefKey(String defKey);
+
+    @Column(name = "`action_url`")
+    @FieldDef(label="表单提交URL", maxLength = 120)
     @EditMode(editor = FieldEditor.Text, required = false)
-    String getCallback();
+    String getActionUrl();
 
-    void setCallback(String callback);
+    void setActionUrl(String actionUrl);
 
-    @Column(name = "`url`")
-    @FieldDef(label="URL", maxLength = 20)
+    @Column(name = "`task_url`")
+    @FieldDef(label="任务URL", maxLength = 120)
     @EditMode(editor = FieldEditor.Text, required = false)
-    String getUrl();
+    String getTaskUrl();
 
-    void setUrl(String url);
+    void setTaskUrl(String taskUrl);
 
-    @Column(name = "`template_uri`")
-    @FieldDef(label="模板URI", maxLength = 100)
+    @Column(name = "`redirect_url`")
+    @FieldDef(label="提交后重定向页面URL", maxLength = 120)
     @EditMode(editor = FieldEditor.Text, required = false)
-    String getTemplateUri();
+    String getRedirectUrl();
 
-    void setTemplateUri(String templateUri);
+    void setRedirectUrl(String redirectUrl);
+
 
     @Column(name = "`created`")
     @FieldDef(label="创建时间")
@@ -62,4 +67,11 @@ public interface ActForm extends IBaseDomain, IMybatisForceParams {
     Date getCreated();
 
     void setCreated(Date created);
+
+    @Column(name = "`modified`")
+    @FieldDef(label="修改时间")
+    @EditMode(editor = FieldEditor.Datetime, required = false)
+    Date getModified();
+
+    void setModified(Date modified);
 }

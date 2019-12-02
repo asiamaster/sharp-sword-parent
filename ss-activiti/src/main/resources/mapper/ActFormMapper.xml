@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.dili.activiti.dao.ActFormMapper">
-  <resultMap id="BaseResultMap" type="com.dili.ss.activiti.domain.ActForm">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="form_key" jdbcType="VARCHAR" property="formKey" />
-    <result column="callback" jdbcType="VARCHAR" property="callback" />
-    <result column="url" jdbcType="VARCHAR" property="url" />
-    <result column="template_uri" jdbcType="VARCHAR" property="templateUri" />
-    <result column="created" jdbcType="TIMESTAMP" property="created" />
-  </resultMap>
-  <sql id="Base_Column_List">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    id, form_key, callback, url, template_uri, created
-  </sql>
+
 
 </mapper>

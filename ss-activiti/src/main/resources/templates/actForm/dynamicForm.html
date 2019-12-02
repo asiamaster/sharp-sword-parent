@@ -1,40 +1,77 @@
- <#body>
-    <div >
-        <!-- =========================================================动态表单========================================================= -->
-        <div class="easyui-panel" style="width:100%;" align="center">
-            <#dynaForm/>
-        </div>
+<#body>
+<style>
+    .mask {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.3;
+        filter: alpha(opacity=30);
+        display: none;
+        background: #ccc;
+    }
+    .mask-msg {
+        position: absolute;
+        top: 50%;
+        margin-top: -20px;
+        padding: 10px 5px 10px 30px;
+        height: 36px;
+        border-width: 2px;
+        border-style: solid;
+        display: none;
+        border-color: #D4D4D4;
+        background: #ffffff 5px center;
+    }
+</style>
+<div id="actDynaForm">
+    <!-- =========================================================动态表单========================================================= -->
+    <div class="easyui-panel" style="width:100%;" align="center">
+        <#dynaForm/>
     </div>
-    <!-- ====================================================================================================================== -->
-    <!-- style & script 分隔线 -->
-    <!-- ====================================================================================================================== -->
-    <script type="text/javascript">
-        function openUpdate(){
-            var formData = {
-            <% for (actControl in actControls) {
-                if (actControl.value != null) {%>
-                    ${actControl.name}:'${actControl.value}',
-                <%
-                }
-            }%>
-            };
-            $('#form').form('load', formData);
+</div>
+<!-- ====================================================================================================================== -->
+<!-- style & script 分隔线 -->
+<!-- ====================================================================================================================== -->
+<script type="text/javascript">
+    /**
+     * 加载表单
+     */
+    function openUpdate(){
+        var formData = {
+        <% for (actControl in actControls) {
+            if (actControl.value != null) {%>
+        ${actControl.name}:'${actControl.value}',
+        <%
         }
+    }%>
+    };
+        $('#form').form('load', formData);
+    }
 
-        function submit(){
-            if(!$('#form').form("validate")){
-                return;
-            }
-            $("#submitBtn").linkbutton("disable");
-            var formData = $("#form").serializeObject();
-            <% if(processDefinitionId != null){%>
-                formData._processDefinitionId = '${processDefinitionId}';
-            <%}else if(taskId != null){%>
-                formData._taskId = '${taskId}';
-            <%}%>
+    /**
+     * 提交表单
+     */
+    function submit(){
+        if(!$('#form').form("validate")){
+            return;
+        }
+        $("#submitBtn").linkbutton("disable");
+        <% if(processDefinitionId != null){%>
+        $("#processDefinitionId").val('${processDefinitionId}')
+        <%}else if(taskId != null){%>
+        $("#taskId").val('${taskId}')
+        <%}%>
+        $("#formKey").val("${actForm.formKey}");
+        $("#redirectUrl").val("${actForm.redirectUrl}");
+        form.action = "${contextPath}${actForm.actionUrl}";
+        //提交表单
+        form.submit();
+
+    <#comment desc="注释ajax提交，改为form.submit()">
             $.ajax({
                 type: "POST",
-                url: "${contextPath}/actControl/submit.action",
+                url: "${contextPath}/actForm/submit.action",
                 data: formData,
                 processData:true,
                 dataType: "json",
@@ -52,13 +89,35 @@
                     swal('错误', '远程访问失败', 'error');
                 }
             });
-        }
+    </#comment>
+    }
 
-        /**
-         * 页面启动加载
-         */
-        $(function () {
-            openUpdate();
-        })
-    </script>
+    /**
+     * 页面启动加载
+     */
+    $(function () {
+        openUpdate();
+        <%if(cover){%>
+        //弹出加载层
+        $("<div class=\"datagrid-mask\"></div>").css({
+            display: "block",
+            position: "absolute",
+            left:"0%",
+            top:30,
+            width: $(".class-allNow-content-right").width(),
+            height: $(".class-allNow-content-right").height()
+        }).appendTo("#actDynaForm");
+        $("<div class=\"mask-msg\"></div>").html("请先签收任务...").css({
+            position: "fixed",
+            left: "50%",
+            top:($(window).height() / 2 + 20),
+            "line-height":"16px",
+            "-moz-opacity": "0.65",
+            "opacity":".65",
+            "filter": "alpha(opacity=65)",
+            width:"155px"
+        }).appendTo("#actDynaForm").css({display: "block"});
+        <%}%>
+    })
+</script>
 </#body>
