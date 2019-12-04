@@ -7,15 +7,14 @@ import com.dili.ss.activiti.domain.ActForm;
 import com.dili.ss.activiti.rpc.BpmcFormRpc;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.dto.DTOUtils;
-import org.springframework.beans.BeansException;
+import com.dili.ss.util.SpringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,18 +24,20 @@ import java.util.Map;
  * BPM表单自动注册器
  */
 @Component
-public class BpmFormRegister implements ApplicationContextAware, EnvironmentAware {
+public class BpmFormRegister implements EnvironmentAware {
 
     @Autowired
     private BpmcFormRpc bpmcFormRpc;
     //流控中心http路径
     private String contextPath;
+    @Autowired
+    private SpringUtil springUtil;
 
     private static final String DEFAULT_CONTEXT_PATH = "http://bpmc.diligrp.com:8617";
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        Map<String, Object> controllerMap = applicationContext.getBeansWithAnnotation(org.springframework.stereotype.Controller.class);
+    @PostConstruct
+    public void init() {
+        Map<String, Object> controllerMap = springUtil.applicationContext().getBeansWithAnnotation(org.springframework.stereotype.Controller.class);
         //存放所有扫描到的需要注册的动态表单
         List<ActForm> actFormList = new ArrayList<>();
         for(Map.Entry<String, Object> entry : controllerMap.entrySet()){
@@ -91,6 +92,6 @@ public class BpmFormRegister implements ApplicationContextAware, EnvironmentAwar
 
     @Override
     public void setEnvironment(Environment environment) {
-        contextPath = environment.getProperty("bpmc.contextPath", DEFAULT_CONTEXT_PATH);
+        contextPath = environment.getProperty("bpm.server.address", DEFAULT_CONTEXT_PATH);
     }
 }

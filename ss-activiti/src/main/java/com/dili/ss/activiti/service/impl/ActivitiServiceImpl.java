@@ -21,6 +21,7 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ModelQuery;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.apache.commons.io.IOUtils;
@@ -62,6 +63,8 @@ public class ActivitiServiceImpl implements ActivitiService {
     private ObjectMapper objectMapper;
     @Autowired
     private ProcessEngine processEngine;
+    @Autowired
+    private FormService formService;
     @Autowired
     private SpringProcessEngineConfiguration springProcessEngineConfiguration;
 
@@ -227,7 +230,7 @@ public class ActivitiServiceImpl implements ActivitiService {
                     .deploy();
         } catch (org.activiti.bpmn.exceptions.XMLException e) {
             e.printStackTrace();
-            throw new ActivitiException("流程节点的id不能以数字开头");
+            throw new ActivitiException(e.getMessage());
         }
         modelData.setDeploymentId(deployment.getId());
         repositoryService.saveModel(modelData);
@@ -519,6 +522,13 @@ public class ActivitiServiceImpl implements ActivitiService {
                 .singleResult();
         //pi == null说明流程实例结束了
         return pi == null ? true : false;
+    }
+
+    @Override
+    public String getLatestFormKeyByProcDefKey(String procDefKey) {
+        //获取最新流程定义的formKey
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(procDefKey).latestVersion().singleResult();
+        return formService.getStartFormKey(processDefinition.getId());
     }
 
     /**

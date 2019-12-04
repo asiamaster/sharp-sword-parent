@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
+/**
+ * 工作流中台服务
+ */
 public interface ActivitiService extends ModelDataJsonConstants {
     /**
      * 创建设计器模型(重载)
@@ -170,4 +173,11 @@ public interface ActivitiService extends ModelDataJsonConstants {
      * @return
      */
     boolean isFinished2(String processInstanceId);
+
+    /**
+     * 根据流程定义key获取最新的formKey
+     * @param procDefKey
+     * @return
+     */
+    String getLatestFormKeyByProcDefKey(String procDefKey);
 }
