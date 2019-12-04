@@ -7,6 +7,7 @@ import com.dili.ss.activiti.service.ActFormService;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.exception.ParamErrorException;
+import com.dili.ss.util.SpringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -218,7 +219,7 @@ public class ActFormController {
         }
         String redirectUrl = variables.get("redirectUrl");
         if(StringUtils.isBlank(redirectUrl)){
-            redirectUrl = "http://bpmc.diligrp.com:8617/task/taskCenter.html";
+            redirectUrl = SpringUtil.getProperty("bpmc.server.address") + "/task/taskCenter.html";
         }
         return "redirect:"+redirectUrl;
     }
