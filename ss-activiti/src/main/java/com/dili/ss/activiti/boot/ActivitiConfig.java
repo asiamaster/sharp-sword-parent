@@ -12,6 +12,7 @@ import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.activiti.spring.boot.ProcessEngineConfigurationConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -25,6 +26,7 @@ import java.util.List;
  * @since 1.0
  */
 @Configuration
+@ConditionalOnExpression("'${activiti.enable}'=='true'")
 public class ActivitiConfig implements ProcessEngineConfigurationConfigurer {
     @Value("${activiti.dbIdentityUsed:false}")
     private String dbIdentityUsed;

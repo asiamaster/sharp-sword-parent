@@ -652,8 +652,9 @@ public class DTOUtils {
 					try {
 						dto.put(fieldName, method.invoke(source));
 					} catch (Exception ex) {
-						logger.warn(TRANS_PROXY_ERROR);
-						throw new DTOProxyException(TRANS_PROXY_ERROR);
+						//忽略转换异常的字段
+//						logger.warn(TRANS_PROXY_ERROR+ex.getMessage());
+//						throw new DTOProxyException(TRANS_PROXY_ERROR+ex.getMessage());
 					}
 
 				}
