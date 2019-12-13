@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cglib.beans.BeanCopier;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
@@ -739,9 +740,14 @@ public class DTOUtils {
 
 			}
 			return instance;
+		}else{//source是普通javaBean
+			T instance = DTOUtils.newInstance(proxyClz);
+			BeanCopier beanCopier = BeanCopier.create(source.getClass(),DTOUtils.getInstanceClass(proxyClz),false);
+			beanCopier.copy(source,instance,null);
+			return instance;
 		}
-		logger.warn(INVALID_DELEGATE_ERROR);
-		throw new DTOProxyException(INVALID_DELEGATE_ERROR);
+//		logger.warn(INVALID_DELEGATE_ERROR);
+//		throw new DTOProxyException(INVALID_DELEGATE_ERROR);
 	}
 
 	/**

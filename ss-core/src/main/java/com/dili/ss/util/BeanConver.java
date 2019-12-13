@@ -31,6 +31,8 @@ import java.util.Map;
 public class BeanConver {
     private final static Logger LOG = LoggerFactory.getLogger(BeanConver.class);
 
+    public static Map<String,BeanCopier> beanCopierMap = new HashMap<String, BeanCopier>();
+
     /**
      * 实例类转换
      * 支持DTO、DTOInstance和javaBean转为javaBean
@@ -40,18 +42,25 @@ public class BeanConver {
      * @param <T> 源对象
      * @param <K> 目标对象
      */
-    public static<T,K> K copyBean(T source, Class<K> target ){
+    public static<T,K> K copyBean(T source, Class<K> target){
         if (source == null) {
             return null;
         }
-        BeanCopier beanCopier = BeanCopier.create(source.getClass(),target,false);
+        String beanKey = generateKey(source.getClass(), target);
+        BeanCopier copier = null;
+        if (!beanCopierMap.containsKey(beanKey)) {
+            copier = BeanCopier.create(source.getClass(), target, false);
+            beanCopierMap.put(beanKey, copier);
+        } else {
+            copier = beanCopierMap.get(beanKey);
+        }
         K result = null;
         try {
             result = (K)target.newInstance();
         } catch (Exception e) {
             LOG.error("实例转换出错");
         }
-        beanCopier.copy(source,result,null);
+        copier.copy(source,result,null);
         return result;
     }
 
@@ -99,7 +108,14 @@ public class BeanConver {
         if(CollectionUtils.isEmpty(source)){
             return new ArrayList<>();
         }
-        BeanCopier beanCopier = BeanCopier.create(source.get(0).getClass(),target,false);
+        String beanKey = generateKey(source.getClass(), target);
+        BeanCopier copier = null;
+        if (!beanCopierMap.containsKey(beanKey)) {
+            copier = BeanCopier.create(source.getClass(), target, false);
+            beanCopierMap.put(beanKey, copier);
+        } else {
+            copier = beanCopierMap.get(beanKey);
+        }
         for(T af : source){
             K af1 = null;
             try {
@@ -107,7 +123,7 @@ public class BeanConver {
             } catch (Exception e) {
                 LOG.error("实例转换出错");
             }
-            beanCopier.copy(af,af1,null);
+            copier.copy(af,af1,null);
             list.add(af1);
         }
         return list;
@@ -287,14 +303,21 @@ public class BeanConver {
         BasePage<K> result = new BasePage<K>();
         List<T> sourceList = source.getDatas();
         for(T af : sourceList){
-            BeanCopier beanCopier = BeanCopier.create(af.getClass(),target,false);
+            String beanKey = generateKey(source.getClass(), target);
+            BeanCopier copier = null;
+            if (!beanCopierMap.containsKey(beanKey)) {
+                copier = BeanCopier.create(source.getClass(), target, false);
+                beanCopierMap.put(beanKey, copier);
+            } else {
+                copier = beanCopierMap.get(beanKey);
+            }
             K af1 = null;
             try {
                 af1 = (K)target.newInstance();
             } catch (Exception e) {
                 LOG.error("实例转换出错");
             }
-            beanCopier.copy(af,af1,null);
+            copier.copy(af, af1,null);
             list.add(af1);
         }
         result.setDatas(list);
@@ -347,12 +370,15 @@ public class BeanConver {
         return result;
     }
 
+    private static String generateKey(Class<?> class1, Class<?> class2) {
+        return class1.toString() + class2.toString();
+    }
+
     private static boolean hasMethod(Class clazz, String methodName, Class<?>... parameterTypes ){
         try {
             clazz.getMethod(methodName, parameterTypes);
             return true;
         } catch (NoSuchMethodException e) {
-//            e.printStackTrace();
             return false;
         }
     }

@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cglib.beans.BeanCopier;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
@@ -41,7 +42,7 @@ public class DTOUtils {
 	private static final String TRANS_PROXY_ERROR = "转换DTO的代理对象出错！";
 	// 错误消息
 	private static final String TO_ENTITY_ERROR = "类为{0}的DTO对象转实体{1}出错!";
-
+	public static Map<String,BeanCopier> beanCopierMap = new HashMap<String, BeanCopier>();
 
 	/**
 	 * 将DTOInstance或其代理对象统一还原回DTO对象
@@ -732,16 +733,23 @@ public class DTOUtils {
 							method.invoke(instance, map.get(fieldName));
 						}
 					} catch (Exception ex) {
-						logger.warn(TRANS_PROXY_ERROR);
-						throw new DTOProxyException(TRANS_PROXY_ERROR);
+						//忽略转换异常的字段
+//						logger.warn(TRANS_PROXY_ERROR);
+//						throw new DTOProxyException(TRANS_PROXY_ERROR);
 					}
 				}
 
 			}
 			return instance;
+		}else{//source是普通javaBean
+//			T instance = DTOUtils.newInstance(proxyClz);
+//			BeanCopier beanCopier = BeanCopier.create(source.getClass(), DTOUtils.getInstanceClass(proxyClz),false);
+//			beanCopier.copy(source, instance,null);
+//			return instance;
+			return (T)BeanConver.copyBean(source, DTOUtils.getInstanceClass(proxyClz));
 		}
-		logger.warn(INVALID_DELEGATE_ERROR);
-		throw new DTOProxyException(INVALID_DELEGATE_ERROR);
+//		logger.warn(INVALID_DELEGATE_ERROR);
+//		throw new DTOProxyException(INVALID_DELEGATE_ERROR);
 	}
 
 	/**
@@ -884,4 +892,7 @@ public class DTOUtils {
 		}
 	}
 
+	private static String generateKey(Class<?> class1, Class<?> class2) {
+		return class1.toString() + class2.toString();
+	}
 }
