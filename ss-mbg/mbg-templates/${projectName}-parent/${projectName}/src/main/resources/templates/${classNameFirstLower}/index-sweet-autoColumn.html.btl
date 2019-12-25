@@ -99,7 +99,7 @@
         <!-- 中央布局 -->
         <!-- ====================================================================================================================== -->
         <!-- 表格 -->
-        <div region="center" style="width:100%;" height="auto">
+        <div region="center" style="width:100%;padding-top: 1px;" height="auto">
             <!-- =========================================================表格========================================================= -->
             <table class="easyui-datagrid" title="${className}列表" id="grid" fitColumns="true" noheader="true"
                    pagination="true" pageSize="30" pageNumber="1" pagePosition="top" rownumbers="false" remoteSort="false"
@@ -159,7 +159,6 @@
     <div id="dlg" class="easyui-dialog" resizable="false" constrain="true" shadow="true" draggable="false" title="${className}信息" style="padding:20px" modal="true" border="thin" closed="true"
          data-options="
 				iconCls: 'icon-save',
-				height: 480,
 				buttons: [{
 					text:'确认',
 					iconCls:'icon-ok',
