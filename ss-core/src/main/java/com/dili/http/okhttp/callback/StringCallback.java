@@ -1,8 +1,8 @@
 package com.dili.http.okhttp.callback;
 
-import java.io.IOException;
-
 import okhttp3.Response;
+
+import java.io.IOException;
 
 /**
  * Created by wm on 17/3/9.

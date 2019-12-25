@@ -1,12 +1,11 @@
 package com.dili.http.okhttp.request;
 
 import com.dili.http.okhttp.utils.Exceptions;
-
-import java.util.Map;
-
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+
+import java.util.Map;
 
 /**
  * Created by wm on 17/3/9.

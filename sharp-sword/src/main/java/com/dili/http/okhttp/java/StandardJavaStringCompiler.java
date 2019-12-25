@@ -1,6 +1,5 @@
 package com.dili.http.okhttp.java;
 
-import com.dili.ss.util.SpringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 编译String为class文件到指定目录

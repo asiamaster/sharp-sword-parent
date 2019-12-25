@@ -5,7 +5,6 @@ import com.dili.ss.activiti.consts.ActivitiConstants;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.image.exception.ActivitiImageException;
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

@@ -1,11 +1,11 @@
 package com.dili.http.okhttp.cookie.store;
 
+import okhttp3.Cookie;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-
-import okhttp3.Cookie;
 
 /**
  * from http://stackoverflow.com/questions/25461792/persistent-cookie-store-using-okhttp-2-on-android

@@ -2,10 +2,9 @@ package com.dili.http.okhttp.builder;
 
 import com.dili.http.okhttp.request.PostFileRequest;
 import com.dili.http.okhttp.request.RequestCall;
+import okhttp3.MediaType;
 
 import java.io.File;
-
-import okhttp3.MediaType;
 
 /**
  * Created by wm on 17/3/9.

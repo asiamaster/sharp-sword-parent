@@ -10,8 +10,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 
-import javax.annotation.PostConstruct;
-
 @Configuration
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActInitConfig {

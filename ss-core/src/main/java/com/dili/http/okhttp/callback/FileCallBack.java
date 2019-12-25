@@ -1,13 +1,12 @@
 package com.dili.http.okhttp.callback;
 
 import com.dili.http.okhttp.OkHttpUtils;
+import okhttp3.Response;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import okhttp3.Response;
 
 /**
  * Created by wm on 17/3/9.

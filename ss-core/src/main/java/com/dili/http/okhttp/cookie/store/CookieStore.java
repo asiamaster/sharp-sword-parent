@@ -1,9 +1,9 @@
 package com.dili.http.okhttp.cookie.store;
 
-import java.util.List;
-
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
+
+import java.util.List;
 
 public interface CookieStore
 {

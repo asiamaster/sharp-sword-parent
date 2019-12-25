@@ -3,6 +3,7 @@ package com.dili.http.okhttp.request;
 import com.dili.http.okhttp.OkHttpUtils;
 import com.dili.http.okhttp.builder.PostFormBuilder;
 import com.dili.http.okhttp.callback.Callback;
+import okhttp3.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.FileNameMap;
@@ -10,13 +11,6 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
-
-import okhttp3.FormBody;
-import okhttp3.Headers;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 /**
  * Created by wm on 17/3/9.

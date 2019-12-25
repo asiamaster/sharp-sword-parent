@@ -1,8 +1,7 @@
 package com.dili.ss.activiti.domain;
 
-import java.io.Serializable;
-
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * @author asiamaster

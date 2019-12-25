@@ -2,12 +2,11 @@ package com.dili.http.okhttp.request;
 
 import com.dili.http.okhttp.callback.Callback;
 import com.dili.http.okhttp.utils.Exceptions;
-
-import java.util.Map;
-
 import okhttp3.Headers;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+
+import java.util.Map;
 
 /**
  * Created by wm on 17/3/9.

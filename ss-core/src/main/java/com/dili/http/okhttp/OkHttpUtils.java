@@ -1,21 +1,15 @@
 package com.dili.http.okhttp;
 
-import com.dili.http.okhttp.builder.GetBuilder;
-import com.dili.http.okhttp.builder.HeadBuilder;
-import com.dili.http.okhttp.builder.OtherRequestBuilder;
-import com.dili.http.okhttp.builder.PostFileBuilder;
-import com.dili.http.okhttp.builder.PostFormBuilder;
-import com.dili.http.okhttp.builder.PostStringBuilder;
+import com.dili.http.okhttp.builder.*;
 import com.dili.http.okhttp.callback.Callback;
 import com.dili.http.okhttp.request.RequestCall;
 import com.dili.http.okhttp.utils.Platform;
-
-import java.io.IOException;
-import java.util.concurrent.Executor;
-
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
+
+import java.io.IOException;
+import java.util.concurrent.Executor;
 
 /**
  * Created by wm on 17/3/9.

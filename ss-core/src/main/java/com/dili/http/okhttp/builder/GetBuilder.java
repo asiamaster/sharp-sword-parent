@@ -6,7 +6,8 @@ import com.dili.http.okhttp.request.RequestCall;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Created by wm on 17/3/9.

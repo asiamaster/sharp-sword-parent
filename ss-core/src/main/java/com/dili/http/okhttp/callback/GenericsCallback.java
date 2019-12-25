@@ -1,9 +1,9 @@
 package com.dili.http.okhttp.callback;
 
+import okhttp3.Response;
+
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
-
-import okhttp3.Response;
 
 /**
  * Created by JimGong on 2016/6/23.

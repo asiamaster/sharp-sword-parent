@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.dao.mapper.CommonMapper;
 import com.dili.ss.metadata.FieldMeta;
 import com.dili.ss.metadata.ValuePair;
-import com.dili.ss.metadata.ValuePairImpl;
 import com.dili.ss.metadata.ValueProvider;
 import com.dili.ss.util.SpringUtil;
 import org.apache.commons.collections.map.HashedMap;

@@ -1,13 +1,11 @@
 package com.dili.ss.quartz.job;
 
-import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.quartz.TaskUtils;
 import com.dili.ss.quartz.domain.QuartzConstants;
 import com.dili.ss.quartz.domain.ScheduleJob;
 import com.dili.ss.quartz.domain.ScheduleMessage;
 import com.dili.ss.quartz.listener.SchedulerRetryListener;
 import com.github.rholder.retry.*;
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.quartz.DisallowConcurrentExecution;

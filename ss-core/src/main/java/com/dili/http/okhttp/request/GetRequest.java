@@ -1,9 +1,9 @@
 package com.dili.http.okhttp.request;
 
-import java.util.Map;
-
 import okhttp3.Request;
 import okhttp3.RequestBody;
+
+import java.util.Map;
 
 /**
  * Created by wm on 17/3/9.

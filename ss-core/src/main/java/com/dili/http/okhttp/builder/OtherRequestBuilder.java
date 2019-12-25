@@ -2,7 +2,6 @@ package com.dili.http.okhttp.builder;
 
 import com.dili.http.okhttp.request.OtherRequest;
 import com.dili.http.okhttp.request.RequestCall;
-
 import okhttp3.RequestBody;
 
 /**

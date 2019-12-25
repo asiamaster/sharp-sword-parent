@@ -2,12 +2,11 @@ package com.dili.http.okhttp.cookie;
 
 import com.dili.http.okhttp.cookie.store.CookieStore;
 import com.dili.http.okhttp.utils.Exceptions;
-
-import java.util.List;
-
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
+
+import java.util.List;
 
 /**
  * Created by wm on 17/3/9.

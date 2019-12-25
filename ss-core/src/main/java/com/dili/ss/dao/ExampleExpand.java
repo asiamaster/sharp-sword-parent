@@ -1,6 +1,5 @@
 package com.dili.ss.dao;
 
-import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.util.StringUtil;
 

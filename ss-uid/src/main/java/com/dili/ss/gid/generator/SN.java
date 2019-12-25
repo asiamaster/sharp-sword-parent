@@ -22,6 +22,7 @@ public class SN {
 
 	private long sequence = 0L;
 
+
     public static void main(String[] args) {
         SN sn = new SN();
         for (int i=0; i<10; i++) {

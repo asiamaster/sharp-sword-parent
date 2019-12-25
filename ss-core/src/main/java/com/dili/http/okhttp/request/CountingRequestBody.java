@@ -2,14 +2,9 @@ package com.dili.http.okhttp.request;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okio.*;
 
 import java.io.IOException;
-
-import okio.Buffer;
-import okio.BufferedSink;
-import okio.ForwardingSink;
-import okio.Okio;
-import okio.Sink;
 
 /**
  * Decorates an OkHttp request body to count the number of bytes written when writing it. Can

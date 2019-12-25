@@ -1,13 +1,9 @@
 package com.dili.http.okhttp.cookie.store;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
+
+import java.util.*;
 
 /**
  * Created by wm on 17/3/9.
