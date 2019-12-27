@@ -25,7 +25,7 @@
     <parent>
 		<artifactId>sharp-sword-parent</artifactId>
 		<groupId>com.dili</groupId>
-		<version>3.5.3-SNAPSHOT</version>
+		<version>3.6.0-SNAPSHOT</version>
 	</parent>
 
     <build>
@@ -80,7 +80,7 @@
             <plugin>
                 <groupId>org.mybatis.generator</groupId>
                 <artifactId>mybatis-generator-maven-plugin</artifactId>
-                <version>1.3.5</version>
+                <version>1.4.0</version>
                 <configuration>
                     <configurationFile>${basedir}/src/main/resources/generator/generatorConfig.xml</configurationFile>
                     <overwrite>true</overwrite>
@@ -88,26 +88,9 @@
                 </configuration>
                 <dependencies>
                     <dependency>
-                        <groupId>mysql</groupId>
-                        <artifactId>mysql-connector-java</artifactId>
-                        <version>${mysql.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>tk.mybatis</groupId>
-                        <artifactId>mapper</artifactId>
-                        <version>${mapper.version}</version>
-                    </dependency>
-                    <dependency>
                         <groupId>com.dili</groupId>
-                        <artifactId>sharp-sword</artifactId>
+                        <artifactId>ss-mbg</artifactId>
                         <version>${project.parent.version}</version>
-                        <!--<scope>system</scope>-->
-                        <!--<systemPath>${\project.basedir}/lib/sharp-sword-1.5.4-SNAPSHOT.jar</systemPath>-->
-                    </dependency>
-                    <dependency>
-                        <groupId>com.ibeetl</groupId>
-                        <artifactId>beetl</artifactId>
-                        <version>2.9.9</version>
                     </dependency>
                 </dependencies>
             </plugin>

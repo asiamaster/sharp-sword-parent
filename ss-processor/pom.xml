@@ -15,7 +15,7 @@
     <parent>
         <artifactId>sharp-sword-parent</artifactId>
         <groupId>com.dili</groupId>
-        <version>3.5.3-SNAPSHOT</version>
+        <version>3.6.0-SNAPSHOT</version>
     </parent>
     <build>
         <!-- 资源文件过滤 -->
