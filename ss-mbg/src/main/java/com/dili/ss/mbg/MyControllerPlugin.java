@@ -37,8 +37,8 @@ public class MyControllerPlugin extends PluginAdapter {
     @Override
     public void setProperties(Properties properties) {
         super.setProperties(properties);
-
     }
+
     @Override
     public boolean validate(List<String> warnings) {
         boolean valid = true;
@@ -160,7 +160,7 @@ public class MyControllerPlugin extends PluginAdapter {
         clazz.addImportedType(ApiImplicitParam.class.getName());
 
         addIndexMethod(clazz, unit);
-        addListMethod(clazz, unit);
+//        addListMethod(clazz, unit);
         addListPageMethod(clazz, unit);
         addInsertMethod(clazz, unit);
         addUpdateMethod(clazz, unit);
@@ -181,6 +181,12 @@ public class MyControllerPlugin extends PluginAdapter {
 
         listMethod.addAnnotation("@ApiOperation(\"跳转到" + unit.getType().getShortName() + "页面\")");
         listMethod.addAnnotation("@RequestMapping(value=\"/index.html\", method = RequestMethod.GET)");
+
+        listMethod.addJavaDocLine("/**");
+        listMethod.addJavaDocLine(" * 跳转到" + unit.getType().getShortName() + "页面");
+        listMethod.addJavaDocLine(" * @param modelMap");
+        listMethod.addJavaDocLine(" * @return String");
+        listMethod.addJavaDocLine(" */");
         clazz.addMethod(listMethod);
     }
 
@@ -211,6 +217,12 @@ public class MyControllerPlugin extends PluginAdapter {
         sb.append("\t})");
         listMethod.addAnnotation(sb.toString());
         listMethod.addAnnotation("@RequestMapping(value=\"/list.action\", method = {RequestMethod.GET, RequestMethod.POST})");
+
+        listMethod.addJavaDocLine("/**");
+        listMethod.addJavaDocLine(" * 查询"+baseModelJavaType.getShortName() + "，返回列表信息");
+        listMethod.addJavaDocLine(" * @param " + StringUtils.uncapitalize(baseModelJavaType.getShortName()));
+        listMethod.addJavaDocLine(" * @return List<"+baseModelJavaType.getShortName()+">");
+        listMethod.addJavaDocLine(" */");
         clazz.addMethod(listMethod);
     }
 
@@ -240,88 +252,113 @@ public class MyControllerPlugin extends PluginAdapter {
         sb.append("\t})");
         listPageMethod.addAnnotation(sb.toString());
         listPageMethod.addAnnotation("@RequestMapping(value=\"/listPage.action\", method = {RequestMethod.GET, RequestMethod.POST})");
+
+        listPageMethod.addJavaDocLine("/**");
+        listPageMethod.addJavaDocLine(" * 分页查询"+baseModelJavaType.getShortName() + "，返回easyui分页信息");
+        listPageMethod.addJavaDocLine(" * @param " + StringUtils.uncapitalize(baseModelJavaType.getShortName()));
+        listPageMethod.addJavaDocLine(" * @return String");
+        listPageMethod.addJavaDocLine(" * @throws Exception");
+        listPageMethod.addJavaDocLine(" */");
         clazz.addMethod(listPageMethod);
     }
 
     //添加insert方法
     private void addInsertMethod(TopLevelClass clazz, CompilationUnit unit){
         FullyQualifiedJavaType baseModelJavaType = unit.getType();
-        Method listMethod = new Method("insert");
+        Method method = new Method("insert");
         Parameter entityParameter = new Parameter(baseModelJavaType, StringUtils.uncapitalize(baseModelJavaType.getShortName()));
         if(!isDTO(unit)){
             entityParameter.addAnnotation("@ModelAttribute");
         }
-        listMethod.addParameter(0, entityParameter);
-        listMethod.setReturnType(new FullyQualifiedJavaType("@ResponseBody BaseOutput"));
-        listMethod.setVisibility(JavaVisibility.PUBLIC);
+        method.addParameter(0, entityParameter);
+        method.setReturnType(new FullyQualifiedJavaType("@ResponseBody BaseOutput"));
+        method.setVisibility(JavaVisibility.PUBLIC);
         List<String> bodyLines = new ArrayList<>();
         String contentLine1 = StringUtils.uncapitalize(baseModelJavaType.getShortName())+"Service.insertSelective("+entityParameter.getName()+");";
         String returnLine = "return BaseOutput.success(\"新增成功\");";
         bodyLines.add(contentLine1);
         bodyLines.add(returnLine);
-        listMethod.addBodyLines(bodyLines);
+        method.addBodyLines(bodyLines);
 
-        listMethod.addAnnotation("@ApiOperation(\"新增" + baseModelJavaType.getShortName() + "\")");
+        method.addAnnotation("@ApiOperation(\"新增" + baseModelJavaType.getShortName() + "\")");
         StringBuilder sb = new StringBuilder();
         sb.append("@ApiImplicitParams({"+LINE_SEPARATOR);
         sb.append("\t\t@ApiImplicitParam(name=\"" + baseModelJavaType.getShortName() + "\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的form信息\", required = true, dataType = \"string\")"+LINE_SEPARATOR);
         sb.append("\t})");
-        listMethod.addAnnotation(sb.toString());
-        listMethod.addAnnotation("@RequestMapping(value=\"/insert.action\", method = {RequestMethod.GET, RequestMethod.POST})");
-        clazz.addMethod(listMethod);
+        method.addAnnotation(sb.toString());
+        method.addAnnotation("@RequestMapping(value=\"/insert.action\", method = {RequestMethod.GET, RequestMethod.POST})");
+
+        method.addJavaDocLine("/**");
+        method.addJavaDocLine(" * 新增"+baseModelJavaType.getShortName() );
+        method.addJavaDocLine(" * @param customer");
+        method.addJavaDocLine(" * @return BaseOutput");
+        method.addJavaDocLine(" */");
+        clazz.addMethod(method);
     }
 
     //添加update方法
     private void addUpdateMethod(TopLevelClass clazz, CompilationUnit unit){
         FullyQualifiedJavaType baseModelJavaType = unit.getType();
-        Method listMethod = new Method("update");
+        Method method = new Method("update");
         Parameter entityParameter = new Parameter(baseModelJavaType, StringUtils.uncapitalize(baseModelJavaType.getShortName()));
         if(!isDTO(unit)){
             entityParameter.addAnnotation("@ModelAttribute");
         }
-        listMethod.addParameter(0, entityParameter);
-        listMethod.setReturnType(new FullyQualifiedJavaType("@ResponseBody BaseOutput"));
-        listMethod.setVisibility(JavaVisibility.PUBLIC);
+        method.addParameter(0, entityParameter);
+        method.setReturnType(new FullyQualifiedJavaType("@ResponseBody BaseOutput"));
+        method.setVisibility(JavaVisibility.PUBLIC);
         List<String> bodyLines = new ArrayList<>();
         String contentLine1 = StringUtils.uncapitalize(baseModelJavaType.getShortName())+"Service.updateSelective("+entityParameter.getName()+");";
         String returnLine = "return BaseOutput.success(\"修改成功\");";
         bodyLines.add(contentLine1);
         bodyLines.add(returnLine);
-        listMethod.addBodyLines(bodyLines);
+        method.addBodyLines(bodyLines);
 
-        listMethod.addAnnotation("@ApiOperation(\"修改" + baseModelJavaType.getShortName() + "\")");
+        method.addAnnotation("@ApiOperation(\"修改" + baseModelJavaType.getShortName() + "\")");
         StringBuilder sb = new StringBuilder();
         sb.append("@ApiImplicitParams({"+LINE_SEPARATOR);
         sb.append("\t\t@ApiImplicitParam(name=\"" + baseModelJavaType.getShortName() + "\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的form信息\", required = true, dataType = \"string\")"+LINE_SEPARATOR);
         sb.append("\t})");
-        listMethod.addAnnotation(sb.toString());
-        listMethod.addAnnotation("@RequestMapping(value=\"/update.action\", method = {RequestMethod.GET, RequestMethod.POST})");
-        clazz.addMethod(listMethod);
+        method.addAnnotation(sb.toString());
+        method.addAnnotation("@RequestMapping(value=\"/update.action\", method = {RequestMethod.GET, RequestMethod.POST})");
+
+        method.addJavaDocLine("/**");
+        method.addJavaDocLine(" * 修改"+baseModelJavaType.getShortName() );
+        method.addJavaDocLine(" * @param customer");
+        method.addJavaDocLine(" * @return BaseOutput");
+        method.addJavaDocLine(" */");
+        clazz.addMethod(method);
     }
 
     //添加delete方法
     private void addDeleteMethod(TopLevelClass clazz, CompilationUnit unit){
         FullyQualifiedJavaType baseModelJavaType = unit.getType();
-        Method listMethod = new Method("delete");
+        Method method = new Method("delete");
         Parameter entityParameter = new Parameter(new FullyQualifiedJavaType("Long"), "id");
-        listMethod.addParameter(0, entityParameter);
-        listMethod.setReturnType(new FullyQualifiedJavaType("@ResponseBody BaseOutput"));
-        listMethod.setVisibility(JavaVisibility.PUBLIC);
+        method.addParameter(0, entityParameter);
+        method.setReturnType(new FullyQualifiedJavaType("@ResponseBody BaseOutput"));
+        method.setVisibility(JavaVisibility.PUBLIC);
         List<String> bodyLines = new ArrayList<>();
         String contentLine1 = StringUtils.uncapitalize(baseModelJavaType.getShortName())+"Service.delete("+entityParameter.getName()+");";
         String returnLine = "return BaseOutput.success(\"删除成功\");";
         bodyLines.add(contentLine1);
         bodyLines.add(returnLine);
-        listMethod.addBodyLines(bodyLines);
+        method.addBodyLines(bodyLines);
 
-        listMethod.addAnnotation("@ApiOperation(\"删除" + baseModelJavaType.getShortName() + "\")");
+        method.addAnnotation("@ApiOperation(\"删除" + baseModelJavaType.getShortName() + "\")");
         StringBuilder sb = new StringBuilder();
         sb.append("@ApiImplicitParams({"+LINE_SEPARATOR);
         sb.append("\t\t@ApiImplicitParam(name=\"id\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的主键\", required = true, dataType = \"long\")"+LINE_SEPARATOR);
         sb.append("\t})");
-        listMethod.addAnnotation(sb.toString());
-        listMethod.addAnnotation("@RequestMapping(value=\"/delete.action\", method = {RequestMethod.GET, RequestMethod.POST})");
-        clazz.addMethod(listMethod);
+        method.addAnnotation(sb.toString());
+        method.addAnnotation("@RequestMapping(value=\"/delete.action\", method = {RequestMethod.GET, RequestMethod.POST})");
+
+        method.addJavaDocLine("/**");
+        method.addJavaDocLine(" * 删除"+baseModelJavaType.getShortName() );
+        method.addJavaDocLine(" * @param id");
+        method.addJavaDocLine(" * @return BaseOutput");
+        method.addJavaDocLine(" */");
+        clazz.addMethod(method);
     }
 
     //判断是否是DTO接口
