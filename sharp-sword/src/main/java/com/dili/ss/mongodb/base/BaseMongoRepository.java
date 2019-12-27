@@ -1,6 +1,7 @@
 package com.dili.ss.mongodb.base;
 
 import com.dili.ss.util.ReflectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -306,18 +307,14 @@ public class BaseMongoRepository<E>  {
         List<E> list = null;
         Criteria c = this.createCriteria(gtMap, ltMap, eqMap, gteMap, lteMap,
                 regexMap, inMap, neMap);
-        Sort sort = null;
-        if (orders != null && orders.size() > 0) {
-            sort = new Sort(orders);
-        }
         Query query = null;
         if (c == null) {
             query = new Query();
         } else {
             query = new Query(c);
         }
-        if (sort != null) {
-            query = query.with(sort);
+        if (CollectionUtils.isNotEmpty(orders)) {
+            query = query.with(Sort.by(orders));
         }
         if (pageSize > 0) {
             query.skip((pageIndex - 1) * pageSize);
@@ -391,12 +388,8 @@ public class BaseMongoRepository<E>  {
     public List<E> findListByPage(Criteria c, List<Order> orders, int pageIndex,
                                   int pageSize){
         Query query = new Query(c);
-        Sort sort = null;
-        if (orders != null && orders.size() > 0) {
-            sort = new Sort(orders);
-        }
-        if (sort != null) {
-            query = query.with(sort);
+        if (CollectionUtils.isNotEmpty(orders)) {
+            query = query.with(Sort.by(orders));
         }
         if (pageSize > 0) {
             query.skip((pageIndex - 1) * pageSize);
@@ -444,10 +437,8 @@ public class BaseMongoRepository<E>  {
             c.orOperator(orList);
         }
         query = new Query(c);
-        Sort sort = null;
-        if (orders != null && orders.size() > 0) {
-            sort = new Sort(orders);
-            query = query.with(sort);
+        if (CollectionUtils.isNotEmpty(orders)) {
+            query = query.with(Sort.by(orders));
         }
         if (pageSize > 0) {
             query.skip((pageIndex - 1) * pageSize);
