@@ -156,6 +156,14 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 		if(!streamDto.isEmpty()) {
 			dto.putAll(streamDto);
 		}
+		//body覆盖metadata
+		if(!streamDto.getMetadata().isEmpty()){
+			if(dto.getMetadata() == null){
+				dto.setMetadata(streamDto.getMetadata());
+			}else {
+				dto.getMetadata().putAll(streamDto.getMetadata());
+			}
+		}
 		T t = (T) DTOUtils.proxyInstance(dto, (Class<IDTO>) clazz);
 		asetErrorMsg(t, parameter);
 		return t;
