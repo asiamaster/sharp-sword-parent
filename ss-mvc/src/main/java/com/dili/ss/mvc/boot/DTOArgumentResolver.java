@@ -1,5 +1,7 @@
 package com.dili.ss.mvc.boot;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.dto.DTO;
 import com.dili.ss.dto.DTOUtils;
@@ -388,7 +390,13 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 			ServletInputStream servletInputStream = ((RequestFacade)webRequest.getNativeRequest()).getInputStream();
 			String inputString = InputStream2String(servletInputStream, "UTF-8");
 			if(StringUtils.isNotBlank(inputString)) {
-				JSONObject jsonObject = JSONObject.parseObject(inputString);
+				inputString = java.net.URLDecoder.decode(inputString, "UTF-8");
+				JSONObject jsonObject;
+				if(JSON.isValid(inputString)) {
+					jsonObject = JSONObject.parseObject(inputString);
+				}else{
+					jsonObject = JSONObject.parseObject(getJsonStrByQueryUrl(inputString));
+				}
 				for(Map.Entry<String, Object> entry : jsonObject.entrySet()){
 					//单独处理metadata
 					if(entry.getKey().startsWith("metadata[") && entry.getKey().endsWith("]")){
@@ -405,6 +413,34 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 		} catch (Exception e){
 			return DTOUtils.proxy(dto, clazz);
 		}
+	}
+
+	/**
+	 * 将url参数转为json对象
+	 *
+	 * @param paramStr
+	 * @returns {{}}
+	 */
+	public static String getJsonStrByQueryUrl(String paramStr){
+		//String paramStr = "a=a1&b=b1&c=c1";
+		String[] params = paramStr.split("&");
+		JSONObject obj = new JSONObject();
+		for (int i = 0; i < params.length; i++) {
+			String[] param = params[i].split("=");
+			if (param.length >= 2) {
+				String key = param[0];
+				String value = param[1];
+				for (int j = 2; j < param.length; j++) {
+					value += "=" + param[j];
+				}
+				try {
+					obj.put(key,value);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return obj.toString();
 	}
 
 	/**

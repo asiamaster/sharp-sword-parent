@@ -444,6 +444,7 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 			String inputString = InputStream2String(servletInputStream, "UTF-8");
 			if(StringUtils.isNotBlank(inputString)) {
 				JSONObject jsonObject = null;
+				inputString = java.net.URLDecoder.decode(inputString, "UTF-8");
 				if(JSON.isValid(inputString)) {
 					jsonObject = JSONObject.parseObject(inputString);
 				}else{
@@ -650,7 +651,7 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 	/**
 	 * 将url参数转为json对象
 	 *
-	 * @param str
+	 * @param paramStr
 	 * @returns {{}}
 	 */
 	public static String getJsonStrByQueryUrl(String paramStr){

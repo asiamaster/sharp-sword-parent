@@ -1,5 +1,7 @@
 package com.dili.ss.mvc.boot;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.dto.DTO;
 import com.dili.ss.dto.DTOUtils;
@@ -39,7 +41,6 @@ import static org.springframework.web.bind.support.WebArgumentResolver.UNRESOLVE
  * springMVC controller方法参数注入DTO
  * Created by asiamaster on 2017/8/2 0002.
  */
-@SuppressWarnings("all")
 public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 
 	@Override
@@ -48,7 +49,6 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 		Class<?> clazz = parameter.getParameterType();
 		if(clazz != null && IDTO.class.isAssignableFrom(clazz)){
@@ -69,30 +69,21 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 *            DTO对象的类，不允许为空
 	 * @return 正常情况下不可能为空，但如果程序内部有问题时只能以null返回
 	 */
-	@SuppressWarnings("unchecked")
 	protected <T extends IDTO> T getDTO(Class<T> clazz, NativeWebRequest webRequest, MethodParameter parameter) {
 		//处理restful调用时，传入的参数不在getParameterMap，而在getInputStream中的情况
 		//注解掉此处，修正URL上有问号参数，body也有内容时，没有取body的缺陷，此时body内容在servletInputStream中
 //		if(webRequest.getParameterMap().isEmpty()){
 //			return getDTO4Restful(clazz, webRequest, parameter);
 //		}
-
-		//构建fields Map，用于getParamValueAndConvert()
-		Map<String, Class<?>> fields = new HashMap<>();
-		for(Method method : clazz.getMethods()){
-			if(POJOUtils.isGetMethod(method) && method.getParameterTypes().length == 0){
-				fields.put(POJOUtils.getBeanField(method), method.getReturnType());
-			}
-		}
 		// 实例化一个DTO数据对象
-		DTO streamDto = getDTO4Restful(clazz, webRequest, parameter);
+		DTO streamDto = DTOUtils.go(getDTO4Restful(clazz, webRequest, parameter));
 		DTO dto = new DTO();
 		// 填充值
 		for (Map.Entry<String, String[]> entry : webRequest.getParameterMap().entrySet()) {
 			String attrName = entry.getKey();
 			//处理metadata，目前只支持一层
 			if(attrName.startsWith("metadata[") && attrName.endsWith("]")){
-				dto.setMetadata(attrName.substring(9, attrName.length()-1), getParamValueAndConvert(entry, fields));
+				dto.setMetadata(attrName.substring(9, attrName.length()-1), getParamValueByForce(entry.getValue()));
 			}else if (Character.isLowerCase(attrName.charAt(0))) {
 				//处理普通类型数组，前台传入的多个相同name的value是数组，这里key以[]结尾
 				//此时entry.getValue()是一个数组
@@ -110,25 +101,25 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 				}
 				//处理前台传参的key为xxx.xxx形式，设置参数的对象、DTO或Map属性
 				else if(attrName.split("\\.").length == 2){
-                    handleDotMapValue(dto, clazz, attrName, entry.getValue());
-                }
-                //处理普通属性
+					handleDotMapValue(dto, clazz, attrName, entry.getValue());
+				}
+				//处理普通属性
 				else{
 					Method method = getMethod(clazz, "get"+ attrName.substring(0, 1).toUpperCase() + attrName.substring(1));
 					if (method == null) {
-						dto.put(attrName, getParamValueAndConvert(entry, fields));
+						dto.put(attrName, getParamValueByForce(entry.getValue()));
 					} else {
 						//返回值为数组或List，统一在这里放List，在下面的代码将进行转换
 						if(List.class.isAssignableFrom(method.getReturnType()) || method.getReturnType().isArray()){
-							dto.put(attrName, Lists.newArrayList(getParamValueAndConvert(entry, fields)));
+							dto.put(attrName, Lists.newArrayList(getParamValueByForce(entry.getValue())));
 						}else{
-							dto.put(attrName, getParamValueAndConvert(entry, fields));
+							dto.put(attrName, getParamValueByForce(entry.getValue()));
 						}
 					}
 				}
 			}else{
-                dto.put(attrName, getParamValueAndConvert(entry, fields));
-            }
+				dto.put(attrName, getParamValueByForce(entry.getValue()));
+			}
 		}
 
 		//再循环一次DTO，把属性中处理成List的Array转成数组
@@ -154,11 +145,10 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 		if(!streamDto.isEmpty()) {
 			dto.putAll(streamDto);
 		}
-		T t = (T) DTOUtils.proxyInstance(dto, (Class<IDTO>) clazz);
+		T t = (T) DTOUtils.proxy(dto, (Class<IDTO>) clazz);
 		asetErrorMsg(t, parameter);
 		return t;
 	}
-	@SuppressWarnings("unchecked")
 	private Method getMethod(Class<?> clazz, String methodName){
 		try {
 			return clazz.getMethod(methodName);
@@ -167,54 +157,53 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 		}
 	}
 
-    /**
-     * 处理前台传参的key为xxx.xxx形式，设置参数的对象、DTO或Map属性
-     * @param dto
-     * @param clazz
-     * @param attrName
-     * @param entryValue
-     * @param <T>
-     */
-	@SuppressWarnings("unchecked")
-    private <T extends IDTO> void handleDotMapValue(DTO dto, Class<T> clazz, String attrName, Object entryValue){
-        String[] names = attrName.split("\\.");
-        String attrObjKey = names[1].trim();
-        //去掉属性名后面的[]
-        attrName = names[0].trim();
-        //有get方法的属性，需要判断返回值如果是Array或List，需要转换前台传的有多个相同name的value数组。
-        Method getMethod = null;
-        try {
-            getMethod = clazz.getMethod("get"+ attrName.substring(0, 1).toUpperCase() + attrName.substring(1));
-            //根据返回值判断value的类型
-            Class<?> returnType = getMethod.getReturnType();
-            //先初始化一个对象作为value
-            if(dto.get(attrName) == null){
-                if (returnType.isInterface() && IDTO.class.isAssignableFrom(returnType)){//初始化成DTO接口
-                    dto.put(attrName, DTOUtils.newInstance((Class<IDTO>)returnType));
-                }else if (!Map.class.isAssignableFrom(returnType)){//未实现Map接口，初始化成普通Java对象
-                    dto.put(attrName, returnType.newInstance());
-                }else{//初始化成Map
-                    dto.put(attrName, new HashMap<String, Object>());
-                }
-            }
-            //处理value中数据
-            if (returnType.isInterface() && IDTO.class.isAssignableFrom(returnType)){
-                ((IDTO)dto.get(attrName)).aset(attrObjKey, getParamValueByForce(entryValue));
-            }else if (!Map.class.isAssignableFrom(returnType)){
-                PropertyUtils.setProperty(dto.get(attrName), attrObjKey, getParamValueByForce(entryValue));
-            }else{
-                ((HashMap)dto.get(attrName)).put(attrObjKey, getParamValueByForce(entryValue));
-            }
-        } catch (NoSuchMethodException e) {
-            //没get方法的属性处理为HashMap
-            if(dto.get(attrName) == null) {
-                dto.put(attrName, new HashMap<String, Object>());
-            }
-            ((HashMap)dto.get(attrName)).put(attrObjKey, getParamValueByForce(entryValue));
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException ex) {
-            //其它异常不处理
-        }
-    }
+	/**
+	 * 处理前台传参的key为xxx.xxx形式，设置参数的对象、DTO或Map属性
+	 * @param dto
+	 * @param clazz
+	 * @param attrName
+	 * @param entryValue
+	 * @param <T>
+	 */
+	private <T extends IDTO> void handleDotMapValue(DTO dto, Class<T> clazz, String attrName, Object entryValue){
+		String[] names = attrName.split("\\.");
+		String attrObjKey = names[1].trim();
+		//去掉属性名后面的[]
+		attrName = names[0].trim();
+		//有get方法的属性，需要判断返回值如果是Array或List，需要转换前台传的有多个相同name的value数组。
+		Method getMethod = null;
+		try {
+			getMethod = clazz.getMethod("get"+ attrName.substring(0, 1).toUpperCase() + attrName.substring(1));
+			//根据返回值判断value的类型
+			Class<?> returnType = getMethod.getReturnType();
+			//先初始化一个对象作为value
+			if(dto.get(attrName) == null){
+				if (returnType.isInterface() && IDTO.class.isAssignableFrom(returnType)){//初始化成DTO接口
+					dto.put(attrName, DTOUtils.newDTO((Class<IDTO>)returnType));
+				}else if (!Map.class.isAssignableFrom(returnType)){//未实现Map接口，初始化成普通Java对象
+					dto.put(attrName, returnType.newInstance());
+				}else{//初始化成Map
+					dto.put(attrName, new HashMap<String, Object>());
+				}
+			}
+			//处理value中数据
+			if (returnType.isInterface() && IDTO.class.isAssignableFrom(returnType)){
+				((IDTO)dto.get(attrName)).aset(attrObjKey, getParamValueByForce(entryValue));
+			}else if (!Map.class.isAssignableFrom(returnType)){
+				PropertyUtils.setProperty(dto.get(attrName), attrObjKey, getParamValueByForce(entryValue));
+			}else{
+				((HashMap)dto.get(attrName)).put(attrObjKey, getParamValueByForce(entryValue));
+			}
+		} catch (NoSuchMethodException e) {
+			//没get方法的属性处理为HashMap
+			if(dto.get(attrName) == null) {
+				dto.put(attrName, new HashMap<String, Object>());
+			}
+			((HashMap)dto.get(attrName)).put(attrObjKey, getParamValueByForce(entryValue));
+		} catch (IllegalAccessException | InstantiationException | InvocationTargetException ex) {
+			//其它异常不处理
+		}
+	}
 
 	/**
 	 * 处理Controller参数中的对象、DTO或Map属性
@@ -225,7 +214,6 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 * @param entryValue
 	 * @param <T>
 	 */
-	@SuppressWarnings("unchecked")
 	private <T extends IDTO> void handleMapValue(DTO dto, Class<T> clazz, String attrName, Object entryValue){
 		String attrObjKey = attrName.substring(attrName.lastIndexOf("[")+1, attrName.length()-1);
 		//去掉属性名后面的[]
@@ -239,7 +227,7 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 			//先初始化一个对象作为value
 			if(dto.get(attrName) == null){
 				if (returnType.isInterface() && IDTO.class.isAssignableFrom(returnType)){//初始化成DTO接口
-					dto.put(attrName, DTOUtils.newInstance((Class<IDTO>)returnType));
+					dto.put(attrName, DTOUtils.newDTO((Class<IDTO>)returnType));
 				}//这里特殊处理[数字]为数组
 				else if(StringUtils.isNumeric(attrObjKey)){
 					dto.put(attrName, new ArrayList<>());
@@ -254,23 +242,13 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 			}
 			//处理value中数据
 			if (returnType.isInterface() && IDTO.class.isAssignableFrom(returnType)){
-				Class<?> fieldType = getFieldType((Class<?>) returnType, attrObjKey);
-				if(fieldType == null){
-					((IDTO) dto.get(attrName)).aset(attrObjKey, getParamValueByForce(entryValue));
-				}else {
-					((IDTO) dto.get(attrName)).aset(attrObjKey, ReturnTypeHandlerFactory.convertValue(fieldType, getParamValueByForce(entryValue)));
-				}
+				((IDTO)dto.get(attrName)).aset(attrObjKey, getParamValueByForce(entryValue));
 			}//这里特殊处理[数字]为数组
 			else if(StringUtils.isNumeric(attrObjKey)){
 				((ArrayList)dto.get(attrName)).add(Integer.parseInt(attrObjKey), getParamValueByForce(entryValue));
 			}
 			else if (!Map.class.isAssignableFrom(returnType)){
-				Class<?> fieldType = getFieldType((Class<?>) returnType, attrObjKey);
-				if(fieldType == null){
-					PropertyUtils.setProperty(dto.get(attrName), attrObjKey, getParamValueByForce(entryValue));
-				}else {
-					PropertyUtils.setProperty(dto.get(attrName), attrObjKey, ReturnTypeHandlerFactory.convertValue(fieldType, getParamValueByForce(entryValue)));
-				}
+				PropertyUtils.setProperty(dto.get(attrName), attrObjKey, getParamValueByForce(entryValue));
 			}else{
 				((HashMap)dto.get(attrName)).put(attrObjKey, getParamValueByForce(entryValue));
 			}
@@ -293,7 +271,6 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 * @param entryValue
 	 * @param <T>
 	 */
-	@SuppressWarnings("unchecked")
 	private <T extends IDTO> void handleListObjValue(DTO dto, Class<T> clazz, String attrName, Object entryValue){
 		Object paramValue = null;
 		String attrObjKey = attrName.substring(attrName.lastIndexOf("][")+2, attrName.length()-1);
@@ -321,15 +298,10 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 					if (IDTO.class.isAssignableFrom((Class<?>) retType) && ((Class<?>) retType).isInterface()) {
 						ArrayList<Object> list = ((ArrayList<Object>)dto.get(attrName));
 						if(CollectionUtils.isEmpty(list) || list.size() <= index){
-							IDTO idto = DTOUtils.newInstance((Class<IDTO>) retType);
+							IDTO idto = DTOUtils.newDTO((Class<IDTO>) retType);
 							list.add(index, idto);
 						}
-						Class<?> fieldType = getFieldType((Class<?>) retType, attrObjKey);
-						if(fieldType == null){
-							((IDTO) list.get(index)).aset(attrObjKey, getParamValueByForce(entryValue));
-						}else{
-							((IDTO) list.get(index)).aset(attrObjKey, ReturnTypeHandlerFactory.convertValue(fieldType, getParamValueByForce(entryValue)));
-						}
+						((IDTO) list.get(index)).aset(attrObjKey, getParamValueByForce(entryValue));
 					}else if(Map.class.isAssignableFrom((Class<?>) retType)){
 						ArrayList<Object> list = ((ArrayList<Object>)dto.get(attrName));
 						if(CollectionUtils.isEmpty(list) || list.size() <= index){
@@ -343,12 +315,7 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 							Object obj = ((Class<?>) retType).newInstance();
 							list.add(index, obj);
 						}
-						Class<?> fieldType = getFieldType((Class<?>) retType, attrObjKey);
-						if(fieldType == null){
-							PropertyUtils.setProperty(list.get(index), attrObjKey, getParamValueByForce(entryValue));
-						}else{
-							PropertyUtils.setProperty(list.get(index), attrObjKey, ReturnTypeHandlerFactory.convertValue(fieldType, getParamValueByForce(entryValue)));
-						}
+						PropertyUtils.setProperty(list.get(index), attrObjKey, getParamValueByForce(entryValue));
 					}
 				}
 			}else{//没有泛型参数，处理为HashMap
@@ -373,22 +340,6 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	}
 
 	/**
-	 * 搜索clazz的fieldName属性，返回其类型
-	 * @param clazz
-	 * @param fieldName
-	 * @return
-	 */
-	private Class<?> getFieldType(Class<?> clazz, String fieldName){
-		for(Method method : clazz.getMethods()){
-			//getter方法，参数个数为0，字段名相同
-			if(POJOUtils.isGetMethod(method) && method.getParameterTypes().length == 0 && fieldName.equals(POJOUtils.getBeanField(method))){
-				return method.getReturnType();
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * 处理Controller参数中的List属性
 	 * @param dto
 	 * @param clazz
@@ -396,7 +347,6 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 * @param entryValue
 	 * @param <T>
 	 */
-	@SuppressWarnings("unchecked")
 	private <T extends IDTO> void handleListValue(DTO dto, Class<T> clazz, String attrName, Object entryValue){
 		Object paramValue = null;
 		int index = attrName.lastIndexOf("[");
@@ -433,15 +383,20 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 * @param <T>
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	private DTO getDTO4Restful(Class<? extends IDTO> clazz, NativeWebRequest webRequest, MethodParameter parameter) {
+	private  <T extends IDTO> T getDTO4Restful(Class<T> clazz, NativeWebRequest webRequest, MethodParameter parameter) {
 		// 实例化一个DTO数据对象
 		DTO dto = new DTO();
 		try {
 			ServletInputStream servletInputStream = ((RequestFacade)webRequest.getNativeRequest()).getInputStream();
 			String inputString = InputStream2String(servletInputStream, "UTF-8");
 			if(StringUtils.isNotBlank(inputString)) {
-				JSONObject jsonObject = JSONObject.parseObject(inputString);
+				inputString = java.net.URLDecoder.decode(inputString, "UTF-8");
+				JSONObject jsonObject;
+				if(JSON.isValid(inputString)) {
+					jsonObject = JSONObject.parseObject(inputString);
+				}else{
+					jsonObject = JSONObject.parseObject(getJsonStrByQueryUrl(inputString));
+				}
 				for(Map.Entry<String, Object> entry : jsonObject.entrySet()){
 					//单独处理metadata
 					if(entry.getKey().startsWith("metadata[") && entry.getKey().endsWith("]")){
@@ -451,11 +406,41 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 					}
 				}
 			}
-			return dto;
-		} catch (Exception e) {
+			return (T)DTOUtils.proxy(dto, clazz);
+		} catch (IOException e) {
 			e.printStackTrace();
-			return dto;
+			return DTOUtils.proxy(dto, clazz);
+		} catch (Exception e){
+			return DTOUtils.proxy(dto, clazz);
 		}
+	}
+
+	/**
+	 * 将url参数转为json对象
+	 *
+	 * @param paramStr
+	 * @returns {{}}
+	 */
+	public static String getJsonStrByQueryUrl(String paramStr){
+		//String paramStr = "a=a1&b=b1&c=c1";
+		String[] params = paramStr.split("&");
+		JSONObject obj = new JSONObject();
+		for (int i = 0; i < params.length; i++) {
+			String[] param = params[i].split("=");
+			if (param.length >= 2) {
+				String key = param[0];
+				String value = param[1];
+				for (int j = 2; j < param.length; j++) {
+					value += "=" + param[j];
+				}
+				try {
+					obj.put(key,value);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return obj.toString();
 	}
 
 	/**
@@ -464,7 +449,6 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 * @param parameter
 	 * @param <T>
 	 */
-	@SuppressWarnings("unchecked")
 	private <T extends IDTO> void asetErrorMsg(T t, MethodParameter parameter){
 		Validated validated = parameter.getParameter().getAnnotation(Validated.class);
 		//有Validated注解则进行校验
@@ -475,13 +459,12 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 
 	/**
 	 * 转换DTO值
-     * 用于处理restful中的参数
+	 * 用于处理restful中的参数
 	 * @param entry
 	 * @param clazz
 	 * @param <T>
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	private <T extends IDTO> Object convertValue(Map.Entry<String, Object> entry, Class<T> clazz){
 		Method getter = null;
 		try {
@@ -513,7 +496,7 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 						if (!(v instanceof Map)) {
 							return;
 						}
-						convertedValues.add(DTOUtils.proxyInstance(new DTO((Map) v), (Class<IDTO>) retType));
+						convertedValues.add(DTOUtils.proxy(new DTO((Map) v), (Class<IDTO>) retType));
 					});
 					return convertedValues;
 				}else{//根据泛型参数转换类型
@@ -525,13 +508,13 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 					if(values.get(0).getClass().equals(retType)){
 						return values;
 					}
-                    List<Object> convertedValues = new ArrayList<Object>(values.size());
+					List<Object> convertedValues = new ArrayList<Object>(values.size());
 					values.stream().forEach(v -> {
-                        //通过转换工厂减少if else， 提高效率
-                        Object convertedValue = ReturnTypeHandlerFactory.convertValue((Class<?>)retType, v);
-                        if(convertedValue != null){
-                            convertedValues.add(convertedValue);
-                        }
+						//通过转换工厂减少if else， 提高效率
+						Object convertedValue = ReturnTypeHandlerFactory.convertValue((Class<?>)retType, v);
+						if(convertedValue != null){
+							convertedValues.add(convertedValue);
+						}
 					});
 					return convertedValues;
 				}
@@ -543,29 +526,9 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 			if(!(obj instanceof Map)) {
 				return obj;
 			}
-			return DTOUtils.proxyInstance(new DTO((Map)obj), (Class<IDTO>) getter.getReturnType());
+			return DTOUtils.proxy(new DTO((Map)obj), (Class<IDTO>) getter.getReturnType());
 		}
 		return entry.getValue();
-	}
-
-
-	/**
-	 * 强制取参数的值，支持转型
-	 *
-	 * @param entry
-	 *            当前的值对象
-	 * @return 如果返回的字符串为空串,则认为是null
-	 */
-	@SuppressWarnings("unchecked")
-	private Object getParamValueAndConvert(Map.Entry<String, String[]> entry, Map<String, Class<?>> fields) {
-		String val = getParamValue(entry.getValue());
-		if(fields.containsKey(entry.getKey())){
-			if(String.class.equals(fields.get(entry.getKey()))){
-				return val;
-			}
-			return ReturnTypeHandlerFactory.convertValue(fields.get(entry.getKey()), val);
-		}
-		return val == null ? null : StringUtils.isBlank(val) ? null : val;
 	}
 
 	/**
@@ -575,7 +538,6 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 *            当前的值对象
 	 * @return 如果返回的字符串为空串,则认为是null
 	 */
-	@SuppressWarnings("unchecked")
 	private String getParamValueByForce(Object obj) {
 		String val = getParamValue(obj);
 		return val == null ? null : StringUtils.isBlank(val) ? null : val;
@@ -586,7 +548,6 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 * @param obj
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	private Object getParamObjValue(Object obj) {
 		return obj == null ? null : obj.getClass().isArray() ? java.io.File.class.isAssignableFrom(((Object[]) obj)[0].getClass()) ? null  : obj : obj;
 	}
@@ -598,7 +559,6 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 * @param obj
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	private String getParamValue(Object obj) {
 		return (String) (obj == null ? null : obj.getClass().isArray() ? java.io.File.class.isAssignableFrom(((Object[]) obj)[0].getClass()) ? null  : ((Object[]) obj)[0] : obj);
 	}
@@ -611,7 +571,6 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 * @return
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
 	public static String InputStream2String(InputStream in, String encoding) throws IOException {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		byte[] data = new byte[BUFFER_SIZE];

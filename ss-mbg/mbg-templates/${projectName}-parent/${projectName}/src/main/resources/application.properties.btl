@@ -21,3 +21,4 @@ druidFilter.enable=true
 #mongodb.enable=true
 #web配置,listener, filter, servlet
 web.enable=true
+web.instanceResolver=true
