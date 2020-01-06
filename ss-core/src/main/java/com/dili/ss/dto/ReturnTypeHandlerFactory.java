@@ -1,5 +1,6 @@
 package com.dili.ss.dto;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -36,6 +37,8 @@ public class ReturnTypeHandlerFactory {
         cache.put(LocalDateTime.class, new LocalDateTimeStrategy());
         cache.put(List.class, new ListStrategy());
         cache.put(String.class, new StringStrategy());
+        cache.put(Map.class, new MapStrategy());
+        cache.put(IDTO.class, new IDTOStrategy());
     }
 
     /**
@@ -81,6 +84,39 @@ public class ReturnTypeHandlerFactory {
                 return (String)value;
             }
             return value == null ? null :value.toString();
+        }
+    }
+
+    /**
+     * Map转换策略
+     */
+    private static class MapStrategy implements Strategy{
+
+        @Override
+        public Object convert(Object value) {
+            if(value instanceof Map){
+                return (Map)value;
+            }
+            return value == null ? null : JSONObject.parseObject(value.toString());
+        }
+    }
+
+    /**
+     * DTO转换策略
+     */
+    private static class IDTOStrategy implements Strategy{
+
+        @Override
+        public Object convert(Object value) {
+            if(value instanceof IDTO){
+                return (IDTO)value;
+            }
+            if(value == null){
+                return null;
+            }
+            DTO dto = new DTO();
+            dto.putAll(JSONObject.parseObject(value.toString()));
+            return DTOUtils.proxy(dto, (Class)DTOUtils.getDTOClass(value));
         }
     }
 
