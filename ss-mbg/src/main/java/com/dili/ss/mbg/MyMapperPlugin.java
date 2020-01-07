@@ -382,7 +382,6 @@ public class MyMapperPlugin extends PluginAdapter {
 	public boolean modelBaseRecordClassGenerated(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
 		//DTO在contextGenerateAdditionalJavaFiles中生成
 		if (isDTO) {
-
 			String dtoSuperInterface = "com.dili.ss.dto.IBaseDomain";
 			topLevelClass.setVisibility(JavaVisibility.PUBLIC);
 			//===============================  添加dto的父接口，在其它插件中用于判断是dto还是JavaBean ===============================

@@ -21,7 +21,7 @@
 		<!-- MyBatis Generator -->
 		<!-- Java接口和实体类 -->
 		<targetJavaProject>\${basedir}/src/main/java</targetJavaProject>
-		<targetMapperPackage>com.dili.${appName}.dao</targetMapperPackage>
+		<targetMapperPackage>com.dili.${appName}.mapper</targetMapperPackage>
 		<targetModelPackage>com.dili.${appName}.domain</targetModelPackage>
 		<targetServicePackage>com.dili.${appName}.service</targetServicePackage>
 		<targetProviderPackage>com.dili.${appName}.provider</targetProviderPackage>
@@ -36,7 +36,7 @@
 		<springloaded.version>1.2.8.RELEASE</springloaded.version>
 		<mapper.version>3.3.9</mapper.version>
 		<mysql.version>5.1.38</mysql.version>
-		<sharp-sword.version>2.3.2-SNAPSHOT</sharp-sword.version>
+		<sharp-sword.version>3.6.0-SNAPSHOT</sharp-sword.version>
 	</properties>
 
 	<!-- 注意： 这里必须要添加， 否者各种依赖有问题  -->
@@ -151,26 +151,11 @@
 					<verbose>true</verbose>
 				</configuration>
 				<dependencies>
-					<dependency>
-						<groupId>mysql</groupId>
-						<artifactId>mysql-connector-java</artifactId>
-						<version>\${mysql.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>tk.mybatis</groupId>
-						<artifactId>mapper</artifactId>
-						<version>\${mapper.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>com.dili</groupId>
-						<artifactId>sharp-sword</artifactId>
-						<version>\${sharp-sword.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>com.ibeetl</groupId>
-						<artifactId>beetl</artifactId>
-						<version>2.7.12</version>
-					</dependency>
+				    <dependency>
+                        <groupId>com.dili</groupId>
+                        <artifactId>ss-mbg</artifactId>
+                        <version>\${sharp-sword.version}</version>
+                    </dependency>
 				</dependencies>
 			</plugin>
 		</plugins>

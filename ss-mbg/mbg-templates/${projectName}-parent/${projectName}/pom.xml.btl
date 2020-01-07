@@ -23,8 +23,6 @@
         <targetXMLPackage>mapper</targetXMLPackage>
         <!--  依赖版本  -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mapper.version>3.3.9</mapper.version>
-        <mysql.version>5.1.38</mysql.version>
     </properties>
 
     <!-- 父工程定义 -->
