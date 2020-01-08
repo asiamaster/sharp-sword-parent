@@ -36,7 +36,6 @@ import com.dili.ss.util.POJOUtils;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import com.sun.tools.javac.code.Attribute;
-import com.sun.tools.javac.code.Scope;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import org.apache.commons.lang3.StringUtils;
@@ -127,16 +126,16 @@ public class DtoProcessor extends BaseProcessor {
             Boolean reuse = null;
             //没有属性，则判断默认值
             if(symbolAttributeMap.isEmpty()) {
-                Scope.Entry entry = compound.type.tsym.members().elems;
-                Iterator it = entry.scope.getElements().iterator();
-                while (it.hasNext()) {
-                    Symbol.MethodSymbol methodSymbol = (Symbol.MethodSymbol) it.next();
-                    Object reuseValue = methodSymbol.getDefaultValue().getValue();
-                    if ("reuse".equals(entry.sym.getSimpleName().toString())) {
-                        reuse = (boolean) reuseValue;
-                        break;
-                    }
-                }
+//                Scope.Entry entry = compound.type.tsym.members().elems;
+//                Iterator it = entry.scope.getElements().iterator();
+//                while (it.hasNext()) {
+//                    Symbol.MethodSymbol methodSymbol = (Symbol.MethodSymbol) it.next();
+//                    Object reuseValue = methodSymbol.getDefaultValue().getValue();
+//                    if ("reuse".equals(entry.sym.getSimpleName().toString())) {
+//                        reuse = (boolean) reuseValue;
+//                        break;
+//                    }
+//                }
             }else {
                 if (GenDTOMethod.class.getName().equals(compound.type.toString())) {
                     for (Map.Entry<Symbol.MethodSymbol, Attribute> entry : symbolAttributeMap.entrySet()) {

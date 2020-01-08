@@ -5,7 +5,7 @@ import com.dili.ss.metadata.FieldMeta;
 import com.dili.ss.metadata.MetadataUtils;
 import com.dili.ss.metadata.ObjectMeta;
 import org.apache.commons.lang3.StringUtils;
-import org.beetl.core.Tag;
+import org.beetl.core.tag.Tag;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 

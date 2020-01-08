@@ -5,7 +5,7 @@ import com.dili.ss.util.POJOUtils;
 import com.dili.ss.util.SpringUtil;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.beetl.core.Tag;
+import org.beetl.core.tag.Tag;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;

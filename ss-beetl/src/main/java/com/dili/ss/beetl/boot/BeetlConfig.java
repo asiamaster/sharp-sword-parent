@@ -1,9 +1,14 @@
 package com.dili.ss.beetl.boot;
 
 import com.dili.ss.beetl.CommonTagFactory;
-import org.beetl.core.*;
+import org.beetl.core.Format;
+import org.beetl.core.Function;
+import org.beetl.core.GroupTemplate;
+import org.beetl.core.VirtualAttributeEval;
 import org.beetl.core.resource.ClasspathResourceLoader;
 import org.beetl.core.resource.StringTemplateResourceLoader;
+import org.beetl.core.tag.Tag;
+import org.beetl.core.tag.TagFactory;
 import org.beetl.ext.spring.BeetlGroupUtilConfiguration;
 import org.beetl.ext.spring.BeetlSpringViewResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +82,7 @@ public class BeetlConfig {
     public BeetlSpringViewResolver getBeetlSpringViewResolver(@Qualifier("beetlGroupUtilConfiguration") BeetlGroupUtilConfiguration beetlGroupUtilConfiguration) {
         BeetlSpringViewResolver beetlSpringViewResolver = new BeetlSpringViewResolver();
         beetlSpringViewResolver.setContentType("text/html;charset=UTF-8");
-        beetlSpringViewResolver.setOrder(1);
+        beetlSpringViewResolver.setOrder(0);
         beetlSpringViewResolver.setPrefix("/templates/");
         beetlSpringViewResolver.setSuffix(".html");
         beetlSpringViewResolver.setConfig(beetlGroupUtilConfiguration);

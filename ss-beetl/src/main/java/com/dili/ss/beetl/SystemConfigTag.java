@@ -3,7 +3,7 @@ package com.dili.ss.beetl;
 import com.dili.ss.util.SpringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.beetl.core.BodyContent;
-import org.beetl.core.Tag;
+import org.beetl.core.tag.Tag;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

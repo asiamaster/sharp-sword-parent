@@ -2,13 +2,12 @@ package com.dili.http.okhttp.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 import java.security.Key;
+import java.util.Base64;
 
 /**
  * DES对称加密算法
@@ -31,9 +30,8 @@ public class DESEncryptUtil {
 	 */
 	public static String encrypt(String srcStr, String key) {
 		String strEncrypt = null;
-		BASE64Encoder base64en = new BASE64Encoder();
 		try {
-			strEncrypt = base64en.encode(encryptByte(srcStr.getBytes(charset), key));
+			strEncrypt = Base64.getEncoder().encodeToString(encryptByte(srcStr.getBytes(charset), key));
 		} catch (Exception e) {
 			log.error("加密异常:", e);
 			throw new RuntimeException("加密异常", e);
@@ -49,9 +47,8 @@ public class DESEncryptUtil {
 	 */
 	public static String encryptQuietly(String srcStr, String key) {
 		String strEncrypt = null;
-		BASE64Encoder base64en = new BASE64Encoder();
 		try {
-			strEncrypt = base64en.encode(encryptByteQuietly(srcStr.getBytes(charset), key));
+			strEncrypt = Base64.getEncoder().encodeToString(encryptByteQuietly(srcStr.getBytes(charset), key));
 		} catch (Exception e) {
 			return null;
 		}
@@ -65,15 +62,12 @@ public class DESEncryptUtil {
 	 * @return				明文
 	 */
 	public static String decrypt(String encryptStr, String key) {
-		BASE64Decoder base64De = new BASE64Decoder();
 		String strDecrypt = null;
 		try {
-			strDecrypt = new String(decryptByte(base64De.decodeBuffer(encryptStr), key), charset);
+			strDecrypt = new String(decryptByte(Base64.getDecoder().decode(encryptStr), key), charset);
 		} catch (Exception e) {
 			log.error("解密异常:", e);
 			throw new RuntimeException("解密异常",e);
-		} finally {
-			base64De = null;
 		}
 		return strDecrypt;
 	}
@@ -85,14 +79,11 @@ public class DESEncryptUtil {
 	 * @return				明文
 	 */
 	public static String decryptQuietly(String encryptStr, String key) {
-		BASE64Decoder base64De = new BASE64Decoder();
 		String strDecrypt = null;
 		try {
-			strDecrypt = new String(decryptByteQuietly(base64De.decodeBuffer(encryptStr), key), charset);
+			strDecrypt = new String(decryptByteQuietly(Base64.getDecoder().decode(encryptStr), key), charset);
 		} catch (Exception e) {
 			return null;
-		} finally {
-			base64De = null;
 		}
 		return strDecrypt;
 	}

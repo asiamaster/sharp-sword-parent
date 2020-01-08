@@ -25,7 +25,7 @@
     <parent>
 		<artifactId>sharp-sword-parent</artifactId>
 		<groupId>com.dili</groupId>
-		<version>3.6.0-SNAPSHOT</version>
+		<version>3.6.1-SNAPSHOT</version>
 	</parent>
 
     <build>
@@ -105,10 +105,12 @@
 			<artifactId>ss-mvc</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.ibeetl/beetl-framework-starter -->
         <dependency>
             <groupId>com.ibeetl</groupId>
-            <artifactId>beetl</artifactId>
-            <version>2.9.9</version>
+            <artifactId>beetl-framework-starter</artifactId>
+            <version>1.2.20.RELEASE</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.antlr</groupId>
@@ -116,6 +118,19 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+<!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.ibeetl/beetl &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.ibeetl</groupId>-->
+<!--            <artifactId>beetl</artifactId>-->
+<!--            <version>3.0.16.RELEASE</version>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.antlr</groupId>-->
+<!--                    <artifactId>antlr4-runtime</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
         <!-- beelt中用到，这里是换了个版本，为了去掉警告 -->
         <dependency>
             <groupId>org.antlr</groupId>

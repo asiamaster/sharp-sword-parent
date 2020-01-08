@@ -30,7 +30,6 @@
 //                  不见满街漂亮妹，哪个归得程序员？
 package com.dili.ss.processor.processor;
 
-import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
@@ -46,7 +45,6 @@ import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.Properties;
 
 /**
@@ -101,16 +99,16 @@ public abstract class BaseProcessor extends AbstractProcessor {
      * @param element
      * @return
      */
-    protected int getLine(Element element){
-        Object javacSourcePosition = ((JavacElements) elementUtils).getSourcePosition(element);
-        try {
-            Method getLineMethod = javacSourcePosition.getClass().getMethod("getLine");
-            getLineMethod.setAccessible(true);
-            return (int)getLineMethod.invoke(javacSourcePosition);
-        } catch (Exception e) {
-            return 0;
-        }
-    }
+//    protected int getLine(Element element){
+//        Object javacSourcePosition = ((JavacElements) elementUtils).getSourcePosition(element);
+//        try {
+//            Method getLineMethod = javacSourcePosition.getClass().getMethod("getLine");
+//            getLineMethod.setAccessible(true);
+//            return (int)getLineMethod.invoke(javacSourcePosition);
+//        } catch (Exception e) {
+//            return 0;
+//        }
+//    }
 
     protected void error(Element e, String msg, Object... args) {
         printMessage(Diagnostic.Kind.ERROR, e, String.format(msg, args));

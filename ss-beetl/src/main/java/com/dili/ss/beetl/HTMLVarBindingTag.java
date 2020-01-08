@@ -1,9 +1,9 @@
 package com.dili.ss.beetl;
 
 import org.beetl.core.Context;
-import org.beetl.core.Tag;
 import org.beetl.core.statement.Statement;
-import org.beetl.ext.tag.HTMLTagVarBindingWrapper;
+import org.beetl.core.tag.HTMLTagVarBindingWrapper;
+import org.beetl.core.tag.Tag;
 
 import java.util.LinkedHashMap;
 
@@ -23,10 +23,10 @@ public class HTMLVarBindingTag extends HTMLTagVarBindingWrapper
 
 	}
 
-	@Override
-	public Object[] bindVars(){
-		return null;
-	}
+//	@Override
+//	public Object[] bindVars(){
+//		return null;
+//	}
 
 	@Override
 	public void mapName2Index(LinkedHashMap<String, Integer> map)
