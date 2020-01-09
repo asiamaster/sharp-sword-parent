@@ -107,23 +107,10 @@
 		</dependency>
 
         <!-- https://mvnrepository.com/artifact/com.ibeetl/beetl-framework-starter -->
-        <dependency>
-            <groupId>com.ibeetl</groupId>
-            <artifactId>beetl-framework-starter</artifactId>
-            <version>1.2.20.RELEASE</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.antlr</groupId>
-                    <artifactId>antlr4-runtime</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.ibeetl/beetl &ndash;&gt;-->
 <!--        <dependency>-->
 <!--            <groupId>com.ibeetl</groupId>-->
-<!--            <artifactId>beetl</artifactId>-->
-<!--            <version>3.0.16.RELEASE</version>-->
+<!--            <artifactId>beetl-framework-starter</artifactId>-->
+<!--            <version>1.2.20.RELEASE</version>-->
 <!--            <exclusions>-->
 <!--                <exclusion>-->
 <!--                    <groupId>org.antlr</groupId>-->
@@ -131,12 +118,25 @@
 <!--                </exclusion>-->
 <!--            </exclusions>-->
 <!--        </dependency>-->
-        <!-- beelt中用到，这里是换了个版本，为了去掉警告 -->
+
+<!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.ibeetl/beetl &ndash;&gt;-->
         <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4-runtime</artifactId>
-            <version>4.7.1</version>
+            <groupId>com.ibeetl</groupId>
+            <artifactId>beetl</artifactId>
+            <version>3.0.16.RELEASE</version>
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.antlr</groupId>-->
+<!--                    <artifactId>antlr4-runtime</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
         </dependency>
+        <!-- beelt中用到，这里是换了个版本，为了去掉警告 -->
+<!--        <dependency>-->
+<!--            <groupId>org.antlr</groupId>-->
+<!--            <artifactId>antlr4-runtime</artifactId>-->
+<!--            <version>4.7.1</version>-->
+<!--        </dependency>-->
         <!-- springloaded -->
         <!-- https://mvnrepository.com/artifact/org.springframework/springloaded -->
         <dependency>

@@ -26,19 +26,6 @@
         </resources>
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
-                <!-- 编译JDK版本 -->
-                <configuration>
-                    <source>13</source>
-                    <target>13</target>
-                    <encoding>UTF-8</encoding>
-                    <compilerArgument>-Xlint:unchecked</compilerArgument>
-                </configuration>
-            </plugin>
-
             <!-- 支持默认maven分隔符${} -->
             <!--<plugin>-->
             <!--<artifactId>maven-resources-plugin</artifactId>-->

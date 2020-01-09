@@ -49,6 +49,8 @@ public class BeetlConfig {
 
     @Value("${server.servlet.context-path:}")
     private String contextPath;
+    @Value("${beetl.templatesPath:templates}")
+    String templatesPath;
 
     //beetl字符串模板
     @Bean("StringGroupTemplate")
@@ -70,7 +72,7 @@ public class BeetlConfig {
         }
         //解决部署后找不到模板问题,但是要在下面的beetlViewResolver中配置beetlSpringViewResolver.setPrefix("/templates/");
         //并且在beetl.properties中改为RESOURCE.tagRoot =templates/htmltag,不然找不到html标签
-        ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader(loader,"");
+        ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader(loader, templatesPath);
         beetlGroupUtilConfiguration.setResourceLoader(classpathResourceLoader);
         beetlGroupUtilConfiguration.init();
         //如果使用了优化编译器，涉及到字节码操作，需要添加ClassLoader
@@ -83,7 +85,7 @@ public class BeetlConfig {
         BeetlSpringViewResolver beetlSpringViewResolver = new BeetlSpringViewResolver();
         beetlSpringViewResolver.setContentType("text/html;charset=UTF-8");
         beetlSpringViewResolver.setOrder(0);
-        beetlSpringViewResolver.setPrefix("/templates/");
+        beetlSpringViewResolver.setPrefix("/");
         beetlSpringViewResolver.setSuffix(".html");
         beetlSpringViewResolver.setConfig(beetlGroupUtilConfiguration);
         return beetlSpringViewResolver;

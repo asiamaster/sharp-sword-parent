@@ -520,14 +520,24 @@ public class ReflectionUtils {
      * @throws Throwable
      */
     public static Object invokeDefaultMethod(Object proxy, Method method, Object[] args) throws Throwable {
-        final Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class
+        Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class
                 .getDeclaredConstructor(Class.class, int.class);
-        if (!constructor.isAccessible()) {
-            constructor.setAccessible(true);
-        }
-        final Class<?> declaringClass = method.getDeclaringClass();
-        return constructor.newInstance(declaringClass, MethodHandles.Lookup.PRIVATE)
-                .unreflectSpecial(method, declaringClass).bindTo(proxy).invokeWithArguments(args);
+        constructor.setAccessible(true);
+
+        Class<?> declaringClass = method.getDeclaringClass();
+        int allModes = MethodHandles.Lookup.PUBLIC | MethodHandles.Lookup.PRIVATE | MethodHandles.Lookup.PROTECTED | MethodHandles.Lookup.PACKAGE;
+        return constructor.newInstance(declaringClass, allModes)
+                .unreflectSpecial(method, declaringClass)
+                .bindTo(proxy)
+                .invokeWithArguments(args);
+//        final Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class
+//                .getDeclaredConstructor(Class.class, int.class);
+//        if (!constructor.isAccessible()) {
+//            constructor.setAccessible(true);
+//        }
+//        final Class<?> declaringClass = method.getDeclaringClass();
+//        return constructor.newInstance(declaringClass, MethodHandles.Lookup.PRIVATE)
+//                .unreflectSpecial(method, declaringClass).bindTo(proxy).invokeWithArguments(args);
     }
 }
 

@@ -32,8 +32,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>13</java.version>
-
+		<java.version>1.8</java.version>
         <springloaded.version>1.2.8.RELEASE</springloaded.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mapper.version>3.3.9</mapper.version>
@@ -161,8 +160,8 @@
 				<version>3.8.1</version>
 				<!-- 编译JDK版本 -->
 				<configuration>
-					<source>13</source>
-					<target>13</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<encoding>UTF-8</encoding>
 					<!-- 支持参数名解析 -->
 					<parameters>true</parameters>
