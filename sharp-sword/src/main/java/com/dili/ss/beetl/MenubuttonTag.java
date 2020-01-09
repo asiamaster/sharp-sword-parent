@@ -5,7 +5,7 @@ import com.dili.ss.util.POJOUtils;
 import com.dili.ss.util.SpringUtil;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.beetl.core.Tag;
+import org.beetl.core.tag.Tag;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -89,13 +89,7 @@ public class MenubuttonTag extends Tag {
 				return;
 			}
 			writeMenu(list, writeMenubutton(list));
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
+		} catch (IOException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -1,12 +1,16 @@
 package com.dili.ss.beetl;
 
-import org.beetl.core.*;
+import org.beetl.core.BodyContent;
+import org.beetl.core.ByteWriter;
+import org.beetl.core.Context;
+import org.beetl.core.Template;
 import org.beetl.core.exception.BeetlException;
 import org.beetl.core.io.ByteWriter_Byte;
 import org.beetl.core.io.ByteWriter_Char;
 import org.beetl.core.resource.ClasspathResource;
 import org.beetl.core.statement.Statement;
-import org.beetl.ext.tag.HTMLTagSupportWrapper;
+import org.beetl.core.tag.HTMLTagSupportWrapper;
+import org.beetl.core.tag.TagFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -97,7 +101,7 @@ public class HTMLTag extends HTMLTagSupportWrapper {
 
     public List<HTMLTag> getChildren() {
         if (children == null) {
-            request.setAttribute(VS, this.VISIT);
+            request.setAttribute(VS, VISIT);
             TagChildrenContext tnc = new TagChildrenContext();
             request.setAttribute("tagChildrenContext", tnc);
             visitChild();
@@ -172,9 +176,10 @@ public class HTMLTag extends HTMLTagSupportWrapper {
         if (tagFactory == null)
         {
             String path = getHtmlTagResourceId(child);
-            Template t = gt.getHtmlFunctionOrTagTemplate(path, this.ctx.getResourceId());
+//            Template t = gt.getHtmlFunctionOrTagTemplate(path, this.ctx.getResourceId());
+            Template t = gt.getTemplate(path);
             t.binding(ctx.globalVar);
-            t.dynamic(ctx.objectKeys);
+//            t.dynamic(ctx.objectKeys);
             t.binding("tag", this);
 
             //绑定templatePath变量

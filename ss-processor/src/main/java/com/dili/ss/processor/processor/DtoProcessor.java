@@ -42,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 import java.io.File;
@@ -120,12 +121,14 @@ public class DtoProcessor extends BaseProcessor {
         //构建注解
         List<AnnotationSpec> annotationSpecs = new ArrayList<>(classAnnotationMirrors.size());
         for(int i=0; i<classAnnotationMirrors.size(); i++){
+//          获取GenDTOMethod注解， compound为@com.dili.ss.processor.annotation.GenDTOMethod
             Attribute.Compound compound = classAnnotationMirrors.get(i);
             Map<Symbol.MethodSymbol, Attribute> symbolAttributeMap = compound.getElementValues();
             //是否重复使用，取GenDTOMethod注解中的reuse的值 st
             Boolean reuse = null;
             //没有属性，则判断默认值
             if(symbolAttributeMap.isEmpty()) {
+                //基于JDK8实现， 获取GenDTOMethod.reuse()的默认值，赋值到break变量
 //                Scope.Entry entry = compound.type.tsym.members().elems;
 //                Iterator it = entry.scope.getElements().iterator();
 //                while (it.hasNext()) {
@@ -136,6 +139,14 @@ public class DtoProcessor extends BaseProcessor {
 //                        break;
 //                    }
 //                }
+                //JDK8以上版本实现， 获取GenDTOMethod.reuse()的默认值，赋值到break变量
+                List<Symbol.MethodSymbol> methodSymbols = (List)compound.getAnnotationType().asElement().getEnclosedElements();
+                for(Symbol.MethodSymbol methodSymbol :  methodSymbols){
+                    if(methodSymbol.getSimpleName().toString().equals("reuse")){
+                        reuse = (boolean) methodSymbol.defaultValue.getValue();
+                        break;
+                    }
+                }
             }else {
                 if (GenDTOMethod.class.getName().equals(compound.type.toString())) {
                     for (Map.Entry<Symbol.MethodSymbol, Attribute> entry : symbolAttributeMap.entrySet()) {
@@ -332,4 +343,8 @@ public class DtoProcessor extends BaseProcessor {
         return annotataions;
     }
 
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return super.getSupportedSourceVersion();
+    }
 }

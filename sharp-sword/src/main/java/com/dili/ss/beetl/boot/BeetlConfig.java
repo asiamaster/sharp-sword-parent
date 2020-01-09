@@ -1,9 +1,14 @@
 package com.dili.ss.beetl.boot;
 
 import com.dili.ss.beetl.CommonTagFactory;
-import org.beetl.core.*;
+import org.beetl.core.Format;
+import org.beetl.core.Function;
+import org.beetl.core.GroupTemplate;
+import org.beetl.core.VirtualAttributeEval;
 import org.beetl.core.resource.ClasspathResourceLoader;
 import org.beetl.core.resource.StringTemplateResourceLoader;
+import org.beetl.core.tag.Tag;
+import org.beetl.core.tag.TagFactory;
 import org.beetl.ext.spring.BeetlGroupUtilConfiguration;
 import org.beetl.ext.spring.BeetlSpringViewResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +49,8 @@ public class BeetlConfig {
 
     @Value("${server.servlet.context-path:}")
     private String contextPath;
+    @Value("${beetl.templatesPath:templates}")
+    String templatesPath;
 
     //beetl字符串模板
     @Bean("StringGroupTemplate")
@@ -65,7 +72,7 @@ public class BeetlConfig {
         }
         //解决部署后找不到模板问题,但是要在下面的beetlViewResolver中配置beetlSpringViewResolver.setPrefix("/templates/");
         //并且在beetl.properties中改为RESOURCE.tagRoot =templates/htmltag,不然找不到html标签
-        ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader(loader,"");
+        ClasspathResourceLoader classpathResourceLoader = new ClasspathResourceLoader(loader, templatesPath);
         beetlGroupUtilConfiguration.setResourceLoader(classpathResourceLoader);
         beetlGroupUtilConfiguration.init();
         //如果使用了优化编译器，涉及到字节码操作，需要添加ClassLoader
@@ -77,8 +84,8 @@ public class BeetlConfig {
     public BeetlSpringViewResolver getBeetlSpringViewResolver(@Qualifier("beetlGroupUtilConfiguration") BeetlGroupUtilConfiguration beetlGroupUtilConfiguration) {
         BeetlSpringViewResolver beetlSpringViewResolver = new BeetlSpringViewResolver();
         beetlSpringViewResolver.setContentType("text/html;charset=UTF-8");
-        beetlSpringViewResolver.setOrder(1);
-        beetlSpringViewResolver.setPrefix("/templates/");
+        beetlSpringViewResolver.setOrder(0);
+        beetlSpringViewResolver.setPrefix("/");
         beetlSpringViewResolver.setSuffix(".html");
         beetlSpringViewResolver.setConfig(beetlGroupUtilConfiguration);
         return beetlSpringViewResolver;

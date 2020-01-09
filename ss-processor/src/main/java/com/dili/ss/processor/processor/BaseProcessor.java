@@ -39,7 +39,6 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
@@ -87,18 +86,16 @@ public abstract class BaseProcessor extends AbstractProcessor {
         }
     }
 
+//    @Override
+//    public SourceVersion getSupportedSourceVersion() {
+//        return SourceVersion.latestSupported();
+//    }
 
-    @Override
-    public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.latestSupported();
-    }
-
-
-    /**
-     * 获取元素的行号
-     * @param element
-     * @return
-     */
+//    /**
+//     * 获取元素的行号
+//     * @param element
+//     * @return
+//     */
 //    protected int getLine(Element element){
 //        Object javacSourcePosition = ((JavacElements) elementUtils).getSourcePosition(element);
 //        try {

@@ -1,6 +1,6 @@
 package com.dili.ss.beetl;
 
-import org.beetl.core.Tag;
+import org.beetl.core.tag.Tag;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 

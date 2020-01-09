@@ -2,7 +2,7 @@ package com.dili.ss.beetl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.metadata.FieldEditor;
-import org.beetl.core.Tag;
+import org.beetl.core.tag.Tag;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

@@ -1,7 +1,7 @@
 package com.dili.ss.beetl;
 
-import org.beetl.core.Tag;
-import org.beetl.core.TagFactory;
+import org.beetl.core.tag.Tag;
+import org.beetl.core.tag.TagFactory;
 
 /**
  * Created by asiamaster on 2017/5/24 0024.
