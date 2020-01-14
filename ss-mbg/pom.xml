@@ -97,19 +97,7 @@
         <dependency>
             <groupId>com.ibeetl</groupId>
             <artifactId>beetl</artifactId>
-            <version>2.9.9</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.antlr</groupId>
-                    <artifactId>antlr4-runtime</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- beelt中用到，这里是换了个版本，为了去掉警告 -->
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4-runtime</artifactId>
-            <version>4.7.1</version>
+            <version>3.0.16.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
