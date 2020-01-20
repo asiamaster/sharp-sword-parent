@@ -39,6 +39,7 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
@@ -121,5 +122,10 @@ public abstract class BaseProcessor extends AbstractProcessor {
 
     protected void printMessage(Diagnostic.Kind kind, Element e, String msg, Object... args) {
         messager.printMessage(kind, String.format(msg, args), e);
+    }
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latest();
     }
 }
