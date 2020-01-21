@@ -290,7 +290,7 @@ public class MyControllerPlugin extends PluginAdapter {
 
         method.addJavaDocLine("/**");
         method.addJavaDocLine(" * 新增"+baseModelJavaType.getShortName() );
-        method.addJavaDocLine(" * @param customer");
+        method.addJavaDocLine(" * @param " + StringUtils.uncapitalize(baseModelJavaType.getShortName()));
         method.addJavaDocLine(" * @return BaseOutput");
         method.addJavaDocLine(" */");
         clazz.addMethod(method);
@@ -324,7 +324,7 @@ public class MyControllerPlugin extends PluginAdapter {
 
         method.addJavaDocLine("/**");
         method.addJavaDocLine(" * 修改"+baseModelJavaType.getShortName() );
-        method.addJavaDocLine(" * @param customer");
+        method.addJavaDocLine(" * @param " + StringUtils.uncapitalize(baseModelJavaType.getShortName()));
         method.addJavaDocLine(" * @return BaseOutput");
         method.addJavaDocLine(" */");
         clazz.addMethod(method);

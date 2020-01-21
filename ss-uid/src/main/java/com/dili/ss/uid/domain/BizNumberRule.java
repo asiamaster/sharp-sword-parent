@@ -26,8 +26,8 @@ public interface BizNumberRule extends IDTO {
     void setDateFormat(String dateFormat);
 
     @FieldDef(label="自增位数")
-    int getLength();
-    void setLength(int length);
+    Integer getLength();
+    void setLength(Integer length);
 
     /**
      * 自增步长范围,默认(null时)为1, 示例"5,20"，即5到20位随机步长
