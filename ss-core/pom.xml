@@ -25,7 +25,7 @@
     <parent>
 		<artifactId>sharp-sword-parent</artifactId>
 		<groupId>com.dili</groupId>
-		<version>3.6.1-SNAPSHOT</version>
+		<version>3.6.2-SNAPSHOT</version>
 	</parent>
 
     <build>
@@ -368,7 +368,7 @@
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.25.0-GA</version>
+            <version>3.26.0-GA</version>
         </dependency>
 
         <dependency>
