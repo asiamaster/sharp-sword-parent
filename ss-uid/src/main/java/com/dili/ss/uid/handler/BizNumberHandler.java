@@ -30,6 +30,7 @@
 //                  不见满街漂亮妹，哪个归得程序员？
 package com.dili.ss.uid.handler;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -72,8 +73,12 @@ public class BizNumberHandler {
      * @return
      */
     public Long getBizNumberByType(String type, String dateFormat, int length, String range) {
+        //没有范围，则默认使用1为自增量
+        if(StringUtils.isBlank(range)){
+            range = "1";
+        }
         String[] ranges = range.split(",");
-        int increment = ranges.length == 1 ? Integer.parseInt(ranges[0]) : rangeRandom(Integer.parseInt(ranges[0]), Integer.parseInt(ranges[1]));
+        int increment = ranges.length == 1 ? Integer.parseInt(ranges[0]) : rangeRandom(Integer.parseInt(ranges[0].trim()), Integer.parseInt(ranges[1].trim()));
         long step;
         //范围步长值取最大自增值的rangeStep倍
         if (ranges.length == 2) {
