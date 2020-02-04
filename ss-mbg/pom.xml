@@ -109,15 +109,15 @@
         <dependency>
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper-generator</artifactId>
-            <version>1.1.2</version>
+            <version>1.1.5</version>
         </dependency>
         <!-- springloaded -->
         <!-- https://mvnrepository.com/artifact/org.springframework/springloaded -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>springloaded</artifactId>
-            <version>${springloaded.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework</groupId>-->
+<!--            <artifactId>springloaded</artifactId>-->
+<!--            <version>${springloaded.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

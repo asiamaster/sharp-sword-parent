@@ -30,6 +30,9 @@
 //                  不见满街漂亮妹，哪个归得程序员？
 package com.dili.ss.uid.service.impl;
 
+import com.dili.ss.base.BaseServiceImpl;
+import com.dili.ss.uid.dao.BizNumberMapper;
+import com.dili.ss.uid.domain.BizNumber;
 import com.dili.ss.uid.domain.BizNumberRule;
 import com.dili.ss.uid.handler.BizNumberHandler;
 import com.dili.ss.uid.service.BizNumberService;
@@ -45,11 +48,19 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ConditionalOnExpression("'${uid.enable}'=='true'")
-public class BizNumberServiceImpl implements BizNumberService {
+public class BizNumberServiceImpl extends BaseServiceImpl<BizNumber, Long> implements BizNumberService {
 
     @Autowired
     private BizNumberHandler bizNumberHandler;
 
+    public BizNumberMapper getActualDao() {
+        return (BizNumberMapper)getDao();
+    }
+
+    @Override
+    public BizNumber selectOne(BizNumber bizNumber){
+        return getActualDao().selectOne(bizNumber);
+    }
     @Override
     public String getBizNumberByType(BizNumberRule bizNumberRule) {
 //        if(bizNumberRule == null){

@@ -337,6 +337,9 @@ public class MyMapperPlugin extends PluginAdapter {
 		for (Method method : methods) {
 			if (POJOUtils.isGetMethod(method.getName())) {
 				IntrospectedColumn introspectedColumn = introspectedTable.getColumn(POJOUtils.humpToLineFast(POJOUtils.getBeanField(method.getName())));
+				if(introspectedColumn == null){
+					continue;
+				}
 				String fieldLabel = StringUtils.isBlank(introspectedColumn.getRemarks()) ? introspectedColumn.getJavaProperty() : BeetlTemplateUtil.getFieldName(introspectedColumn.getRemarks());
 				//设置@Id和@GeneratedValue
 				if(introspectedColumn.isIdentity()) {

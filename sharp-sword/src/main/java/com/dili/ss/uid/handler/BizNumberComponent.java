@@ -136,7 +136,7 @@ public class BizNumberComponent {
      * @return
      */
     private Long getInitBizNumber(String dateStr, int length) {
-        return StringUtils.isBlank(dateStr) ? 1 : NumberUtils.toLong(dateStr) * new Double(Math.pow(10, length)).longValue() + 1;
+        return StringUtils.isBlank(dateStr) ? 1 : NumberUtils.toLong(dateStr) * Double.valueOf(Math.pow(10, length)).longValue() + 1;
     }
 
 }
