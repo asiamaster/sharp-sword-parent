@@ -9,6 +9,7 @@ import com.dili.ss.util.SpringUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,7 @@ import java.util.Map;
  */
 @Component
 @Scope("prototype")
+@ConditionalOnBean(name = "commonMapper")
 public class SimpleValueProvider implements ValueProvider {
     //    字段所在的表
     private String table;

@@ -1,6 +1,7 @@
 package com.dili.ss.metadata.provider;
 
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.Map;
  * 简单批量提供者实现,根据datagrid表头参数动态提供数据。
  */
 @Component
+@ConditionalOnBean(name = "commonMapper")
 public class SimpleBatchDisplayTextProvider extends BatchSqlDisplayTextProviderAdaptor {
     //    关联(数据库)表名
     protected static final String RELATION_TABLE_KEY = "_relationTable";

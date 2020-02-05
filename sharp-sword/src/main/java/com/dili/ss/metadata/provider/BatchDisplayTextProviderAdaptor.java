@@ -3,7 +3,6 @@ package com.dili.ss.metadata.provider;
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.metadata.*;
 import com.dili.ss.metadata.handler.DefaultMismatchHandler;
-import com.dili.ss.service.CommonService;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.POJOUtils;
 import org.slf4j.Logger;
@@ -29,8 +28,6 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
 //    主DTO与关联DTO的关联(java bean)属性，即外键
     protected static final String FK_FILED_KEY = "_fkField";
 
-    @Autowired
-    protected CommonService commonService;
     @Autowired
     protected DefaultMismatchHandler defaultMismatchHandler;
 
