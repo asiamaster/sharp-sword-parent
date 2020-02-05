@@ -3,7 +3,7 @@ package com.dili.ss.exception;
 /**
  * Created by Administrator on 2016/10/11.
  */
-public class BusinessException extends Exception {
+public class BusinessException extends RuntimeException {
     private String errorCode;
     private String errorMsg;
 
