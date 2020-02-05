@@ -25,11 +25,15 @@ public class PageOutput<T> extends BaseOutput<T> {
     /**
      * 起始行
      */
-    private int startRow;
+    private Integer startRow;
     /**
      * 末行
      */
-    private int endRow;
+    private Integer endRow;
+    /**
+     * 总页数
+     */
+    private Integer pages;
 
 
     public PageOutput() {
@@ -62,6 +66,14 @@ public class PageOutput<T> extends BaseOutput<T> {
         return this;
     }
 
+    public Integer getPages() {
+        return pages;
+    }
+
+    public void setPages(Integer pages) {
+        this.pages = pages;
+    }
+
     /**
      * 页大小，每页记录数
      */
@@ -86,19 +98,19 @@ public class PageOutput<T> extends BaseOutput<T> {
         return this;
     }
 
-    public int getStartRow() {
+    public Integer getStartRow() {
         return startRow;
     }
 
-    public void setStartRow(int startRow) {
+    public void setStartRow(Integer startRow) {
         this.startRow = startRow;
     }
 
-    public int getEndRow() {
+    public Integer getEndRow() {
         return endRow;
     }
 
-    public void setEndRow(int endRow) {
+    public void setEndRow(Integer endRow) {
         this.endRow = endRow;
     }
 

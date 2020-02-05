@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2014 www.diligrp.com All rights reserved.
- * 本软件源代码版权归----所有,未经许可不得任意复制与传播.
- */
 package com.dili.ss.domain;
 
 
@@ -15,9 +11,9 @@ import com.dili.ss.constant.ResultCode;
 public class PageOutput<T> extends BaseOutput<T> {
 
     /**
-     * 页码，获取第page页数据
+     * 页码，从1开始
      */
-    private Integer page;
+    private Integer pageNum;
     /**
      * 页大小，每页记录数
      */
@@ -26,6 +22,26 @@ public class PageOutput<T> extends BaseOutput<T> {
      * 总记录数
      */
     private Integer total;
+    /**
+     * 起始行
+     */
+    private Integer startRow;
+    /**
+     * 末行
+     */
+    private Integer endRow;
+    /**
+     * 总页数
+     */
+    private Integer pages;
+
+
+    public PageOutput() {
+    }
+
+    public PageOutput(String code, String result) {
+        super(code, result);
+    }
 
     @Override
     public T getData() {
@@ -41,13 +57,21 @@ public class PageOutput<T> extends BaseOutput<T> {
     /**
      * 页码，获取第page页数据
      */
-    public Integer getPage() {
-        return page;
+    public Integer getPageNum() {
+        return pageNum;
     }
 
-    public PageOutput setPage(Integer page) {
-        this.page = page;
+    public PageOutput setPageNum(Integer pageNum) {
+        this.pageNum = pageNum;
         return this;
+    }
+
+    public Integer getPages() {
+        return pages;
+    }
+
+    public void setPages(Integer pages) {
+        this.pages = pages;
     }
 
     /**
@@ -74,12 +98,20 @@ public class PageOutput<T> extends BaseOutput<T> {
         return this;
     }
 
-    // -----------------------------------------------------------------------------------
-    public PageOutput() {
+    public Integer getStartRow() {
+        return startRow;
     }
 
-    public PageOutput(String code, String result) {
-        super(code, result);
+    public void setStartRow(Integer startRow) {
+        this.startRow = startRow;
+    }
+
+    public Integer getEndRow() {
+        return endRow;
+    }
+
+    public void setEndRow(Integer endRow) {
+        this.endRow = endRow;
     }
 
     public static <T> PageOutput<T> create(String code, String result) {
