@@ -17,7 +17,6 @@ import java.util.Map;
 @ConditionalOnBean(name = "commonMapper")
 public abstract class BatchSqlDisplayTextProviderAdaptor extends BatchDisplayTextProviderAdaptor {
 
-
     @Autowired
     protected CommonService commonService;
 

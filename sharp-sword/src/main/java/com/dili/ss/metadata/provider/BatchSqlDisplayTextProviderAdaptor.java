@@ -1,6 +1,8 @@
 package com.dili.ss.metadata.provider;
 
 import com.alibaba.fastjson.JSONObject;
+import com.dili.ss.service.CommonService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,9 @@ import java.util.Map;
 @Component
 @ConditionalOnBean(name = "commonMapper")
 public abstract class BatchSqlDisplayTextProviderAdaptor extends BatchDisplayTextProviderAdaptor {
+
+    @Autowired
+    protected CommonService commonService;
 
     @Override
     protected List<Map> getFkList(List<String> relationIds, Map metaMap) {
