@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2014 www.diligrp.com All rights reserved.
- * 本软件源代码版权归----所有,未经许可不得任意复制与传播.
- */
 package com.dili.ss.domain;
 
 
@@ -15,9 +11,9 @@ import com.dili.ss.constant.ResultCode;
 public class PageOutput<T> extends BaseOutput<T> {
 
     /**
-     * 页码，获取第page页数据
+     * 页码，从1开始
      */
-    private Integer page;
+    private Integer pageNum;
     /**
      * 页大小，每页记录数
      */
@@ -26,6 +22,22 @@ public class PageOutput<T> extends BaseOutput<T> {
      * 总记录数
      */
     private Integer total;
+    /**
+     * 起始行
+     */
+    private int startRow;
+    /**
+     * 末行
+     */
+    private int endRow;
+
+
+    public PageOutput() {
+    }
+
+    public PageOutput(String code, String result) {
+        super(code, result);
+    }
 
     @Override
     public T getData() {
@@ -41,12 +53,12 @@ public class PageOutput<T> extends BaseOutput<T> {
     /**
      * 页码，获取第page页数据
      */
-    public Integer getPage() {
-        return page;
+    public Integer getPageNum() {
+        return pageNum;
     }
 
-    public PageOutput setPage(Integer page) {
-        this.page = page;
+    public PageOutput setPageNum(Integer pageNum) {
+        this.pageNum = pageNum;
         return this;
     }
 
@@ -74,12 +86,20 @@ public class PageOutput<T> extends BaseOutput<T> {
         return this;
     }
 
-    // -----------------------------------------------------------------------------------
-    public PageOutput() {
+    public int getStartRow() {
+        return startRow;
     }
 
-    public PageOutput(String code, String result) {
-        super(code, result);
+    public void setStartRow(int startRow) {
+        this.startRow = startRow;
+    }
+
+    public int getEndRow() {
+        return endRow;
+    }
+
+    public void setEndRow(int endRow) {
+        this.endRow = endRow;
     }
 
     public static <T> PageOutput<T> create(String code, String result) {
