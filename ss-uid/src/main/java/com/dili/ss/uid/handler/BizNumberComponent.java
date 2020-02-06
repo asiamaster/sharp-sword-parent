@@ -129,14 +129,5 @@ public class BizNumberComponent {
         return list.get(0);
     }
 
-    /**
-     * 获取日期加每日计数量的初始化字符串，最低位从1开始
-     * @param dateStr
-     * @param length 编码位数(不包含日期位数)
-     * @return
-     */
-    private Long getInitBizNumber(String dateStr, int length) {
-        return StringUtils.isBlank(dateStr) ? 1 : NumberUtils.toLong(dateStr) * Double.valueOf(Math.pow(10, length)).longValue() + 1;
-    }
 
 }
