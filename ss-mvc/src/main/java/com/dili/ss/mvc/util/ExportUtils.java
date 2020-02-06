@@ -314,7 +314,7 @@ public class ExportUtils {
             //列号
             int columnIndex=0;
             while(it.hasNext()){
-                columnIndex++;
+
 //            for (int j = 0; j < rowColumns.size(); j++) {
                 //列头信息
                 Map<String, Object> columnMap = it.next();
@@ -347,6 +347,7 @@ public class ExportUtils {
                         colspanAdd = colspanAdd + colspan - 1;
                     }
                 }
+                columnIndex++;
 	            index++;
             }
         }
