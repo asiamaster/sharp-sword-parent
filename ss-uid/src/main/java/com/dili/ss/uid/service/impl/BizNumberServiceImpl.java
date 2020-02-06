@@ -63,9 +63,9 @@ public class BizNumberServiceImpl extends BaseServiceImpl<BizNumber, Long> imple
     }
     @Override
     public String getBizNumberByType(BizNumberRule bizNumberRule) {
-//        if(bizNumberRule == null){
-//            return null;
-//        }
+        if(bizNumberRule == null){
+            return null;
+        }
 //        String range = bizNumberRule.getRange();
 //        //默认自增步长为1
 //        if(StringUtils.isBlank(range)){
