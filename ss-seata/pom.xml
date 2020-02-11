@@ -76,12 +76,22 @@
 <!--            <version>0.4.2</version>-->
 <!--        </dependency>-->
         <!-- https://mvnrepository.com/artifact/io.seata/seata-spring -->
+<!--        <dependency>-->
+<!--            <groupId>io.seata</groupId>-->
+<!--            <artifactId>seata-spring</artifactId>-->
+<!--            <version>1.0.0</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>io.seata</groupId>-->
+<!--            <artifactId>seata-all</artifactId>-->
+<!--            <version>1.0.0</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>io.seata</groupId>
-            <artifactId>seata-spring</artifactId>
-            <version>0.6.1</version>
+            <artifactId>seata-spring-boot-starter</artifactId>
+            <version>1.0.0</version>
         </dependency>
-
 
         <!-- springloaded -->
         <!-- https://mvnrepository.com/artifact/org.springframework/springloaded -->

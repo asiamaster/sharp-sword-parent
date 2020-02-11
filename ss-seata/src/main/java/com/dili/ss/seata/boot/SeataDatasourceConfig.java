@@ -30,6 +30,7 @@ public class SeataDatasourceConfig {
     //seata使用的代理数据源
     //由于两个dataSource的Bean和MapperAutoConfiguration有冲突
     //这里使用Map的形式来注入druidDataSourceProperties
+    //seata-spring-boot-starter默认开启数据源自动代理，用户若再手动配置DataSourceProxy将会导致异常。
     @Primary
     @Bean("dataSource")
     public DataSourceProxy dataSource(@Qualifier("druidDataSourceProperties") Map<String, String> druidDataSourceProperties) throws InvocationTargetException, IllegalAccessException {

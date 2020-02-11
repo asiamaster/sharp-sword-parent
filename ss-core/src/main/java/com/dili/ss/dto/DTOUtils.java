@@ -703,8 +703,11 @@ public class DTOUtils {
 			}
 			return (T)instance;
 		} else if (isInstance(source)) {
-			T instance = DTOUtils.newInstance(proxyClz);
+			T instance = null;
 			try {
+				//拷贝bean属性
+				instance = (T)BeanConver.copyBean(source, DTOUtils.getInstanceClass(proxyClz));
+				//浅拷贝DTO属性
 				instance.aset(((IDTO)source).aget());
 			} catch (Exception e) {
 				//don't care
