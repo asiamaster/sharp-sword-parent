@@ -61,7 +61,10 @@ public class BizNumberHandler {
 
     @PostConstruct
     public void init() {
-        bizNumberManager = new BizNumberManagerImpl();
+        try {
+            bizNumberManager = new BizNumberManagerImpl();
+        } catch (Exception e) {
+        }
         bizNumberManager.setBizNumberComponent(bizNumberComponent);
     }
     /**
