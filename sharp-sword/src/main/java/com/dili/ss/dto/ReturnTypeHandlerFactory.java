@@ -233,7 +233,13 @@ public class ReturnTypeHandlerFactory {
                 return null;
             }
             if(String.class.equals(value.getClass())){
-                return Instant.from(DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss").withZone(ZoneId.systemDefault()).parse((String)value));
+                String format = "yyyy-MM-dd HH:mm:ss";
+                if(((String)value).length() == 10){
+                    format = "yyyy-MM-dd";
+                }else if(((String)value).length() == 23){
+                    format = "yyyy-MM-dd HH:mm:ss.SSS";
+                }
+                return Instant.from(DateTimeFormatter.ofPattern(format).withZone(ZoneId.systemDefault()).parse((String)value));
             } else if(Long.class.equals(value.getClass())){
                 return Instant.ofEpochMilli((Long) value);
             }
@@ -252,7 +258,13 @@ public class ReturnTypeHandlerFactory {
                 return null;
             }
             if(String.class.equals(value.getClass())){
-                return LocalDateTime.parse((String)value, DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss").withZone(ZoneId.systemDefault()));
+                String format = "yyyy-MM-dd HH:mm:ss";
+                if(((String)value).length() == 10){
+                    format = "yyyy-MM-dd";
+                }else if(((String)value).length() == 23){
+                    format = "yyyy-MM-dd HH:mm:ss.SSS";
+                }
+                return LocalDateTime.parse((String) value, DateTimeFormatter.ofPattern(format).withZone(ZoneId.systemDefault()));
             }else if(Long.class.equals(value.getClass())){
                 return LocalDateTime.ofInstant(Instant.ofEpochMilli((Long) value), ZoneId.systemDefault());
             }
@@ -272,8 +284,9 @@ public class ReturnTypeHandlerFactory {
             }
             // 如果当前字段的值不是日期型, 转换返回值，并且将新的返回值填入委托对象中
             if(String.class.equals(value.getClass())){
+
                 try {
-                    return StringUtils.isNumeric(value.toString()) ? new Date(Long.parseLong(value.toString())) : DateUtils.parseDate(value.toString(), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd", "E MMM dd yyyy HH:mm:ss");
+                    return StringUtils.isNumeric(value.toString()) ? new Date(Long.parseLong(value.toString())) : DateUtils.parseDate(value.toString(), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss.SSS", "E MMM dd yyyy HH:mm:ss");
                 } catch (ParseException e) {
                     try {
                         return new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss", Locale.US).parse(value.toString());

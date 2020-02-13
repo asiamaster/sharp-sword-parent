@@ -70,11 +70,6 @@
             <artifactId>spring-aspects</artifactId>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>com.alibaba.fescar</groupId>-->
-<!--            <artifactId>fescar-spring</artifactId>-->
-<!--            <version>0.4.2</version>-->
-<!--        </dependency>-->
         <!-- https://mvnrepository.com/artifact/io.seata/seata-spring -->
 <!--        <dependency>-->
 <!--            <groupId>io.seata</groupId>-->
@@ -82,11 +77,6 @@
 <!--            <version>1.0.0</version>-->
 <!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>io.seata</groupId>-->
-<!--            <artifactId>seata-all</artifactId>-->
-<!--            <version>1.0.0</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>io.seata</groupId>
             <artifactId>seata-spring-boot-starter</artifactId>

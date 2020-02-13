@@ -5,18 +5,16 @@ import io.seata.rm.datasource.DataSourceProxy;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-@Configuration
-@ConditionalOnExpression("'${seata.enable}'=='true'&&!'${spring.datasource.url:}'.equals('')")
+//@Configuration
+//@ConditionalOnExpression("'${seata.enable}'=='true'&&!'${spring.datasource.url:}'.equals('')")
 public class SeataDatasourceConfig {
 
     @Autowired
