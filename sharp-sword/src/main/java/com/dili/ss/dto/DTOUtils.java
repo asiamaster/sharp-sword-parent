@@ -240,7 +240,7 @@ public class DTOUtils {
 		T retval = null;
 		// 如果是接口方式,则直接根据接口来创建
 		if (proxyClz.isInterface()) {
-			retval = newInstance(proxyClz);
+			retval = BeanConver.copyMap(realObj, proxyClz);
 			retval.aset(realObj);
 		}else{
 			throw new ParamErrorException("proxyClz参数必须是实现IDTO的接口类");
@@ -683,9 +683,10 @@ public class DTOUtils {
 		assert (proxyClz != null);
 
 		if (source instanceof DTO) {
-			T instance = DTOUtils.newInstance(proxyClz);
+			T instance = BeanConver.copyMap((DTO)source, proxyClz);;
 			try {
-				IDTO.class.getMethod("aset", DTO.class).invoke(instance, source);
+				instance.aset((DTO)source);
+//				IDTO.class.getMethod("aset", DTO.class).invoke(instance, source);
 			} catch (Exception e) {
 				//don't care
 			}
