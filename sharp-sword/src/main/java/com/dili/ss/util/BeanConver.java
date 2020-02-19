@@ -85,7 +85,9 @@ public class BeanConver {
                     continue;
                 }
                 field.setAccessible(true);
-                field.set(obj, map.get(field.getName()));
+                try {
+                    field.set(obj, map.get(field.getName()));
+                }catch (Exception e){}
             }
         } catch (InstantiationException e) {
             return null;
@@ -103,15 +105,15 @@ public class BeanConver {
      * @param target 目标对象
      * @return
      */
-    public static <T,K> List<K> copeList(List<T> source, Class<K> target){
+    public static <T,K> List<K> copyList(List<T> source, Class<K> target){
         List<K> list = new ArrayList<K>();
         if(CollectionUtils.isEmpty(source)){
             return new ArrayList<>();
         }
-        String beanKey = generateKey(source.getClass(), target);
+        String beanKey = generateKey(source.get(0).getClass(), target);
         BeanCopier copier = null;
         if (!beanCopierMap.containsKey(beanKey)) {
-            copier = BeanCopier.create(source.getClass(), target, false);
+            copier = BeanCopier.create(source.get(0).getClass(), target, false);
             beanCopierMap.put(beanKey, copier);
         } else {
             copier = beanCopierMap.get(beanKey);
@@ -128,7 +130,6 @@ public class BeanConver {
         }
         return list;
     }
-
 
     /**
      * 把javaBean、Instance或dto对象转换为Map键值对
@@ -238,7 +239,7 @@ public class BeanConver {
      * @return
      */
     @Deprecated
-    public static <T,K> K copeBaseQueryBean(T source,Class<K> target ){
+    public static <T,K> K copyBaseQueryBean(T source,Class<K> target ){
         K k = copyBean(source, target);
         if(BaseQuery.class.isAssignableFrom(target)){
             BasePage p = (BasePage)k;
@@ -298,7 +299,7 @@ public class BeanConver {
      * @return
      */
     @Deprecated
-    public static <T,K> BasePage<K> copePage(BasePage<T> source, Class<K> target){
+    public static <T,K> BasePage<K> copyPage(BasePage<T> source, Class<K> target){
         List<K> list = new ArrayList<K>();
         BasePage<K> result = new BasePage<K>();
         List<T> sourceList = source.getDatas();

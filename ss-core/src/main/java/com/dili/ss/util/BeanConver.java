@@ -85,7 +85,9 @@ public class BeanConver {
                     continue;
                 }
                 field.setAccessible(true);
-                field.set(obj, map.get(field.getName()));
+                try {
+                    field.set(obj, map.get(field.getName()));
+                }catch (Exception e){}
             }
         } catch (InstantiationException e) {
             return null;
