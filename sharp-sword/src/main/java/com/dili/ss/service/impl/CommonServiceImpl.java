@@ -6,8 +6,10 @@ import com.dili.ss.dto.IDTO;
 import com.dili.ss.metadata.ValuePair;
 import com.dili.ss.service.CommonService;
 import com.github.pagehelper.PageHelper;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.Map;
  * Created by asiamaster on 2017/7/25 0025.
  */
 @Service
-@ConditionalOnBean(name = "commonMapper")
+@ConditionalOnClass({ SqlSessionFactory.class, SqlSessionFactoryBean.class })
 public class CommonServiceImpl implements CommonService {
 
 	@Autowired

@@ -2,8 +2,10 @@ package com.dili.ss.metadata.provider;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.service.CommonService;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -14,7 +16,7 @@ import java.util.Map;
  * 批量本地sql提供者
  */
 @Component
-@ConditionalOnBean(name = "commonMapper")
+@ConditionalOnClass({ SqlSessionFactory.class, SqlSessionFactoryBean.class })
 public abstract class BatchSqlDisplayTextProviderAdaptor extends BatchDisplayTextProviderAdaptor {
 
     @Autowired

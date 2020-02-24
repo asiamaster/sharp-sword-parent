@@ -13,11 +13,13 @@ import com.dili.ss.util.ReflectionUtils;
 import com.github.pagehelper.Page;
 import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.poi.ss.formula.functions.T;
+import org.mybatis.spring.SqlSessionFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +37,7 @@ import java.util.List;
 @Api(value = "common-api", description = "通用控制器操作", position = 1)
 @Controller
 @RequestMapping("/common")
-@ConditionalOnBean(name = "commonMapper")
+@ConditionalOnClass({ SqlSessionFactory.class, SqlSessionFactoryBean.class })
 public class CommonController {
     private static final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
     @Autowired

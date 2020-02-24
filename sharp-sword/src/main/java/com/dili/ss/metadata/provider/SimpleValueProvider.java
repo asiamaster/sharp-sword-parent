@@ -8,8 +8,10 @@ import com.dili.ss.metadata.ValueProvider;
 import com.dili.ss.util.SpringUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +24,7 @@ import java.util.Map;
  */
 @Component
 @Scope("prototype")
-@ConditionalOnBean(name = "commonMapper")
+@ConditionalOnClass({ SqlSessionFactory.class, SqlSessionFactoryBean.class })
 public class SimpleValueProvider implements ValueProvider {
     //    字段所在的表
     private String table;
