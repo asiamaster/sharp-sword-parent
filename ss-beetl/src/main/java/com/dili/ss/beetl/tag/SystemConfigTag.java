@@ -1,9 +1,10 @@
-package com.dili.ss.beetl;
+package com.dili.ss.beetl.tag;
 
 import com.dili.ss.util.SpringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.beetl.core.BodyContent;
 import org.beetl.core.tag.Tag;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Map;
  * Created by asiamaster on 2017/7/21 0021.
  */
 @Component("config")
+@ConditionalOnExpression("'${beetl.enable}'=='true'")
 public class SystemConfigTag extends Tag {
 
 	//属性名

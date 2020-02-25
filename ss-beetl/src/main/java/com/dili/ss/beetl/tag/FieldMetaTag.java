@@ -1,4 +1,4 @@
-package com.dili.ss.beetl;
+package com.dili.ss.beetl.tag;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.metadata.FieldMeta;
@@ -6,6 +6,7 @@ import com.dili.ss.metadata.MetadataUtils;
 import com.dili.ss.metadata.ObjectMeta;
 import org.apache.commons.lang3.StringUtils;
 import org.beetl.core.tag.Tag;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -20,6 +21,7 @@ import java.util.Map;
  * Created by asiamaster on 2017/7/11 0011.
  */
 @Component("fieldMeta")
+@ConditionalOnExpression("'${beetl.enable}'=='true'")
 public class FieldMetaTag extends Tag {
 	private final String LINE_SEPARATOR = System.getProperty("line.separator");
 	private final String TAB = "    ";

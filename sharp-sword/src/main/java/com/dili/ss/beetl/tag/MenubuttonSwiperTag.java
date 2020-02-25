@@ -1,4 +1,4 @@
-package com.dili.ss.beetl;
+package com.dili.ss.beetl.tag;
 
 import com.dili.ss.util.AopTargetUtils;
 import com.dili.ss.util.POJOUtils;
@@ -6,6 +6,7 @@ import com.dili.ss.util.SpringUtil;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.beetl.core.tag.Tag;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -22,8 +23,9 @@ import java.util.*;
  * 菜单按钮自定义标签
  * Created by asiamaster on 2017/7/11 0011.
  */
-@Component("menubutton")
-public class MenubuttonTag extends Tag {
+@Component("menubuttonSwiper")
+@ConditionalOnExpression("'${beetl.enable}'=='true'")
+public class MenubuttonSwiperTag extends Tag {
 	private final String LINE_SEPARATOR = System.getProperty("line.separator");
 	private final String TAB = "    ";
 
@@ -37,6 +39,7 @@ public class MenubuttonTag extends Tag {
 	private final String METHOD = "_method";
 	private final String QUERYPARAMS = "_queryParams";
 	private final String DIV_ID = "_divId";
+	private final String CONTAINER_ID = "_containerId";
 	private final String MENU_WIDTH = "_menuWidth";
 	private final String MENU_HEIGHT = "_menuHeight";
 	private final String PANEL_ALIGN = "_panelAlign";
@@ -48,6 +51,7 @@ public class MenubuttonTag extends Tag {
 	private final String ICON_CLS_FIELD_DEFAULT = "iconCls";
 	private final String DISABLED_FIELD_DEFAULT = "disabled";
 	private final String DIV_ID_DEFAULT = "_menubuttonDiv";
+	private final String CONTAINER_ID_DEFAULT = "swiperContainer";
 	private final String MENU_WIDTH_DEFAULT = "80";
 	private final String MENU_HEIGHT_DEFAULT = "30";
 	private final String PANEL_ALIGN_DEFAULT = "left";
@@ -112,6 +116,8 @@ public class MenubuttonTag extends Tag {
 		String iconClsField = argsMap.get(ICON_CLS_FIELD) == null ? ICON_CLS_FIELD_DEFAULT : argsMap.get(ICON_CLS_FIELD).toString();
 		String disabledField = argsMap.get(DISABLED_FIELD) == null ? DISABLED_FIELD_DEFAULT : argsMap.get(DISABLED_FIELD).toString();
 		String divId = argsMap.get(DIV_ID) == null ? DIV_ID_DEFAULT : argsMap.get(DIV_ID).toString();
+		//swiper用的容器id
+		String containerId = argsMap.get(CONTAINER_ID) == null ? CONTAINER_ID_DEFAULT : argsMap.get(CONTAINER_ID).toString();
 		String menuWidth = argsMap.get(MENU_WIDTH) == null ? MENU_WIDTH_DEFAULT : argsMap.get(MENU_WIDTH).toString();
 		String menuHeight = argsMap.get(MENU_HEIGHT) == null ? MENU_HEIGHT_DEFAULT : argsMap.get(MENU_HEIGHT).toString();
 		String panelAlign = argsMap.get(PANEL_ALIGN) == null ? PANEL_ALIGN_DEFAULT : argsMap.get(PANEL_ALIGN).toString();
@@ -123,7 +129,9 @@ public class MenubuttonTag extends Tag {
 		}
 
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("<div id=\""+divId+"\" class=\"easyui-panel\" align=\""+panelAlign+"\" style=\"padding:1px;\">"+ LINE_SEPARATOR);
+		stringBuilder.append("<div id=\""+divId+"\" class=\"easyui-panel swiper-container\" align=\""+panelAlign+"\" style=\"padding:1px;\">"+ LINE_SEPARATOR);
+		stringBuilder.append("<div id=\""+containerId+"\" >");
+		stringBuilder.append("<div class=\"swiper-wrapper\">");
 		for(Object root : rootList) {
 			//校验text和id必须有
 			if(getData(root, textField, isMap) == null || getData(root, idField, isMap) == null) {
@@ -132,6 +140,7 @@ public class MenubuttonTag extends Tag {
 			String id = getData(root, idField, isMap);
 			String iconCls = getData(root, iconClsField, isMap);
 			String disabled = getData(root, disabledField, isMap);
+			stringBuilder.append("<div class=\"swiper-slide\">");
 			//没有子的根节点的class为easyui-linkbutton
 			if(!hasChild(list, id, isMap, parentIdField)){
 				stringBuilder.append("<a id=\"menubutton_" + id + "\" href=\"#\" class=\"easyui-linkbutton\"  data-options=\"width:"+menuWidth+", height:"+menuHeight+", blankKey:''");
@@ -162,7 +171,13 @@ public class MenubuttonTag extends Tag {
 			}
 			stringBuilder.append("," + getDataOptions(root, Map.class.isAssignableFrom(root.getClass())));
 			stringBuilder.append("\">" + getData(root, textField, isMap) + "</a>"+ LINE_SEPARATOR);
+			stringBuilder.append("</div>");
 		}
+		stringBuilder.append("</div>"+ LINE_SEPARATOR);//end of swiper-wrapper
+		stringBuilder.append("</div>");//end of swiper-container
+		//导航按钮
+		stringBuilder.append("<div class=\"swiper-button-prev swiper-button-black\"></div>");
+		stringBuilder.append("<div class=\"swiper-button-next swiper-button-black\"></div>");
 		stringBuilder.append("</div>"+ LINE_SEPARATOR);
 		try {
 			ctx.byteWriter.writeString(stringBuilder.toString() );

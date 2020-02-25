@@ -3,7 +3,7 @@ package com.dili.ss.util;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,12 +32,12 @@ public class DateUtils {
     }
 
     /**
-     * 当前日期格式化
+     * 当前日期格式化(时区为GMT+08:00)
      * @param format
      * @return
      */
     public static String format(String format) {
-        return format(LocalDateTime.now(), format);
+        return format(LocalDateTime.now(ZoneId.of("GMT+08:00")), format);
     }
 
     /**
@@ -262,6 +262,19 @@ public class DateUtils {
     }
 
     /**
+     * 获取dataStr(格式为yyyy-MM-dd)的最晚时间23:59:59，精确到秒
+     * @param dateStr
+     * @return
+     */
+    public static String formatDate2DateTimeEndSecond(String dateStr) {
+        Calendar calendar = format(dateStr, "yyyy-MM-dd");
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        return format(calendar.getTime());
+    }
+
+    /**
      * 获取date的最早时间0:0:0
      * @param date
      * @return
@@ -295,6 +308,24 @@ public class DateUtils {
             calendar.set(Calendar.MINUTE, 59);
             calendar.set(Calendar.SECOND, 59);
             calendar.set(Calendar.MILLISECOND, 999);
+            return calendar.getTime();
+        }
+    }
+
+    /**
+     * 获取date的最晚时间23:59:59，精确到秒
+     * @param date
+     * @return
+     */
+    public static Date formatDate2DateTimeEndSecond(Date date) {
+        if (date == null) {
+            return null;
+        } else {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+            calendar.set(Calendar.SECOND, 59);
             return calendar.getTime();
         }
     }
@@ -396,5 +427,74 @@ public class DateUtils {
         return (int) ((date2.getTime() - date1.getTime()) / (1000*3600*24));
     }
 
+    /**
+     * date转换为LocalDateTime
+     * @param date
+     * @return
+     */
+    public static LocalDateTime dateToLocalDateTime(Date date) {
+        Instant instant = date.toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+        return LocalDateTime.ofInstant(instant, zone);
+    }
 
+
+    /**
+     * java.util.Date --> java.time.LocalDate
+     * @param date
+     * @return
+     */
+    public static LocalDate dateToLocalDate(Date date) {
+        Instant instant = date.toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
+        return localDateTime.toLocalDate();
+    }
+
+    /**
+     * java.util.Date --> java.time.LocalTime
+     * @param date
+     * @return
+     */
+    public LocalTime dateToLocalTime(Date date) {
+        Instant instant = date.toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
+        return localDateTime.toLocalTime();
+    }
+
+
+    /**
+     * java.time.LocalDateTime --> java.util.Date
+     * @param localDateTime
+     * @return
+     */
+    public static Date localDateTimeToUdate(LocalDateTime localDateTime) {
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant = localDateTime.atZone(zone).toInstant();
+        return Date.from(instant);
+    }
+
+
+    /**
+     * java.time.LocalDate --> java.util.Date
+     * @param localDate
+     * @return
+     */
+    public static Date localDateToUdate(LocalDate localDate) {
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant = localDate.atStartOfDay().atZone(zone).toInstant();
+        return Date.from(instant);
+    }
+
+    /**
+     * java.time.LocalTime --> java.util.Date
+     */
+    public static Date localTimeToUdate(LocalTime localTime) {
+        LocalDate localDate = LocalDate.now();
+        LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant = localDateTime.atZone(zone).toInstant();
+        return Date.from(instant);
+    }
 }

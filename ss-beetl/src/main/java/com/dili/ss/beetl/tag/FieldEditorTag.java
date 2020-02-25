@@ -1,8 +1,9 @@
-package com.dili.ss.beetl;
+package com.dili.ss.beetl.tag;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.metadata.FieldEditor;
 import org.beetl.core.tag.Tag;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.Map;
  * Created by asiamaster on 2017/7/21 0021.
  */
 @Component("fieldEditor")
+@ConditionalOnExpression("'${beetl.enable}'=='true'")
 public class FieldEditorTag extends Tag {
 	private final String LINE_SEPARATOR = System.getProperty("line.separator");
 	private final String TAB = "    ";
