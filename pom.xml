@@ -6,7 +6,7 @@
 	<groupId>com.dili</groupId>
 	<artifactId>sharp-sword-parent</artifactId>
 	<name>sharp-sword-parent</name>
-	<version>3.6.4-SNAPSHOT</version>
+	<version>3.6.5-SNAPSHOT</version>
 	<!--<version>1.0.0.RELEASE</version>-->
 	<description>利刃框架父项目</description>
 	<packaging>pom</packaging>
@@ -197,7 +197,7 @@
 				<!-- Import dependency management from Spring Boot -->
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
-				<version>2.2.2.RELEASE</version>
+				<version>2.2.4.RELEASE</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

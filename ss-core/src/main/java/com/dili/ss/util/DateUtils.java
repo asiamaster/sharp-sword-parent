@@ -262,6 +262,19 @@ public class DateUtils {
     }
 
     /**
+     * 获取dataStr(格式为yyyy-MM-dd)的最晚时间23:59:59，精确到秒
+     * @param dateStr
+     * @return
+     */
+    public static String formatDate2DateTimeEndSecond(String dateStr) {
+        Calendar calendar = format(dateStr, "yyyy-MM-dd");
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        return format(calendar.getTime());
+    }
+
+    /**
      * 获取date的最早时间0:0:0
      * @param date
      * @return
@@ -295,6 +308,24 @@ public class DateUtils {
             calendar.set(Calendar.MINUTE, 59);
             calendar.set(Calendar.SECOND, 59);
             calendar.set(Calendar.MILLISECOND, 999);
+            return calendar.getTime();
+        }
+    }
+
+    /**
+     * 获取date的最晚时间23:59:59，精确到秒
+     * @param date
+     * @return
+     */
+    public static Date formatDate2DateTimeEndSecond(Date date) {
+        if (date == null) {
+            return null;
+        } else {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+            calendar.set(Calendar.SECOND, 59);
             return calendar.getTime();
         }
     }
