@@ -1,5 +1,6 @@
 package com.dili.ss.uid.service;
 
+import com.dili.ss.uid.domain.BizNumber;
 import com.dili.ss.uid.domain.BizNumberRule;
 
 /**
@@ -14,4 +15,10 @@ public interface BizNumberService {
 	 */
 	String getBizNumberByType(BizNumberRule bizNumberRule);
 
+	/**
+	 * 查询一条
+	 * @param bizNumber
+	 * @return
+	 */
+	BizNumber selectOne(BizNumber bizNumber);
 }
