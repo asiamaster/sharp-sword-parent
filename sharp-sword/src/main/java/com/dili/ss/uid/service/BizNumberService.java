@@ -1,12 +1,13 @@
 package com.dili.ss.uid.service;
 
+import com.dili.ss.base.BaseService;
 import com.dili.ss.uid.domain.BizNumber;
 import com.dili.ss.uid.domain.BizNumberRule;
 
 /**
  * 业务号服务
  */
-public interface BizNumberService {
+public interface BizNumberService extends BaseService<BizNumber, Long> {
 
 	/**
 	 * 根据业务类型规则获取编号
