@@ -160,7 +160,7 @@ public class RedisDistributedLock{
 
     /**
      * Lettuce方式释放锁
-     * 根据lockKey从redis获取到的值和lockValue对比，如果相同则根据key删除缓存，不同则返回false
+     * 根据lockKey从redis获取到的值和lockValue对比，如果相同则根据key删除缓存并返回true，不同则返回false
      * @param lockKey
      * @param lockValue
      * @return
