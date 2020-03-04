@@ -68,7 +68,8 @@ public class BizNumberComponent {
         }
         //每天最大分配号数
         int max = new Double(Math.pow(10, length)).intValue();
-        Long initBizNumber = BizNumberUtils.getInitBizNumber(DateUtils.format(dateFormat), length);
+        String dateStr = dateFormat == null ? null : DateUtils.format(dateFormat);
+        Long initBizNumber = BizNumberUtils.getInitBizNumber(dateStr, length);
         //先申请占位
         Long tempStartSeq = 0L;
         if(startSeq != null){

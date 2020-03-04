@@ -34,9 +34,8 @@ import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.uid.dao.BizNumberMapper;
 import com.dili.ss.uid.domain.BizNumber;
 import com.dili.ss.uid.domain.SequenceNo;
+import com.dili.ss.uid.util.BizNumberUtils;
 import com.dili.ss.util.DateUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
@@ -69,7 +68,8 @@ public class BizNumberComponent {
         }
         //每天最大分配号数
         int max = new Double(Math.pow(10, length)).intValue();
-        Long initBizNumber = getInitBizNumber(DateUtils.format(dateFormat), length);
+        String dateStr = dateFormat == null ? null : DateUtils.format(dateFormat);
+        Long initBizNumber = BizNumberUtils.getInitBizNumber(dateStr, length);
         //先申请占位
         Long tempStartSeq = 0L;
         if(startSeq != null){
@@ -129,14 +129,5 @@ public class BizNumberComponent {
         return list.get(0);
     }
 
-    /**
-     * 获取日期加每日计数量的初始化字符串，最低位从1开始
-     * @param dateStr
-     * @param length 编码位数(不包含日期位数)
-     * @return
-     */
-    private Long getInitBizNumber(String dateStr, int length) {
-        return StringUtils.isBlank(dateStr) ? 1 : NumberUtils.toLong(dateStr) * Double.valueOf(Math.pow(10, length)).longValue() + 1;
-    }
 
 }

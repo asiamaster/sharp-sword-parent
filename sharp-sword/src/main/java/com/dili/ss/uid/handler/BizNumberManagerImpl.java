@@ -61,7 +61,7 @@ public class BizNumberManagerImpl implements BizNumberManager{
      */
     @Override
     public Long getBizNumberByType(String type, String dateFormat, int length, long step) {
-        String dateStr = DateUtils.format(dateFormat);
+        String dateStr = dateFormat == null ? null : DateUtils.format(dateFormat);
         Long orderId = getNextSequenceId(type, null, dateFormat, length, step);
         //如果不是同天，重新获取从1开始的编号
         if (StringUtils.isNotBlank(dateStr) && !dateStr.equals(StringUtils.substring(String.valueOf(orderId), 0, 8))) {
