@@ -17,11 +17,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cglib.beans.BeanCopier;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.*;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.*;
@@ -100,11 +101,11 @@ public class DTOUtils {
 						}
 					}
 					dto.putAll(((IDTO) obj).aget());
-					dto.putAll(BeanConver.transformObjectToMap(obj));
+					dto.putAll(transformBeanToMap(obj));
 					return dto;
 				}else{
 					DTO dto = ((IDTO)obj).aget();
-					dto.putAll(BeanConver.transformObjectToMap(obj));
+					dto.putAll(transformBeanToMap(obj));
 					return dto;
 				}
 			} catch (Exception e) {
@@ -896,7 +897,36 @@ public class DTOUtils {
 		}
 	}
 
-	private static String generateKey(Class<?> class1, Class<?> class2) {
-		return class1.toString() + class2.toString();
+	/**
+	 * 将JavaBean转为Map
+	 * @param bean
+	 * @return
+	 * @throws IntrospectionException
+	 */
+	private static Map<String, Object> transformBeanToMap(Object bean) throws IntrospectionException {
+		BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+		for (int i = 0; i < propertyDescriptors.length; i++) {
+			PropertyDescriptor descriptor = propertyDescriptors[i];
+			String propertyName = descriptor.getName();
+			if (!"class".equals(propertyName)) {
+				Method readMethod = descriptor.getReadMethod();
+				//可能该属性并没有getter方法
+				if(readMethod == null){
+					continue;
+				}
+				Object result = null;
+				try {
+					result = readMethod.invoke(bean, new Object[0]);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				}
+				if (result != null) {
+					returnMap.put(propertyName, result);
+				}
+			}
+		}
+		return returnMap;
 	}
+
 }

@@ -7,10 +7,11 @@ import com.dili.ss.dto.DTO;
 import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.dto.ReturnTypeHandlerFactory;
+import com.dili.ss.exception.AppException;
+import com.dili.ss.mvc.servlet.RequestReaderHttpServletRequestWrapper;
 import com.dili.ss.mvc.util.BeanValidator;
 import com.dili.ss.util.POJOUtils;
 import com.google.common.collect.Lists;
-import org.apache.catalina.connector.RequestFacade;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,14 +22,13 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import javax.servlet.ServletInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.servlet.ServletRequest;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -395,8 +395,10 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 		// 实例化一个DTO数据对象
 		DTO dto = new DTO();
 		try {
-			ServletInputStream servletInputStream = ((RequestFacade)webRequest.getNativeRequest()).getInputStream();
-			String inputString = InputStream2String(servletInputStream, "UTF-8");
+//			ServletInputStream servletInputStream = ((RequestFacade)webRequest.getNativeRequest()).getInputStream();
+//			ServletInputStream servletInputStream = (((RequestReaderHttpServletRequestWrapper)webRequest.getNativeRequest()).getInputStream());
+//			String inputString = InputStream2String(servletInputStream, "UTF-8");
+			String inputString = getBodyString((RequestReaderHttpServletRequestWrapper)webRequest.getNativeRequest());
 			if(StringUtils.isNotBlank(inputString)) {
 				inputString = java.net.URLDecoder.decode(inputString, "UTF-8");
 				JSONObject jsonObject;
@@ -579,14 +581,49 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String InputStream2String(InputStream in, String encoding) throws IOException {
+	private String InputStream2String(InputStream in, String encoding) throws IOException {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		in.mark(0);
 		byte[] data = new byte[BUFFER_SIZE];
 		int count = -1;
 		while((count = in.read(data,0,BUFFER_SIZE)) != -1) {
 			outStream.write(data, 0, count);
 		}
+		in.reset();
 		data = null;
 		return new String(outStream.toByteArray(), encoding);
+	}
+
+	/**
+	 * 获取请求Body
+	 * 可重复获取
+	 * @param request 过滤后被的request
+	 * @return 返回body
+	 */
+	private String getBodyString(ServletRequest request) {
+		StringBuilder sb = new StringBuilder();
+		InputStream inputStream = null;
+		BufferedReader reader = null;
+		try {
+			inputStream = request.getInputStream();
+			reader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")));
+			String line = "";
+			while ((line = reader.readLine()) != null) {
+				sb.append(line);
+			}
+		} catch (Exception e) {
+			throw new AppException("获取requestBody出错：" + e.getMessage());
+		} finally {
+			try {
+				if (inputStream != null) {
+					inputStream.close();
+				}
+				if (reader != null) {
+					reader.close();
+				}
+			} catch (IOException ignored) {
+			}
+		}
+		return sb.toString();
 	}
 }

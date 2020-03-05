@@ -144,7 +144,7 @@ public class BeanConver {
         if(bean instanceof Map){
             return (Map) bean;
         }
-        if(DTOUtils.isProxy(bean)){
+        if(DTOUtils.isProxy(bean) || DTOUtils.isInstance(bean)){
             try {
                 return DTOUtils.go(bean, true);
             } catch (Throwable throwable) {
