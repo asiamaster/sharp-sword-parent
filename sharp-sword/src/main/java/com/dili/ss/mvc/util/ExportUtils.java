@@ -20,6 +20,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -39,6 +40,7 @@ import java.util.concurrent.TimeUnit;
  * Created by asiamaster on 2017/6/15 0015.
  */
 @Component
+@DependsOn("initConfig")
 public class ExportUtils {
 
     public final static Logger log = LoggerFactory.getLogger(ExportUtils.class);

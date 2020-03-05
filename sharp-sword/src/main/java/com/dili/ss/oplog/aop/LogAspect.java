@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +44,7 @@ import java.util.concurrent.ExecutorService;
 @Component
 @Aspect
 @Order(1)
+@DependsOn("initConfig")
 @ConditionalOnExpression("'${oplog.enable}'=='true'")
 public class LogAspect {
 

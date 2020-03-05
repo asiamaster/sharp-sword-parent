@@ -4,6 +4,8 @@ import com.dili.http.okhttp.utils.B;
 import com.dili.ss.retrofitful.aop.annotation.Order;
 import com.dili.ss.retrofitful.aop.invocation.Invocation;
 import com.dili.ss.retrofitful.aop.service.RestfulService;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -12,7 +14,8 @@ import javax.annotation.PostConstruct;
  * 默认的restful拦截器，最后执行
  */
 @Component
-@Order(Integer.MAX_VALUE)
+@Order(Ordered.LOWEST_PRECEDENCE)
+@DependsOn("initConfig")
 public class RestfulFilter extends AbstractFilter {
     private RestfulService restfulService;
 

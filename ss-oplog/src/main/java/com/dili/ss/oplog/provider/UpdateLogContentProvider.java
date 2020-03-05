@@ -5,8 +5,8 @@ import com.dili.ss.base.BaseService;
 import com.dili.ss.dto.DTO;
 import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IDTO;
+import com.dili.ss.exception.ParamErrorException;
 import com.dili.ss.metadata.annotation.FieldDef;
-import com.dili.ss.oplog.annotation.OpLog;
 import com.dili.ss.oplog.base.LogContentProvider;
 import com.dili.ss.oplog.dto.LogContext;
 import com.dili.ss.oplog.dto.UpdatedLogInfo;
@@ -22,10 +22,7 @@ import javax.persistence.Transient;
 import java.beans.Introspector;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 修改方法 的日志内容提供者
@@ -48,9 +45,9 @@ public class UpdateLogContentProvider implements LogContentProvider {
     @Override
     public String content(Method method, Object[] args, String params, LogContext logContext){
         //修改取第一个参数
-        Object param1 = args[0];
-        OpLog opLog = method.getAnnotation(OpLog.class);
-        Class<?> clazz = DTOUtils.getDTOClass(param1);
+        Object updatedBean = args[0];
+//        OpLog opLog = method.getAnnotation(OpLog.class);
+        Class<?> clazz = DTOUtils.getDTOClass(updatedBean);
         JSONObject jsonObject = JSONObject.parseObject(params);
         String serviceName = jsonObject.getString("serviceName");
         BaseService<? extends IDTO, Long> service = null;
@@ -66,11 +63,11 @@ public class UpdateLogContentProvider implements LogContentProvider {
         Object id = null;
         //如果是DTO接口，则取getter上的FieldDef注解的label
         if(clazz.isInterface()) {
-            id = buildUpdatedFieldsByDto(updatedFields, clazz, param1, service, excludes);
+            id = buildUpdatedFieldsByDto(updatedFields, clazz, updatedBean, service, excludes);
         }
         //否则是普通JAVABean，取字段上的FieldDef注解的label
         else{
-            id = buildUpdatedFieldsByBean(updatedFields, clazz, param1, service, excludes);
+            id = buildUpdatedFieldsByBean(updatedFields, clazz, updatedBean, service, excludes);
         }
         StringBuilder stringBuilder = new StringBuilder("[目标id]:"+id+"\r\n");
         if(updatedFields.isEmpty()){
@@ -92,10 +89,21 @@ public class UpdateLogContentProvider implements LogContentProvider {
         return stringBuilder.toString();
     }
 
+    /**
+     * 构建修改的字段信息
+     * service名称必须是 "实体Service"
+     * @param updatedFields
+     * @paramclazz
+     * @param param1
+     * @param service
+     * @param excludes
+     * @return
+     */
     private Object buildUpdatedFieldsByDto(Map<String, UpdatedLogInfo> updatedFields, Class<?> clazz, Object param1, BaseService<? extends IDTO, Long> service, List<String> excludes){
         DTO dto = DTOUtils.go(param1);
         Object idObj = dto.get("id");
         IDTO oldObj = null;
+        //根据id从数据库获取原始对象
         if(service != null && idObj != null){
             oldObj = service.get(Long.parseLong(idObj.toString()));
         }
@@ -120,7 +128,7 @@ public class UpdateLogContentProvider implements LogContentProvider {
                     updatedLogInfo.setLabel(label);
                     if(oldObj != null){
                         //新旧值相同，则不记录
-                        if(value.equals(oldObjDTO.get(field))){
+                        if(Objects.equals(value, oldObjDTO.get(field))){
                             continue;
                         }
                         updatedLogInfo.setOldValue(oldObjDTO.get(field));
@@ -132,13 +140,24 @@ public class UpdateLogContentProvider implements LogContentProvider {
         return idObj;
     }
 
+    /**
+     * 构建修改的字段信息
+     * service名称必须是 "实体Service"
+     * @param updatedFields
+     * @param clazz
+     * @param param1
+     * @param service
+     * @param excludes
+     * @return
+     */
     private Object buildUpdatedFieldsByBean(Map<String, UpdatedLogInfo> updatedFields, Class<?> clazz, Object param1, BaseService<? extends IDTO, Long> service, List<String> excludes){
         Map<String, Object> objMap = null;
         try {
             objMap = BeanConver.transformObjectToMap(param1);
         } catch (Exception e) {
-            objMap = null;
+            throw new ParamErrorException(e);
         }
+        //数据库中的原始对象的Map
         Map<String, Object> oldObjMap = null;
         if(service != null && objMap != null && objMap.get("id") != null){
             Object oldBean = service.get(Long.parseLong(objMap.get("id").toString()));
