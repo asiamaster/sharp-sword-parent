@@ -48,8 +48,7 @@ public class UpdateLogContentProvider implements LogContentProvider {
         Object updatedBean = args[0];
 //        OpLog opLog = method.getAnnotation(OpLog.class);
         Class<?> clazz = DTOUtils.getDTOClass(updatedBean);
-        JSONObject jsonObject = JSONObject.parseObject(params);
-        String serviceName = jsonObject.getString("serviceName");
+        String serviceName = StringUtils.isBlank(params) ? null : params.trim().startsWith("{") ? JSONObject.parseObject(params).getString("serviceName") : params.trim();
         BaseService<? extends IDTO, Long> service = null;
         if(StringUtils.isBlank(serviceName)){
             service = serviceMap.get(Introspector.decapitalize(clazz.getSimpleName())+"ServiceImpl");
@@ -94,14 +93,14 @@ public class UpdateLogContentProvider implements LogContentProvider {
      * service名称必须是 "实体Service"
      * @param updatedFields
      * @paramclazz
-     * @param param1
+     * @param updatedBean 形参中被修改的对象
      * @param service
      * @param excludes
      * @return
      */
-    private Object buildUpdatedFieldsByDto(Map<String, UpdatedLogInfo> updatedFields, Class<?> clazz, Object param1, BaseService<? extends IDTO, Long> service, List<String> excludes){
-        DTO dto = DTOUtils.go(param1);
-        Object idObj = dto.get("id");
+    private Object buildUpdatedFieldsByDto(Map<String, UpdatedLogInfo> updatedFields, Class<?> clazz, Object updatedBean, BaseService<? extends IDTO, Long> service, List<String> excludes){
+        DTO updatedDto = DTOUtils.go(updatedBean);
+        Object idObj = updatedDto.get("id");
         IDTO oldObj = null;
         //根据id从数据库获取原始对象
         if(service != null && idObj != null){
@@ -121,18 +120,18 @@ public class UpdateLogContentProvider implements LogContentProvider {
                     continue;
                 }
                 String label = fieldDef == null ? field : fieldDef.label();
-                Object value = dto.get(field);
+                Object value = updatedDto.get(field);
                 if(null != value){
-                    UpdatedLogInfo updatedLogInfo = new UpdatedLogInfo();
-                    updatedLogInfo.setNewValue(value);
-                    updatedLogInfo.setLabel(label);
                     if(oldObj != null){
                         //新旧值相同，则不记录
                         if(Objects.equals(value, oldObjDTO.get(field))){
                             continue;
                         }
-                        updatedLogInfo.setOldValue(oldObjDTO.get(field));
                     }
+                    UpdatedLogInfo updatedLogInfo = new UpdatedLogInfo();
+                    updatedLogInfo.setOldValue(oldObjDTO.get(field));
+                    updatedLogInfo.setNewValue(value);
+                    updatedLogInfo.setLabel(label);
                     updatedFields.put(field, updatedLogInfo);
                 }
             }

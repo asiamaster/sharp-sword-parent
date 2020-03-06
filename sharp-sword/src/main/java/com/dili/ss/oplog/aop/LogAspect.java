@@ -26,7 +26,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -43,7 +42,6 @@ import java.util.concurrent.ExecutorService;
  */
 @Component
 @Aspect
-@Order(1)
 @DependsOn("initConfig")
 @ConditionalOnExpression("'${oplog.enable}'=='true'")
 public class LogAspect {
@@ -98,9 +96,10 @@ public class LogAspect {
             }
         }
         LogContext finalLogContext = logContext;
+        String content = getContent(point, finalLogContext);
         executor.execute(() -> {
             try {
-                log(point, finalLogContext);
+                log(point, finalLogContext, content);
             } catch (Exception e) {
                 log.error("操作日志异常:"+e.getMessage());
             }
@@ -110,14 +109,13 @@ public class LogAspect {
         return retValue;
     }
 
-
     /**
-     * 记录日志
+     * 获取内容
      * @param point
      * @param logContext
-     * @throws ClassNotFoundException
+     * @return
      */
-    private void log(ProceedingJoinPoint point, LogContext logContext) throws Exception {
+    private String getContent(ProceedingJoinPoint point, LogContext logContext){
         Method method = ((MethodSignature) point.getSignature()).getMethod();
         OpLog opLog = method.getAnnotation(OpLog.class);
         String content = null;
@@ -130,12 +128,25 @@ public class LogAspect {
                 logContentProvider = getObj(cp, LogContentProvider.class);
             } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | BeansException e) {
                 log.error(e.getMessage());
-                return;
+                return null;
             }
             content = logContentProvider.content(method, point.getArgs(), opLog.params(), logContext);
         }else{
             content = getBeetlContent(method, point.getArgs());
         }
+        return content;
+    }
+
+    /**
+     * 记录日志
+     * @param point
+     * @param logContext 上下文
+     * @param content 日志内容
+     * @throws ClassNotFoundException
+     */
+    private void log(ProceedingJoinPoint point, LogContext logContext, String content) throws Exception {
+        Method method = ((MethodSignature) point.getSignature()).getMethod();
+        OpLog opLog = method.getAnnotation(OpLog.class);
         String handler = StringUtils.isBlank(opLog.handler()) ? this.handler : opLog.handler();
         //有handler并且有内容
         if(StringUtils.isNotBlank(handler)) {
@@ -214,7 +225,7 @@ public class LogAspect {
      * @param objName
      * @return
      */
-    private <T> T getObj(String objName, Class<T> clazz) throws ClassNotFoundException, IllegalAccessException, InstantiationException, BeansException, ParamErrorException {
+    private <T> T getObj(String objName, Class<T> clazz) throws ClassNotFoundException, IllegalAccessException, InstantiationException, BeansException {
         if(objName.contains(".")){
             Class objClass = Class.forName(objName);
             if(clazz.isAssignableFrom(objClass)){
@@ -222,8 +233,13 @@ public class LogAspect {
             }
             throw new ParamErrorException(objName + "不是" + clazz.getName() +"的实例");
         }else{
-            //这里可能bean不存在，会抛异常
-            T bean = SpringUtil.getBean(objName, clazz);
+            T bean = null;
+            try {
+                //这里可能bean不存在，会抛异常
+                bean = SpringUtil.getBean(objName, clazz);
+            } catch (BeansException e) {
+                throw e;
+            }
             if(clazz.isAssignableFrom(bean.getClass())){
                 return bean;
             }

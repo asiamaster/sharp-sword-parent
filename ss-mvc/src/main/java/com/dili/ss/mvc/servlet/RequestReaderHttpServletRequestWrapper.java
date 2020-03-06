@@ -25,7 +25,7 @@ public class RequestReaderHttpServletRequestWrapper extends ContentCachingReques
      * @param request request
      * @throws IOException io异常
      */
-    public RequestReaderHttpServletRequestWrapper(HttpServletRequest request) throws IOException {
+    public RequestReaderHttpServletRequestWrapper(HttpServletRequest request) {
         super(request);
         request.getParameterMap();//此处将body中的parameter取出来，，这样后续的任何request.getParamter（）都会有值
         this.body = getBodyString(request).getBytes(Charset.forName("UTF-8"));

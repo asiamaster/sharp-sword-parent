@@ -449,7 +449,7 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 		DTO dto = new DTO();
 		try {
 //			ServletInputStream servletInputStream = ((RequestFacade)webRequest.getNativeRequest()).getInputStream();
-			String inputString = getBodyString((RequestReaderHttpServletRequestWrapper)webRequest.getNativeRequest());
+			String inputString = webRequest.getNativeRequest() instanceof RequestReaderHttpServletRequestWrapper ? getBodyString((RequestReaderHttpServletRequestWrapper)webRequest.getNativeRequest()) : "";
 			//下面的方法不能重复读取
 //			ServletInputStream servletInputStream = (((RequestReaderHttpServletRequestWrapper)webRequest.getNativeRequest()).getInputStream());
 //			inputString = InputStream2String(servletInputStream, "UTF-8");

@@ -18,6 +18,7 @@ public class SSFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         ServletRequest requestWrapper = null;
         //获取请求中的流，将取出来的字符串，再次转换成流，然后把它放入到新request对象中。
+        //request应该是RequestFacade
         if (request instanceof HttpServletRequest) {
             requestWrapper = new RequestReaderHttpServletRequestWrapper((HttpServletRequest) request);
         }

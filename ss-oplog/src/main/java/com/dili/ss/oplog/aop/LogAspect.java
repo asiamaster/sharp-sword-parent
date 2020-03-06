@@ -96,9 +96,10 @@ public class LogAspect {
             }
         }
         LogContext finalLogContext = logContext;
+        String content = getContent(point, finalLogContext);
         executor.execute(() -> {
             try {
-                log(point, finalLogContext);
+                log(point, finalLogContext, content);
             } catch (Exception e) {
                 log.error("操作日志异常:"+e.getMessage());
             }
@@ -108,14 +109,13 @@ public class LogAspect {
         return retValue;
     }
 
-
     /**
-     * 记录日志
+     * 获取内容
      * @param point
      * @param logContext
-     * @throws ClassNotFoundException
+     * @return
      */
-    private void log(ProceedingJoinPoint point, LogContext logContext) throws Exception {
+    private String getContent(ProceedingJoinPoint point, LogContext logContext){
         Method method = ((MethodSignature) point.getSignature()).getMethod();
         OpLog opLog = method.getAnnotation(OpLog.class);
         String content = null;
@@ -128,12 +128,25 @@ public class LogAspect {
                 logContentProvider = getObj(cp, LogContentProvider.class);
             } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | BeansException e) {
                 log.error(e.getMessage());
-                return;
+                return null;
             }
             content = logContentProvider.content(method, point.getArgs(), opLog.params(), logContext);
         }else{
             content = getBeetlContent(method, point.getArgs());
         }
+        return content;
+    }
+
+    /**
+     * 记录日志
+     * @param point
+     * @param logContext 上下文
+     * @param content 日志内容
+     * @throws ClassNotFoundException
+     */
+    private void log(ProceedingJoinPoint point, LogContext logContext, String content) throws Exception {
+        Method method = ((MethodSignature) point.getSignature()).getMethod();
+        OpLog opLog = method.getAnnotation(OpLog.class);
         String handler = StringUtils.isBlank(opLog.handler()) ? this.handler : opLog.handler();
         //有handler并且有内容
         if(StringUtils.isNotBlank(handler)) {

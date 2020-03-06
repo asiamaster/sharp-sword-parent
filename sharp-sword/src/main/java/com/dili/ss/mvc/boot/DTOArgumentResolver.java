@@ -398,7 +398,7 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 //			ServletInputStream servletInputStream = ((RequestFacade)webRequest.getNativeRequest()).getInputStream();
 //			ServletInputStream servletInputStream = (((RequestReaderHttpServletRequestWrapper)webRequest.getNativeRequest()).getInputStream());
 //			String inputString = InputStream2String(servletInputStream, "UTF-8");
-			String inputString = getBodyString((RequestReaderHttpServletRequestWrapper)webRequest.getNativeRequest());
+			String inputString = webRequest.getNativeRequest() instanceof RequestReaderHttpServletRequestWrapper ? getBodyString((RequestReaderHttpServletRequestWrapper)webRequest.getNativeRequest()) : "";
 			if(StringUtils.isNotBlank(inputString)) {
 				inputString = java.net.URLDecoder.decode(inputString, "UTF-8");
 				JSONObject jsonObject;
