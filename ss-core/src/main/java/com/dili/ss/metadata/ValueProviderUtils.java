@@ -46,7 +46,7 @@ public class ValueProviderUtils {
 	 */
 	public static <T extends IBaseDomain> List<Map> buildDataByProvider(T domain, List list) throws Exception {
 		Map metadata = null;
-		if (DTOUtils.isProxy(domain)) {
+		if (DTOUtils.isProxy(domain) || DTOUtils.isInstance(domain)) {
 			metadata = domain.mget();
 		} else {
 			metadata = domain.getMetadata();
