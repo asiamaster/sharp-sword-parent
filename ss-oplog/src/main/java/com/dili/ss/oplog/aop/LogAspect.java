@@ -97,6 +97,9 @@ public class LogAspect {
         }
         LogContext finalLogContext = logContext;
         String content = getContent(point, finalLogContext);
+        //先执行方法
+        Object retValue = point.proceed();
+        //方法执行完后异步执行日志
         executor.execute(() -> {
             try {
                 log(point, finalLogContext, content);
@@ -104,8 +107,6 @@ public class LogAspect {
                 log.error("操作日志异常:"+e.getMessage());
             }
         });
-        //先执行方法
-        Object retValue = point.proceed();
         return retValue;
     }
 
