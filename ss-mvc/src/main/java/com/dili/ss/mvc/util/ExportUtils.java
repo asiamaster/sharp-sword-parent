@@ -101,8 +101,7 @@ public class ExportUtils {
         for (int j = 0; j < tableHeaders.size(); j++) {
             //列头信息
             TableHeader tableHeader = tableHeaders.get(j);
-            Cell cell = headerRow.createCell(j);               //创建列头对应个数的单元格
-            cell.setCellType(CellType.STRING);             //设置列头单元格的数据类型
+            Cell cell = headerRow.createCell(j, CellType.STRING);               //创建列头对应个数的单元格
             RichTextString text = new XSSFRichTextString(tableHeader.getTitle().replaceAll("\\n", "").trim());
             cell.setCellValue(text);                                 //设置列头单元格的值
             cell.setCellStyle(columnTopStyle);                       //设置列头单元格样式
@@ -119,9 +118,10 @@ public class ExportUtils {
             //迭代列头
             for(int j=0; j<tableHeaders.size(); j++){
                 TableHeader tableHeader = tableHeaders.get(j);
-                Cell cell = dataRow.createCell(j);
-                cell.setCellStyle(dataColumnStyle);
                 Object value = rowDataMap.get(tableHeader.getField());
+                CellType cellType = value instanceof Number ? CellType.NUMERIC : CellType.STRING;
+                Cell cell = dataRow.createCell(j, cellType);
+                cell.setCellStyle(dataColumnStyle);
                 if(providerMeta != null && providerMeta.containsKey(tableHeader.getField())){
                     ValueProvider valueProvider = null;
                     //value是provider的beanId
@@ -229,9 +229,10 @@ public class ExportUtils {
 				if(headerMap.get("hidden")!=null && headerMap.get("hidden").equals(true)){
 					continue;
 				}
-				Cell cell = row.createCell(index);
+                Object value = rowDataMap.get(headerMap.get("field"));
+                CellType cellType = value instanceof Number ? CellType.NUMERIC : CellType.STRING;
+				Cell cell = row.createCell(index, cellType);
 				cell.setCellStyle(dataColumnStyle);
-				Object value = rowDataMap.get(headerMap.get("field"));
 				//判断是否有值提供者需要转义(此功能已经在datagrid的查询中封装，这里不需要处理了)
 //                if(headerMap.containsKey("provider")){
 //                    value = valueProviderUtils.setDisplayText(headerMap.get("provider").toString(), value, null);
@@ -335,15 +336,14 @@ public class ExportUtils {
                     sheet.setColumnWidth(columnIndex, headerTitle.getBytes().length*2*256);
 //                    sheet.autoSizeColumn(j, true);
                 }
-                Cell cell = row.createCell(index+colspanAdd);               //创建列头对应个数的单元格
-                cell.setCellType(CellType.STRING);             //设置列头单元格的数据类型
+                Cell cell = row.createCell(index+colspanAdd, CellType.STRING);               //创建列头对应个数的单元格
                 RichTextString text = new XSSFRichTextString(headerTitle);
                 cell.setCellValue(text);                                 //设置列头单元格的值
                 cell.setCellStyle(columnTopStyle);                       //设置列头单元格样式
                 if(columnMap.get("colspan") != null) {
                     Integer colspan = Integer.class.isAssignableFrom(columnMap.get("colspan").getClass())? (Integer)columnMap.get("colspan") : Integer.parseInt(columnMap.get("colspan").toString());
                     if(colspan > 1) {
-                        Cell tempCell = row.createCell(index + colspanAdd + colspan - 1);               //创建合并最后一列的列头，保证最后一列有右边框
+                        Cell tempCell = row.createCell(index + colspanAdd + colspan - 1, CellType.STRING);               //创建合并最后一列的列头，保证最后一列有右边框
                         tempCell.setCellStyle(columnTopStyle);
                         sheet.addMergedRegion(new CellRangeAddress(i, i, index + colspanAdd, index + colspanAdd + colspan - 1));
                         colspanAdd = colspanAdd + colspan - 1;
