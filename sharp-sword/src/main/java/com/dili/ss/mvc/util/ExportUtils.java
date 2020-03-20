@@ -13,6 +13,7 @@ import com.dili.ss.util.IExportThreadPoolExecutor;
 import com.dili.ss.util.SpringUtil;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -132,9 +134,9 @@ public class ExportUtils {
                         valueProvider = SpringUtil.getBean(providerBeanId, ValueProvider.class);
                         providerBuffer.put(providerBeanId, valueProvider);
                     }
-                    cell.setCellValue(valueProvider.getDisplayText(value, null, null));
+                    setCellValue(cell, valueProvider.getDisplayText(value, null, null), dataColumnStyle);
                 }else {
-                    cell.setCellValue(value == null ? null : value.toString());
+                    setCellValue(cell, value, dataColumnStyle);
                 }
             }
         }
@@ -237,9 +239,39 @@ public class ExportUtils {
 //                if(headerMap.containsKey("provider")){
 //                    value = valueProviderUtils.setDisplayText(headerMap.get("provider").toString(), value, null);
 //                }
-                cell.setCellValue(value == null ? null : value.toString());
+                setCellValue(cell, value, dataColumnStyle);
                 index++;
             }
+        }
+    }
+
+    /**
+     * 设置单元格的值，主要是处理单元格类型
+     * @param cell
+     * @param value
+     * @param dataColumnStyle
+     */
+    private void setCellValue(Cell cell, Object value, CellStyle dataColumnStyle){
+        if(value == null){
+            cell.setCellValue("");
+        }else if(value instanceof Integer){
+            //数据格式只显示整数
+            dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,#0"));
+            cell.setCellValue(((Integer)value).doubleValue());
+        }else if(value instanceof Long){
+            dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,#0"));
+            cell.setCellValue(((Long)value).doubleValue());
+        }else if(value instanceof Short){
+            dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,#0"));
+            cell.setCellValue(((Short)value).doubleValue());
+        }else if(value instanceof Float){
+            cell.setCellValue(((Float)value).doubleValue());
+        }else if(value instanceof Double){
+            cell.setCellValue((Double)value);
+        }else if(value instanceof BigDecimal){
+            cell.setCellValue(((BigDecimal)value).doubleValue());
+        }else{
+            cell.setCellValue(value.toString());
         }
     }
 
