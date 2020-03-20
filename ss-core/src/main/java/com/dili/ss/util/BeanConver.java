@@ -78,7 +78,8 @@ public class BeanConver {
         Object obj = null;
         try {
             obj = beanClass.isInterface() ? DTOUtils.newInstance((Class)beanClass) : beanClass.newInstance();
-            Field[] fields = obj.getClass().getDeclaredFields();
+//            Field[] fields = obj.getClass().getDeclaredFields();
+            List<Field> fields = ReflectionUtils.getAccessibleFields(obj.getClass(), true, true);
             for (Field field : fields) {
                 int mod = field.getModifiers();
                 if(Modifier.isStatic(mod) || Modifier.isFinal(mod)){
