@@ -455,7 +455,10 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 //			inputString = InputStream2String(servletInputStream, "UTF-8");
 			if(StringUtils.isNotBlank(inputString)) {
 				JSONObject jsonObject = null;
-				inputString = java.net.URLDecoder.decode(inputString, "UTF-8");
+				try {
+					inputString = java.net.URLDecoder.decode(inputString, "UTF-8");
+				} catch (UnsupportedEncodingException | IllegalArgumentException e) {
+				}
 				if(JSON.isValid(inputString)) {
 					jsonObject = JSONObject.parseObject(inputString);
 				}else{

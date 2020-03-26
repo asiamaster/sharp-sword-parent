@@ -400,7 +400,10 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 //			String inputString = InputStream2String(servletInputStream, "UTF-8");
 			String inputString = webRequest.getNativeRequest() instanceof RequestReaderHttpServletRequestWrapper ? getBodyString((RequestReaderHttpServletRequestWrapper)webRequest.getNativeRequest()) : "";
 			if(StringUtils.isNotBlank(inputString)) {
-				inputString = java.net.URLDecoder.decode(inputString, "UTF-8");
+				try {
+					inputString = java.net.URLDecoder.decode(inputString, "UTF-8");
+				} catch (UnsupportedEncodingException | IllegalArgumentException e) {
+				}
 				JSONObject jsonObject;
 				if(JSON.isValid(inputString)) {
 					jsonObject = JSONObject.parseObject(inputString);
@@ -417,9 +420,6 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 				}
 			}
 			return (T)DTOUtils.proxy(dto, clazz);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return DTOUtils.proxy(dto, clazz);
 		} catch (Exception e){
 			return DTOUtils.proxy(dto, clazz);
 		}
