@@ -4,14 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.connection.ReturnType;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.Charset;
-import java.util.concurrent.TimeUnit;
 
 /**
  * redis分布式锁
@@ -77,7 +77,7 @@ public class RedisDistributedLock{
     }
 
     /**
-     * 获取锁
+     * 获取锁，key作为获取锁的条件，key和value将作为释放锁的条件
      * @param key
      * @param value
      * @param expire 单位秒
@@ -96,8 +96,12 @@ public class RedisDistributedLock{
 //        }
 //        return false;
         try {
-            ValueOperations<String, Object> operations = redisTemplate.opsForValue();
-            return operations.setIfAbsent(key, value, expire, TimeUnit.SECONDS);
+//            ValueOperations<String, Object> operations = redisTemplate.opsForValue();
+//            return operations.setIfAbsent(key, value, expire, TimeUnit.SECONDS);
+            RedisCallback<Boolean> callback = (connection) -> {
+                return connection.set(key.getBytes(Charset.forName("UTF-8")), value.getBytes(Charset.forName("UTF-8")), Expiration.seconds(expire), RedisStringCommands.SetOption.SET_IF_ABSENT);
+            };
+            return (Boolean)redisTemplate.execute(callback);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -160,13 +164,14 @@ public class RedisDistributedLock{
 
     /**
      * Lettuce方式释放锁
+     * 根据lockKey从redis获取到的值和lockValue对比，如果相同则根据key删除缓存并返回true，不同则返回false
      * @param lockKey
-     * @param requestId 唯一ID
+     * @param lockValue
      * @return
      */
-    public boolean releaseLock(String lockKey, String requestId) {
+    public boolean releaseLock(String lockKey, String lockValue) {
         RedisCallback<Boolean> callback = (connection) -> {
-            return connection.eval(UNLOCK_LUA.getBytes(), ReturnType.BOOLEAN ,1, lockKey.getBytes(Charset.forName("UTF-8")), requestId.getBytes(Charset.forName("UTF-8")));
+            return connection.eval(UNLOCK_LUA.getBytes(), ReturnType.BOOLEAN ,1, lockKey.getBytes(Charset.forName("UTF-8")), lockValue.getBytes(Charset.forName("UTF-8")));
         };
         return (Boolean)redisTemplate.execute(callback);
     }
