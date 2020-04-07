@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/css/swiper.min.css">
+<link rel="stylesheet"  href="${contextPath}/webjars/swiper/4.5.0/dist/css/swiper.min.css">
 <style>
     #.${_divId} {
         position: relative;
@@ -58,7 +58,8 @@
     }
 
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
+
+<script src="${contextPath}/webjars/swiper/4.5.0/dist/js/swiper.min.js"></script>
 <script type="text/javascript">
     $(function () {
         var ${_containerId!"swiperContainer"} = new Swiper('#${_containerId!"swiperContainer"}', {
