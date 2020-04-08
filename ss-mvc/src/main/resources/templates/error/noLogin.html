@@ -42,11 +42,9 @@
         <div>
             <img src="${contextPath}/common/image/error-404.png" alt="">
         </div>
-        <h2>未登录</h2>
+        <h2>用户未登录</h2>
         <div class="guide">
             <a href="#" onclick="history.go(-1)" class="primary-btn dili-btn">返回上一页</a>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <#config has="error.page.indexPage"><a href="#" onclick="location.href='<#config name="error.page.indexPage"/>'" class="primary-btn dili-btn">去网站首页</a></#config>
             &nbsp;&nbsp;&nbsp;&nbsp;
             <#config has="error.page.loginPage"><a href="#" onclick="toLogin();" class="primary-btn dili-btn">重新登录</a></#config>
         </div>
