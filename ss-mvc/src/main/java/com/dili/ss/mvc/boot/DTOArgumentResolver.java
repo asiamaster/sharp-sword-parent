@@ -550,7 +550,7 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 	 */
 	private String getParamValueByForce(Object obj) {
 		String val = getParamValue(obj);
-		return val == null ? null : StringUtils.isBlank(val) ? null : val;
+		return val == null ? null : StringUtils.isEmpty(val) ? null : val;
 	}
 
 	/**

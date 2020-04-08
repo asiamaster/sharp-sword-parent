@@ -584,6 +584,9 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 			return null;
 		}
 		String val = getParamValue(entry.getValue());
+		if(StringUtils.isEmpty(val)){
+			val = null;
+		}
 		if(fields.containsKey(entry.getKey())){
 			if(String.class.equals(fields.get(entry.getKey()))){
 				return val;
