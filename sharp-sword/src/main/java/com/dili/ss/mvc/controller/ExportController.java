@@ -43,14 +43,15 @@ public class ExportController {
 
     @RequestMapping("/isFinished.action")
     public @ResponseBody String isFinished(HttpServletRequest request, HttpServletResponse response, @RequestParam("token") String token) throws InterruptedException {
-        //每次阻塞时间，默认为1秒
+        //每次阻塞时间，默认为1秒，避免出来后台死循环
         long waitTime = 1000L;
         //每秒去判断是否导出完成
         while(!SsConstants.EXPORT_FLAG.containsKey(token) || SsConstants.EXPORT_FLAG.get(token).equals(0L)){
             if(waitTime >= maxWait){
                 break;
             }
-            Thread.sleep(waitTime++);
+            waitTime++;
+            Thread.sleep(1000L);
         }
         log.info("export token["+token+"] finished at:"+ DateUtils.dateFormat(SsConstants.EXPORT_FLAG.get(token)));
         SsConstants.EXPORT_FLAG.remove(token);
