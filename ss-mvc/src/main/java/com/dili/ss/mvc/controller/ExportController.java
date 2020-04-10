@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,12 +34,23 @@ public class ExportController {
     @Autowired
     ExportUtils exportUtils;
 
+    /**
+     * 导出遮照的最大阻塞时间，默认半小时
+     */
+    @Value("${maxWait:1800000}")
+    private Long maxWait;
+
 
     @RequestMapping("/isFinished.action")
     public @ResponseBody String isFinished(HttpServletRequest request, HttpServletResponse response, @RequestParam("token") String token) throws InterruptedException {
+        //每次阻塞时间，默认为1秒
+        long waitTime = 1000L;
         //每秒去判断是否导出完成
         while(!SsConstants.EXPORT_FLAG.containsKey(token) || SsConstants.EXPORT_FLAG.get(token).equals(0L)){
-            Thread.sleep(1000L);
+            if(waitTime >= maxWait){
+                break;
+            }
+            Thread.sleep(waitTime++);
         }
         log.info("export token["+token+"] finished at:"+ DateUtils.dateFormat(SsConstants.EXPORT_FLAG.get(token)));
         SsConstants.EXPORT_FLAG.remove(token);
