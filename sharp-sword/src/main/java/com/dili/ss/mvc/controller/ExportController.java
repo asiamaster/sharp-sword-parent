@@ -75,10 +75,15 @@ public class ExportController {
                                              @RequestParam("token") String token) {
         try {
             if(StringUtils.isBlank(token)){
-                SsConstants.EXPORT_FLAG.put(token, System.currentTimeMillis());
                 return "令牌不存在";
             }
             if(SsConstants.EXPORT_FLAG.size()>=SsConstants.LIMIT){
+                //为避免isFinished方法中未成功清除token， 这里需要清空阻塞时间过长的Token
+                for(Map.Entry<String, Long> entry : SsConstants.EXPORT_FLAG.entrySet()){
+                    if(System.currentTimeMillis() >= (entry.getValue() + maxWait)){
+                        SsConstants.EXPORT_FLAG.remove(entry.getKey());
+                    }
+                }
                 SsConstants.EXPORT_FLAG.put(token, System.currentTimeMillis());
                 return "服务器忙，请稍候再试";
             }
