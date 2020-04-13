@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/css/swiper.min.css">
+<link rel="stylesheet"  href="${contextPath}/webjars/swiper/4.5.0/dist/css/swiper.min.css">
 <style>
     #.${_divId} {
         position: relative;
@@ -17,9 +17,14 @@
         width: 900px;
     }
     }
-    @media only screen and (min-width: 1920px) {
+    @media only screen and (min-width: 1900px) {
     #${_containerId!"swiperContainer"} {
         width: 1400px;
+    }
+    }
+    @media only screen and (min-width: 2500px) {
+    #${_containerId!"swiperContainer"} {
+        width: 1600px;
     }
     }
     .swiper-slide {
@@ -58,13 +63,15 @@
     }
 
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.5.0/js/swiper.min.js"></script>
+
+<script src="${contextPath}/webjars/swiper/4.5.0/dist/js/swiper.min.js"></script>
 <script type="text/javascript">
     $(function () {
         var ${_containerId!"swiperContainer"} = new Swiper('#${_containerId!"swiperContainer"}', {
             slidesPerView : 3,
             spaceBetween: 0,
             breakpoints: {
+                //当屏幕宽度小于等于1366
                 1366: {
                     slidesPerView: ${_slidesPerView!5},
                     slidesPerGroup : ${_slidesPerGroup!1},
@@ -75,6 +82,10 @@
                 },
                 1920: {
                     slidesPerView: ${_slidesPerView!8},
+                    slidesPerGroup : ${_slidesPerGroup!1},
+                },
+                2560: {
+                    slidesPerView: ${_slidesPerView!10},
                     slidesPerGroup : ${_slidesPerGroup!1},
                 }
             },
