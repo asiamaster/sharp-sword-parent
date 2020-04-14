@@ -28,17 +28,18 @@ public class QuartzRecycleJob implements ApplicationListener<ContextRefreshedEve
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-		if (contextRefreshedEvent.getApplicationContext().getParent() == null) {
-			List<ScheduleJob> scheduleJobs = scheduleJobService.list(null);
-			for (ScheduleJob job : scheduleJobs) {
-				//启动时把所有非正常调度任务都改为正常
-				if(!job.getJobStatus().equals(QuartzConstants.JobStatus.NORMAL.getCode())) {
-					job.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
-				}
-				scheduleJobService.updateSelective(job);
-				scheduleJobService.addJob(job, true);
+		//contextRefreshedEvent.getApplicationContext().getParent()现在无法判断只进入一次，这里注释掉
+//		if (contextRefreshedEvent.getApplicationContext().getParent() == null) {
+		List<ScheduleJob> scheduleJobs = scheduleJobService.list(null);
+		for (ScheduleJob job : scheduleJobs) {
+			//启动时把所有非正常调度任务都改为正常
+			if(!job.getJobStatus().equals(QuartzConstants.JobStatus.NORMAL.getCode())) {
+				job.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
 			}
+			scheduleJobService.updateSelective(job);
+			scheduleJobService.addJob(job, true);
 		}
+//		}
 	}
 
 	public void scan(ScheduleMessage scheduleMessage) {
