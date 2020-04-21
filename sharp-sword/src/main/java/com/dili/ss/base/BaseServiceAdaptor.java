@@ -585,10 +585,6 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 				} else {
 					andEqual(criteria, columnName, value);
 				}
-				//拼接自定义and conditon expr
-				if(domain.mget(IDTO.AND_CONDITION_EXPR) != null){
-					criteria = criteria.andCondition(domain.mget(IDTO.AND_CONDITION_EXPR).toString());
-				}
 			}else{
 				if (like != null) {
 					orLike(criteria, columnName, like.value(), value);
@@ -601,16 +597,17 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 				} else {
 					orEqual(criteria, columnName, value);
 				}
-				//拼接自定义and conditon expr
-				if(domain.mget(IDTO.AND_CONDITION_EXPR) != null){
-					criteria = criteria.orCondition(domain.mget(IDTO.AND_CONDITION_EXPR).toString());
-				}
 			}
 		}
 		//拼接自定义and conditon expr
-		if(domain.getMetadata(IDTO.AND_CONDITION_EXPR) != null){
-			criteria = criteria.andCondition(domain.getMetadata(IDTO.AND_CONDITION_EXPR).toString());
+		if(domain.mget(IDTO.AND_CONDITION_EXPR) != null){
+			criteria = criteria.andCondition(domain.mget(IDTO.AND_CONDITION_EXPR).toString());
 		}
+		//拼接自定义or conditon expr
+		if(domain.mget(IDTO.OR_CONDITION_EXPR) != null){
+			criteria = criteria.orCondition(domain.mget(IDTO.OR_CONDITION_EXPR).toString());
+		}
+
 		StringBuilder orderByClauseBuilder = new StringBuilder();
 		for(Field field : tClazz.getFields()) {
 			Transient transient1 = field.getAnnotation(Transient.class);
@@ -726,10 +723,6 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 				} else {
 					andEqual(criteria, columnName, value);
 				}
-				//拼接自定义and conditon expr
-				if(domain.mget(IDTO.AND_CONDITION_EXPR) != null){
-					criteria = criteria.andCondition(domain.mget(IDTO.AND_CONDITION_EXPR).toString());
-				}
 			}else{
 				if (like != null) {
 					orLike(criteria, columnName, like.value(), value);
@@ -742,11 +735,15 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 				} else {
 					orEqual(criteria, columnName, value);
 				}
-				//拼接自定义and conditon expr
-				if(domain.mget(IDTO.AND_CONDITION_EXPR) != null){
-					criteria = criteria.orCondition(domain.mget(IDTO.AND_CONDITION_EXPR).toString());
-				}
 			}
+		}
+		//拼接自定义and conditon expr
+		if(domain.mget(IDTO.AND_CONDITION_EXPR) != null){
+			criteria = criteria.andCondition(domain.mget(IDTO.AND_CONDITION_EXPR).toString());
+		}
+		//拼接自定义or conditon expr
+		if(domain.mget(IDTO.OR_CONDITION_EXPR) != null){
+			criteria = criteria.orCondition(domain.mget(IDTO.OR_CONDITION_EXPR).toString());
 		}
 		//设置@OrderBy注解的排序(会被IBaseDomain中的排序字段覆盖)
 		buildOrderByClause(methods, example);

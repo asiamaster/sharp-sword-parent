@@ -14,8 +14,8 @@ import java.util.Map;
  */
 public interface IDTO extends Serializable {
 	//用于BaseServiceImpl中构建自定义Example条件的Key，请从metadata中获取和操作
-
 	String AND_CONDITION_EXPR = "_andConditionExpr";
+	String OR_CONDITION_EXPR = "_orConditionExpr";
 
 	//强制空值, DTO或实体的metadata中的key，用于BaseServiceImpl中的ByExample查询
 	@Transient
