@@ -236,7 +236,7 @@ public class ValueProviderUtils {
 		Object queryParamsObj = paramMap.get(ValueProvider.QUERY_PARAMS_KEY);
 		String emptyText = ValueProvider.EMPTY_ITEM_TEXT;
 		List<ValuePair<?>> valuePairs =  providerObj == null ? Collections.EMPTY_LIST : providerObj.getLookupList(val, paramMap, null);
-        valuePairs = Lists.newArrayList(valuePairs);
+		valuePairs = Lists.newArrayList(valuePairs);
 		if(queryParamsObj != null){
 			//获取查询参数
 			JSONObject queryParams = JSONObject.parseObject(queryParamsObj.toString());
@@ -254,8 +254,8 @@ public class ValueProviderUtils {
 				}
 			}
 		}else{
-            valuePairs.add(0, new ValuePairImpl<String>(emptyText, ""));
-        }
+			valuePairs.add(0, new ValuePairImpl<String>(emptyText, ""));
+		}
 		return valuePairs;
 	}
 
@@ -314,7 +314,7 @@ public class ValueProviderUtils {
 		while(it.hasNext()){
 			Map.Entry<String, Object> entry = it.next();
 			if(!isJson(entry.getValue().toString())){
-				if(entry.getKey().equals(IDTO.NULL_VALUE_FIELD) || entry.getKey().equals(IDTO.AND_CONDITION_EXPR)){
+				if(entry.getKey().equals(IDTO.NULL_VALUE_FIELD) || entry.getKey().equals(IDTO.AND_CONDITION_EXPR) || entry.getKey().equals(IDTO.OR_CONDITION_EXPR)){
 					continue;
 				}
 				Map<String, Object> value = Maps.newHashMap();

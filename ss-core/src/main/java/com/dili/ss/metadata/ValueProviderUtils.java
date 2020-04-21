@@ -314,7 +314,7 @@ public class ValueProviderUtils {
 		while(it.hasNext()){
 			Map.Entry<String, Object> entry = it.next();
 			if(!isJson(entry.getValue().toString())){
-				if(entry.getKey().equals(IDTO.NULL_VALUE_FIELD) || entry.getKey().equals(IDTO.AND_CONDITION_EXPR)){
+				if(entry.getKey().equals(IDTO.NULL_VALUE_FIELD) || entry.getKey().equals(IDTO.AND_CONDITION_EXPR) || entry.getKey().equals(IDTO.OR_CONDITION_EXPR)){
 					continue;
 				}
 				Map<String, Object> value = Maps.newHashMap();
