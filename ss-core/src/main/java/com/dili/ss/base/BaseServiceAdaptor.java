@@ -573,7 +573,7 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 				throw new ParamErrorException("SQL注入拦截:"+value);
 			}
 
-			if(SqlOperator.AND.equals(sqlOperator.value())) {
+			if(sqlOperator == null || SqlOperator.AND.equals(sqlOperator.value())) {
 				if (like != null) {
 					andLike(criteria, columnName, like.value(), value);
 				} else if (operator != null) {
@@ -714,7 +714,7 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 			if(value instanceof String && !checkXss((String)value)){
 				throw new ParamErrorException("SQL注入拦截:"+value);
 			}
-			if(SqlOperator.AND.equals(sqlOperator.value())) {
+			if(sqlOperator == null || SqlOperator.AND.equals(sqlOperator.value())) {
 				if (like != null) {
 					andLike(criteria, columnName, like.value(), value);
 				} else if (operator != null) {
