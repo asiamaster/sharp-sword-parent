@@ -600,12 +600,12 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 			}
 		}
 		//拼接自定义and conditon expr
-		if(domain.mget(IDTO.AND_CONDITION_EXPR) != null){
-			criteria = criteria.andCondition(domain.mget(IDTO.AND_CONDITION_EXPR).toString());
+		if(domain.getMetadata(IDTO.AND_CONDITION_EXPR) != null){
+			criteria = criteria.andCondition(domain.getMetadata(IDTO.AND_CONDITION_EXPR).toString());
 		}
 		//拼接自定义or conditon expr
-		if(domain.mget(IDTO.OR_CONDITION_EXPR) != null){
-			criteria = criteria.orCondition(domain.mget(IDTO.OR_CONDITION_EXPR).toString());
+		if(domain.getMetadata(IDTO.OR_CONDITION_EXPR) != null){
+			criteria = criteria.orCondition(domain.getMetadata(IDTO.OR_CONDITION_EXPR).toString());
 		}
 
 		StringBuilder orderByClauseBuilder = new StringBuilder();
