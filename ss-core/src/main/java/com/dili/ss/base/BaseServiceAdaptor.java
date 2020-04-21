@@ -8,6 +8,7 @@ import com.dili.ss.domain.EasyuiPageOutput;
 import com.dili.ss.domain.annotation.FindInSet;
 import com.dili.ss.domain.annotation.Like;
 import com.dili.ss.domain.annotation.Operator;
+import com.dili.ss.domain.annotation.SqlOperator;
 import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IBaseDomain;
 import com.dili.ss.dto.IDTO;
@@ -551,6 +552,8 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
             Like like = field.getAnnotation(Like.class);
             Operator operator = field.getAnnotation(Operator.class);
 			FindInSet findInSet = field.getAnnotation(FindInSet.class);
+			//and/or
+			SqlOperator sqlOperator = field.getAnnotation(SqlOperator.class);
             Class<?> fieldType = field.getType();
             Object value = null;
             try {
@@ -569,57 +572,40 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 			if(value instanceof String && !checkXss((String)value)){
 				throw new ParamErrorException("SQL注入拦截:"+value);
 			}
-            if(like != null) {
-                switch(like.value()){
-                    case Like.LEFT:
-                        criteria = criteria.andCondition(columnName + " like '%" + value + "' ");
-                        break;
-                    case Like.RIGHT:
-                        criteria = criteria.andCondition(columnName + " like '" + value + "%' ");
-                        break;
-                    case Like.BOTH:
-                        criteria = criteria.andCondition(columnName + " like '%" + value + "%' ");
-                        break;
-                    default :
-                        criteria = criteria.andCondition(columnName + " = '"+ value+"' ");
-                }
-            }else if(operator != null){
-                if(operator.value().equals(Operator.IN) || operator.value().equals(Operator.NOT_IN)){
-                    StringBuilder sb = new StringBuilder();
-                    if(Collection.class.isAssignableFrom(fieldType)){
-                        for(Object o : (Collection)value){
-							if(o instanceof String){
-								sb.append(", '").append(o).append("'");
-							}else {
-								sb.append(", ").append(o);
-							}
-                        }
-                    }else if(fieldType.isArray()){
-                        for(Object o : ( (Object[])value)){
-							if(o instanceof String){
-								sb.append(", '").append(o).append("'");
-							}else {
-								sb.append(", ").append(o);
-							}
-                        }
-                    }else{
-						sb.append(", '").append(value).append("'");
-                    }
-                    if(!sb.toString().isEmpty()) {
-						criteria = criteria.andCondition(columnName + " " + operator.value() + "(" + sb.substring(1) + ")");
+
+			if(SqlOperator.AND.equals(sqlOperator.value())) {
+				if (like != null) {
+					andLike(criteria, columnName, like.value(), value);
+				} else if (operator != null) {
+					if (!andOerator(criteria, columnName, fieldType, operator.value(), value)) {
+						continue;
 					}
-                }else {
-                    criteria = criteria.andCondition(columnName + " " + operator.value() + " '" + value + "' ");
-                }
-            }else if(findInSet != null){
-				if(Number.class.isAssignableFrom(value.getClass())){
-					criteria = criteria.andCondition("find_in_set (" + value + ", "+columnName+")");
-				}else{
-					criteria = criteria.andCondition("find_in_set ('" + value + "', "+columnName+")");
+				} else if (findInSet != null) {
+					andFindInSet(criteria, columnName, value);
+				} else {
+					andEqual(criteria, columnName, value);
+				}
+				//拼接自定义and conditon expr
+				if(domain.mget(IDTO.AND_CONDITION_EXPR) != null){
+					criteria = criteria.andCondition(domain.mget(IDTO.AND_CONDITION_EXPR).toString());
 				}
 			}else{
-                criteria = criteria.andCondition(columnName + " = '"+ value+"' ");
-            }
+				if (like != null) {
+					orLike(criteria, columnName, like.value(), value);
+				} else if (operator != null) {
+					if (!orOerator(criteria, columnName, fieldType, operator.value(), value)) {
+						continue;
+					}
+				} else if (findInSet != null) {
+					orFindInSet(criteria, columnName, value);
+				} else {
+					orEqual(criteria, columnName, value);
+				}
+				//拼接自定义and conditon expr
+				if(domain.mget(IDTO.AND_CONDITION_EXPR) != null){
+					criteria = criteria.orCondition(domain.mget(IDTO.AND_CONDITION_EXPR).toString());
+				}
+			}
         }
         //拼接自定义and conditon expr
         if(domain.getMetadata(IDTO.AND_CONDITION_EXPR) != null){
@@ -716,6 +702,8 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
             Like like = method.getAnnotation(Like.class);
 			Operator operator = method.getAnnotation(Operator.class);
 			FindInSet findInSet = method.getAnnotation(FindInSet.class);
+			//and/or
+			SqlOperator sqlOperator = method.getAnnotation(SqlOperator.class);
             Class<?> fieldType = method.getReturnType();
             Object value = getGetterValue(domain, method);
             //没值就不拼接sql
@@ -726,77 +714,238 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 			if(value instanceof String && !checkXss((String)value)){
 				throw new ParamErrorException("SQL注入拦截:"+value);
 			}
-            if(like != null) {
-                switch(like.value()){
-                    case Like.LEFT:
-                        criteria = criteria.andCondition(columnName + " like '%" + value + "' ");
-                        break;
-                    case Like.RIGHT:
-                        criteria = criteria.andCondition(columnName + " like '" + value + "%' ");
-                        break;
-                    case Like.BOTH:
-                        criteria = criteria.andCondition(columnName + " like '%" + value + "%' ");
-                        break;
-                    default : {
-                    	if(value instanceof Boolean || Number.class.isAssignableFrom(value.getClass())){
-							criteria = criteria.andCondition(columnName + " = " + value + " ");
-						}else{
-							criteria = criteria.andCondition(columnName + " = '" + value + "' ");
-						}
+			if(SqlOperator.AND.equals(sqlOperator.value())) {
+				if (like != null) {
+					andLike(criteria, columnName, like.value(), value);
+				} else if (operator != null) {
+					if (!andOerator(criteria, columnName, fieldType, operator.value(), value)) {
+						continue;
 					}
-                }
-            }else if(operator != null){
-                if(operator.value().equals(Operator.IN) || operator.value().equals(Operator.NOT_IN)){
-                    if(value instanceof Collection && CollectionUtils.isEmpty((Collection)value)){
-                        continue;
-                    }
-                    StringBuilder sb = new StringBuilder();
-                    if(Collection.class.isAssignableFrom(fieldType)){
-                        for(Object o : (Collection)value){
-							if(o instanceof String){
-								sb.append(", '").append(o).append("'");
-							}else {
-								sb.append(", ").append(o);
-							}
-                        }
-                    }else if(fieldType.isArray()){
-                        for(Object o : ( (Object[])value)){
-							if(o instanceof String){
-								sb.append(", '").append(o).append("'");
-							}else {
-								sb.append(", ").append(o);
-							}
-                        }
-                    }else{
-						sb.append(", '").append(value).append("'");
-                    }
-                    criteria = criteria.andCondition(columnName + " " + operator.value() + "(" + sb.substring(1) + ")");
-                }else {
-                    criteria = criteria.andCondition(columnName + " " + operator.value() + " '" + value + "' ");
-                }
-            }else if(findInSet != null){
-				if(Number.class.isAssignableFrom(value.getClass())){
-					criteria = criteria.andCondition("find_in_set (" + value + ", "+columnName+")");
-				}else{
-					criteria = criteria.andCondition("find_in_set ('" + value + "', "+columnName+")");
+				} else if (findInSet != null) {
+					andFindInSet(criteria, columnName, value);
+				} else {
+					andEqual(criteria, columnName, value);
+				}
+				//拼接自定义and conditon expr
+				if(domain.mget(IDTO.AND_CONDITION_EXPR) != null){
+					criteria = criteria.andCondition(domain.mget(IDTO.AND_CONDITION_EXPR).toString());
 				}
 			}else{
-				if(value instanceof Boolean || Number.class.isAssignableFrom(value.getClass())){
-					criteria = criteria.andCondition(columnName + " = "+ value+" ");
-				}else{
-					criteria = criteria.andCondition(columnName + " = '"+ value+"' ");
+				if (like != null) {
+					orLike(criteria, columnName, like.value(), value);
+				} else if (operator != null) {
+					if (!orOerator(criteria, columnName, fieldType, operator.value(), value)) {
+						continue;
+					}
+				} else if (findInSet != null) {
+					orFindInSet(criteria, columnName, value);
+				} else {
+					orEqual(criteria, columnName, value);
 				}
-            }
-        }
-        //拼接自定义and conditon expr
-        if(domain.mget(IDTO.AND_CONDITION_EXPR) != null){
-            criteria = criteria.andCondition(domain.mget(IDTO.AND_CONDITION_EXPR).toString());
+				//拼接自定义and conditon expr
+				if(domain.mget(IDTO.AND_CONDITION_EXPR) != null){
+					criteria = criteria.orCondition(domain.mget(IDTO.AND_CONDITION_EXPR).toString());
+				}
+			}
         }
         //设置@OrderBy注解的排序(会被IBaseDomain中的排序字段覆盖)
 		buildOrderByClause(methods, example);
 //		设置IBaseDomain中的排序字段(会覆盖@OrderBy注解的排序)
         setOrderBy(domain, example);
     }
+
+	/**
+	 * 拼接or like
+	 * @param criteria
+	 * @param columnName
+	 * @param likeValue
+	 * @param value
+	 */
+	private void orLike(Example.Criteria criteria, String columnName, String likeValue, Object value){
+		switch(likeValue){
+			case Like.LEFT:
+				criteria = criteria.orCondition(columnName + " like '%" + value + "' ");
+				break;
+			case Like.RIGHT:
+				criteria = criteria.orCondition(columnName + " like '" + value + "%' ");
+				break;
+			case Like.BOTH:
+				criteria = criteria.orCondition(columnName + " like '%" + value + "%' ");
+				break;
+			default : {
+				if(value instanceof Boolean || Number.class.isAssignableFrom(value.getClass())){
+					criteria = criteria.orCondition(columnName + " = " + value + " ");
+				}else{
+					criteria = criteria.orCondition(columnName + " = '" + value + "' ");
+				}
+			}
+		}
+	}
+
+	/**
+	 * or 操作符
+	 * @param criteria
+	 * @param columnName
+	 * @param operatorValue
+	 * @param value
+	 * @return 当操作符为IN并且为空集合，返回false，需要跳过
+	 */
+	private boolean orOerator(Example.Criteria criteria, String columnName, Class<?> fieldType, String operatorValue, Object value){
+		if(operatorValue.equals(Operator.IN) || operatorValue.equals(Operator.NOT_IN)){
+			if(value instanceof Collection && CollectionUtils.isEmpty((Collection)value)){
+				return false;
+			}
+			StringBuilder sb = new StringBuilder();
+			if(Collection.class.isAssignableFrom(fieldType)){
+				for(Object o : (Collection)value){
+					if(o instanceof String){
+						sb.append(", '").append(o).append("'");
+					}else {
+						sb.append(", ").append(o);
+					}
+				}
+			}else if(fieldType.isArray()){
+				for(Object o : ( (Object[])value)){
+					if(o instanceof String){
+						sb.append(", '").append(o).append("'");
+					}else {
+						sb.append(", ").append(o);
+					}
+				}
+			}else{
+				sb.append(", '").append(value).append("'");
+			}
+			criteria = criteria.orCondition(columnName + " " + operatorValue + "(" + sb.substring(1) + ")");
+		}else {
+			criteria = criteria.orCondition(columnName + " " + operatorValue + " '" + value + "' ");
+		}
+		return true;
+	}
+
+	/**
+	 * or findInSet
+	 * @param criteria
+	 * @param columnName
+	 * @param value
+	 */
+	private void orFindInSet(Example.Criteria criteria, String columnName, Object value){
+		if(Number.class.isAssignableFrom(value.getClass())){
+			criteria = criteria.orCondition("find_in_set (" + value + ", "+columnName+")");
+		}else{
+			criteria = criteria.orCondition("find_in_set ('" + value + "', "+columnName+")");
+		}
+	}
+
+	/**
+	 * or equal
+	 * @param criteria
+	 * @param columnName
+	 * @param value
+	 */
+	private void orEqual(Example.Criteria criteria, String columnName, Object value){
+		if(value instanceof Boolean || Number.class.isAssignableFrom(value.getClass())){
+			criteria = criteria.orCondition(columnName + " = "+ value+" ");
+		}else{
+			criteria = criteria.orCondition(columnName + " = '"+ value+"' ");
+		}
+	}
+
+	/**
+	 * and equal
+	 * @param criteria
+	 * @param columnName
+	 * @param value
+	 */
+	private void andEqual(Example.Criteria criteria, String columnName, Object value){
+		if(value instanceof Boolean || Number.class.isAssignableFrom(value.getClass())){
+			criteria = criteria.andCondition(columnName + " = "+ value+" ");
+		}else{
+			criteria = criteria.andCondition(columnName + " = '"+ value+"' ");
+		}
+	}
+
+	/**
+	 * and findInSet
+	 * @param criteria
+	 * @param columnName
+	 * @param value
+	 */
+	private void andFindInSet(Example.Criteria criteria, String columnName, Object value){
+		if(Number.class.isAssignableFrom(value.getClass())){
+			criteria = criteria.andCondition("find_in_set (" + value + ", "+columnName+")");
+		}else{
+			criteria = criteria.andCondition("find_in_set ('" + value + "', "+columnName+")");
+		}
+	}
+
+	/**
+	 * 拼接and like
+	 * @param criteria
+	 * @param columnName
+	 * @param likeValue
+	 * @param value
+	 */
+	private void andLike(Example.Criteria criteria, String columnName, String likeValue, Object value){
+		switch(likeValue){
+			case Like.LEFT:
+				criteria = criteria.andCondition(columnName + " like '%" + value + "' ");
+				break;
+			case Like.RIGHT:
+				criteria = criteria.andCondition(columnName + " like '" + value + "%' ");
+				break;
+			case Like.BOTH:
+				criteria = criteria.andCondition(columnName + " like '%" + value + "%' ");
+				break;
+			default : {
+				if(value instanceof Boolean || Number.class.isAssignableFrom(value.getClass())){
+					criteria = criteria.andCondition(columnName + " = " + value + " ");
+				}else{
+					criteria = criteria.andCondition(columnName + " = '" + value + "' ");
+				}
+			}
+		}
+	}
+
+	/**
+	 * and 操作符
+	 * @param criteria
+	 * @param columnName
+	 * @param operatorValue
+	 * @param value
+	 * @return 当操作符为IN并且为空集合，返回false，需要跳过
+	 */
+	private boolean andOerator(Example.Criteria criteria, String columnName, Class<?> fieldType, String operatorValue, Object value){
+		if(operatorValue.equals(Operator.IN) || operatorValue.equals(Operator.NOT_IN)){
+			if(value instanceof Collection && CollectionUtils.isEmpty((Collection)value)){
+				return false;
+			}
+			StringBuilder sb = new StringBuilder();
+			if(Collection.class.isAssignableFrom(fieldType)){
+				for(Object o : (Collection)value){
+					if(o instanceof String){
+						sb.append(", '").append(o).append("'");
+					}else {
+						sb.append(", ").append(o);
+					}
+				}
+			}else if(fieldType.isArray()){
+				for(Object o : ( (Object[])value)){
+					if(o instanceof String){
+						sb.append(", '").append(o).append("'");
+					}else {
+						sb.append(", ").append(o);
+					}
+				}
+			}else{
+				sb.append(", '").append(value).append("'");
+			}
+			criteria = criteria.andCondition(columnName + " " + operatorValue + "(" + sb.substring(1) + ")");
+		}else {
+			criteria = criteria.andCondition(columnName + " " + operatorValue + " '" + value + "' ");
+		}
+		return true;
+	}
+
 
 	/**
 	 * 设置@OrderBy注解的排序

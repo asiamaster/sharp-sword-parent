@@ -477,7 +477,7 @@ public class ExportUtils {
                 return resp.body().string();
             }
         } catch (Exception e) {
-            log.error(String.format("远程调用["+url+"]发生异常,code:[%s], message:[%s]", resp.code(),resp.message()));
+            log.error(String.format("远程调用["+url+"]发生异常,message:[%s]", e.getMessage()), e);
         }
         return null;
     }
