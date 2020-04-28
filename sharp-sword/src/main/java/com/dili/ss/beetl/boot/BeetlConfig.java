@@ -88,6 +88,7 @@ public class BeetlConfig {
         beetlSpringViewResolver.setPrefix("/");
         beetlSpringViewResolver.setSuffix(".html");
         beetlSpringViewResolver.setConfig(beetlGroupUtilConfiguration);
+        beetlSpringViewResolver.setRedirectHttp10Compatible(false);
         return beetlSpringViewResolver;
     }
 

@@ -176,8 +176,9 @@ public class ExportUtils {
     private void buildData(ExportParam exportParam, SXSSFWorkbook workbook, Sheet sheet, HttpServletRequest request){
         //渲染数据列
         CellStyle dataColumnStyle = getDataColumnStyle(workbook);//获取列头样式对象
+        String basePath = SpringUtil.getProperty("project.serverPath", request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort());
         //这里获取到的是nginx转换后的(IP)地址和端口号，如果是跳板机这种，有可能会禁止访问，后续改为从配置读取
-        String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
+//        String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
         String url = exportParam.getUrl().startsWith("/") ? exportParam.getUrl() : "/" + exportParam.getUrl();
 //        Map<String, String> queryParams = exportParam.getQueryParams();
         //先获取总数
@@ -233,6 +234,9 @@ public class ExportUtils {
                 }
                 Object value = rowDataMap.get(headerMap.get("field"));
                 CellType cellType = value instanceof Number ? CellType.NUMERIC : CellType.STRING;
+                if(value instanceof Long || value instanceof Integer) {
+                    dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
+                }
                 Cell cell = row.createCell(index, cellType);
                 cell.setCellStyle(dataColumnStyle);
                 //判断是否有值提供者需要转义(此功能已经在datagrid的查询中封装，这里不需要处理了)
