@@ -87,7 +87,7 @@ public class BizNumberComponent {
             }
             if(tempStartSeq > initBizNumber + max - 1){
 //                throw new RuntimeException("当天业务编码分配数超过" + max + ",无法分配!");
-                System.out.println("当天业务编码分配数超过" + max + ",无法分配!");
+                System.out.println("["+type+"]当天业务编码分配数超过" + max + ",无法分配!");
                 return null;
             }
         }else{
