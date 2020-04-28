@@ -470,7 +470,7 @@ public class ExportUtils {
                         .execute();
             }
             if(resp.isSuccessful()){
-	            log.info(String.format("远程调用["+url+"]成功,code:[%s], message:[%s]", resp.code(),resp.message()));
+	            log.info(String.format("远程调用[%s]成功,code:[%s]", url, resp.code()));
                 return resp.body().string();
 //                String retVal = new String(resp.body().bytes(), "UTF-8");
 //                log.info("==============================================================");
