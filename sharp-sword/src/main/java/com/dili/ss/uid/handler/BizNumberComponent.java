@@ -64,7 +64,9 @@ public class BizNumberComponent {
     public SequenceNo getSeqNoByNewTransactional(SequenceNo idSequence, String type, Long startSeq, String dateFormat, int length){
         BizNumber bizNumber = this.getBizNumberByType(type);
         if(bizNumber == null){
-            throw new RuntimeException("业务类型不存在");
+//            throw new RuntimeException("业务类型不存在");
+            System.out.println("业务类型不存在!");
+            return null;
         }
         //每天最大分配号数
         int max = new Double(Math.pow(10, length)).intValue();
@@ -84,7 +86,9 @@ public class BizNumberComponent {
                 tempStartSeq = bizNumber.getValue();
             }
             if(tempStartSeq > initBizNumber + max - 1){
-                throw new RuntimeException("当天业务编码分配数超过" + max + ",无法分配!");
+//                throw new RuntimeException("当天业务编码分配数超过" + max + ",无法分配!");
+                System.out.println("当天业务编码分配数超过" + max + ",无法分配!");
+                return null;
             }
         }else{
             tempStartSeq = bizNumber.getValue();
