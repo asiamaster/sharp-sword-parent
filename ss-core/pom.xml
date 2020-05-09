@@ -377,7 +377,7 @@
             <version>0.9.11</version>
             <exclusions>
                 <exclusion>
-                    <groupId>javassist</groupId>
+                    <groupId>org.javassist</groupId>
                     <artifactId>javassist</artifactId>
                 </exclusion>
                 <exclusion>
