@@ -236,7 +236,7 @@ public class ValueProviderUtils {
 		String emptyText = ValueProvider.EMPTY_ITEM_TEXT;
 		List<ValuePair<?>> valuePairs =  providerObj == null ? Collections.EMPTY_LIST : providerObj.getLookupList(val, paramMap, null);
 		if(valuePairs == null) {
-			valuePairs = new ArrayList<ValuePair<?>>(1);;
+			valuePairs = new ArrayList<ValuePair<?>>(1);
 		}
 		if(queryParamsObj != null){
 			//获取查询参数
