@@ -340,7 +340,7 @@ function modifyJsonKey(json,oldkey,newkey){
             return;
         }
         var val = json[oldkey];
-        delete json[oldkey];
+        // delete json[oldkey];
         json[newkey]=val;
     }
 }
@@ -436,12 +436,12 @@ $(function() {
      * 根据字段按百分比重置列宽
      * 示例:
      * grid.datagrid('resizeColumn', [{
- *							field : 'id',
- *							width : '35%'
- *						}, {
- *							field : 'name',
- *							width : '35%'
- *						}]);
+     *							field : 'id',
+     *							width : '35%'
+     *						}, {
+     *							field : 'name',
+     *							width : '35%'
+     *						}]);
      */
     $.extend($.fn.datagrid.methods, {
         resizeColumn : function(jq, param) {

@@ -8,7 +8,6 @@ import com.dili.ss.dto.IBaseDomain;
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.SpringUtil;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -236,7 +235,9 @@ public class ValueProviderUtils {
 		Object queryParamsObj = paramMap.get(ValueProvider.QUERY_PARAMS_KEY);
 		String emptyText = ValueProvider.EMPTY_ITEM_TEXT;
 		List<ValuePair<?>> valuePairs =  providerObj == null ? Collections.EMPTY_LIST : providerObj.getLookupList(val, paramMap, null);
-		valuePairs = Lists.newArrayList(valuePairs);
+		if(valuePairs == null) {
+			valuePairs = new ArrayList<ValuePair<?>>(1);;
+		}
 		if(queryParamsObj != null){
 			//获取查询参数
 			JSONObject queryParams = JSONObject.parseObject(queryParamsObj.toString());

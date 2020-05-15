@@ -340,7 +340,7 @@ function modifyJsonKey(json,oldkey,newkey){
             return;
         }
         var val = json[oldkey];
-        delete json[oldkey];
+        // delete json[oldkey];
         json[newkey]=val;
     }
 }
