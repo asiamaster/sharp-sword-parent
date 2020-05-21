@@ -143,15 +143,32 @@
             <groupId>org.springframework</groupId>
             <artifactId>springloaded</artifactId>
             <version>${springloaded.version}</version>
+            <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.webjars.npm/swiper -->
         <dependency>
             <groupId>org.webjars.npm</groupId>
             <artifactId>swiper</artifactId>
             <version>4.5.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.webjars.npm</groupId>
+                    <artifactId>ssr-window</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
         </dependency>
-      
-    
+        <!-- 解决swiper中的ssr-window自有包冲突 -->
+        <!-- https://mvnrepository.com/artifact/org.webjars.npm/ssr-window -->
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>ssr-window</artifactId>
+            <version>3.0.0-alpha.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+
+
     </dependencies>
 
 </project>
