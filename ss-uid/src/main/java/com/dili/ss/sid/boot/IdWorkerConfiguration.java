@@ -36,6 +36,8 @@ import com.dili.ss.sid.service.impl.SnowFlakeIdServiceImpl;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -66,10 +68,14 @@ public class IdWorkerConfiguration {
     private String worker;
     @Value("${id.dataCenter:noDataCenter}")
     private String dataCenter;
+    protected static final Logger log = LoggerFactory.getLogger(IdWorkerConfiguration.class);
     @Bean
     @Primary
     public SnowFlakeIdService idWorker(SnowflakeIdConverter snowflakeIdConverter){
-        return new SnowFlakeIdServiceImpl(getDataCenterFromConfig(), getWorkFromConfig(), snowflakeIdConverter);
+        Long datacenterId = getDataCenterFromConfig();
+        Long workerId = getWorkFromConfig();
+        log.info("detect server datacenterId:" + datacenterId + ", workerId:" + workerId);
+        return new SnowFlakeIdServiceImpl(datacenterId, workerId, snowflakeIdConverter);
     }
 
     private Long getWorkFromConfig() {

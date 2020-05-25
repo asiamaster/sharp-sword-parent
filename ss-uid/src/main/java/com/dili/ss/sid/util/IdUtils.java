@@ -125,7 +125,7 @@ public final class IdUtils {
 //        String uid = UUID.randomUUID().toString().replaceAll("-", "");
 //        long id = stringIdToLongId(now+"00"+uid+"fff");
 //        System.out.println(id);
-//        long id = nextId();
+//        id = nextId();
 //        SnowflakeId snowflakeId = expId(id);
 //        System.out.println(transTime(snowflakeId.getTimeStamp()));
 //    }
