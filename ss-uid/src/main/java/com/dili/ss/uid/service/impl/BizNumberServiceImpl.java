@@ -79,11 +79,9 @@ public class BizNumberServiceImpl extends BaseServiceImpl<BizNumber, Long> imple
 //            }
 //        }
         Long bizNumber = bizNumberHandler.getBizNumberByType(bizNumberRule.getType(), bizNumberRule.getDateFormat(), bizNumberRule.getLength(), bizNumberRule.getRange());
-        if(StringUtils.isBlank(bizNumberRule.getDateFormat())){
-            return bizNumberRule.getPrefix() + String.format("%0" + bizNumberRule.getLength() + "d", bizNumber);
-        }else {
-            return bizNumberRule.getPrefix() + bizNumber;
-        }
+        String bizNumberStr = StringUtils.isBlank(bizNumberRule.getDateFormat()) ? String.format("%0" + bizNumberRule.getLength() + "d", bizNumber) : bizNumber.toString();
+        String prefix = bizNumberRule.getPrefix();
+        return prefix == null ? bizNumberStr : prefix + bizNumberStr;
     }
 
 }

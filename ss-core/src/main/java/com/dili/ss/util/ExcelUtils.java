@@ -6,7 +6,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -53,15 +52,14 @@ public class ExcelUtils {
         }
     }
 
-    public static void main1(String[] args) throws Exception {
-        // 同时支持Excel 2003、2007
-        File excelFile = new File("d:/CRM.xlsx"); // 创建文件对象
-        checkExcelVaild(excelFile);
-        FileInputStream is = new FileInputStream(excelFile); // 文件流
-        List<List<Map<String, Object>>> list = getSheetsDatas(is, 1);
-        System.out.println(list);
-
-    }
+//    public static void main1(String[] args) throws Exception {
+//        // 同时支持Excel 2003、2007
+//        File excelFile = new File("d:/CRM.xlsx"); // 创建文件对象
+//        checkExcelVaild(excelFile);
+//        FileInputStream is = new FileInputStream(excelFile); // 文件流
+//        List<List<Map<String, Object>>> list = getSheetsDatas(is, 0);
+//        System.out.println(list);
+//    }
 
 
     /**
@@ -86,14 +84,10 @@ public class ExcelUtils {
                 for (Row row : sheet) {
                     //行数据,key为列头，值为行数据
                     Map<String, Object> rowData = new HashMap<>();
-                    // 跳过第一和第二行的目录
+                    // 跳过标题所在的行数
                     if (rowIndex < headerRow) {
                         rowIndex++;
                         continue;
-                    }
-                    //如果当前行第一列没有数据，跳出循环
-                    if (null == row.getCell(0)) {
-                        break;
                     }
                     int lastCellNum = row.getLastCellNum();
                     //如果是列头行或者列头索引为空，记录列头
@@ -101,11 +95,11 @@ public class ExcelUtils {
                         for (int colIndex = 0; colIndex < lastCellNum; colIndex++) {
                             Cell cell = row.getCell(colIndex);
                             if (cell == null) {
-                                break;
+                                continue;
                             }
                             Object value = getValue(cell);
                             if (value == null) {
-                                break;
+                                continue;
                             }
 //                          key为列头，值为列索引
                             rowIndexData.put(colIndex, value.toString());
