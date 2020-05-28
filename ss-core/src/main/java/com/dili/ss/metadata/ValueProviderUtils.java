@@ -250,7 +250,8 @@ public class ValueProviderUtils {
 			Boolean required = queryParams.getBoolean(ValueProvider.REQUIRED_KEY);
 			//非必填才在首位添加空值内容
 			if(required == null || required.equals(false)){
-				if(providerObj != null) {
+				//有提供者信息， 值对列表不为空，且第一位不是空串，则添加“请选择”
+				if(providerObj != null && !valuePairs.isEmpty() && !"".equals(valuePairs.get(0).getValue())) {
 					valuePairs.add(0, new ValuePairImpl<String>(emptyText, ""));
 				}
 			}
