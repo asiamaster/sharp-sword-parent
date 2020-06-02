@@ -44,6 +44,7 @@ import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
+import javax.persistence.*;
 import javax.tools.Diagnostic;
 import java.io.File;
 import java.io.IOException;
@@ -66,12 +67,12 @@ public class DtoProcessor extends BaseProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         Set<? extends Element> set = env.getElementsAnnotatedWith(GenDTOMethod.class);
         set.forEach(element -> {
-            // 检查被注解为@Factory的元素是否是一个接口
-            if (element.getKind() != ElementKind.INTERFACE) {
-                error(element, "Only interface can be annotated with @%s",
-                        GenDTOMethod.class.getSimpleName());
-                return;
-            }
+            // 检查被注解为@GenDtoMethod的元素是否是一个接口
+//            if (element.getKind() != ElementKind.INTERFACE) {
+//                error(element, "Only interface can be annotated with @%s",
+//                        GenDTOMethod.class.getSimpleName());
+//                return;
+//            }
             //获取源文件地址
             String sourceFilePath = ((Symbol.ClassSymbol) element).sourcefile.getName();
             //解析生成的源文件目录
@@ -81,7 +82,12 @@ public class DtoProcessor extends BaseProcessor {
             //构建java源文件
             TypeSpec typeSpec = null;
             try {
-                typeSpec = buildSource(element);
+                if (element.getKind() == ElementKind.INTERFACE) {
+                    typeSpec = buildIntfSource(element);
+                }else{
+                    typeSpec = buildClassSource(element);
+                }
+
             } catch (ClassNotFoundException e) {
                 messager.printMessage(Diagnostic.Kind.WARNING, "构建失败:" + e.getMessage());
                 return;
@@ -105,10 +111,120 @@ public class DtoProcessor extends BaseProcessor {
     }
 
     /**
-     * 根据element中的属性构建getter/setter方法，原有方法和方法上的注解保留
+     * 根据element类中的属性构建getter/setter方法，原有方法和方法上的注解保留
      * @param element
      */
-    private TypeSpec buildSource(Element element) throws ClassNotFoundException {
+    private TypeSpec buildClassSource(Element element) throws ClassNotFoundException {
+        String simpleName = element.getSimpleName().toString();
+        //构建类
+        TypeSpec.Builder interfaceBuilder = TypeSpec.interfaceBuilder(simpleName)
+                .addModifiers(Modifier.PUBLIC);
+        String doc = elementUtils.getDocComment(element);
+        if(StringUtils.isNotBlank(doc)) {
+            interfaceBuilder.addJavadoc(doc);
+        }
+        com.sun.tools.javac.util.List<Attribute.Compound> classAnnotationMirrors = ((Symbol.ClassSymbol) element).getAnnotationMirrors();
+        //构建类注解
+        List<AnnotationSpec> annotationSpecs = new ArrayList<>(classAnnotationMirrors.size());
+        //是否包括Table注解，没有的话就构建一个
+        boolean containsTableAnnotation = false;
+        for(int i=0; i<classAnnotationMirrors.size(); i++){
+//          获取GenDTOMethod注解， compound为@com.dili.ss.processor.annotation.GenDTOMethod
+            Attribute.Compound compound = classAnnotationMirrors.get(i);
+            Map<Symbol.MethodSymbol, Attribute> symbolAttributeMap = compound.getElementValues();
+            //是否重复使用，取GenDTOMethod注解中的reuse的值 st
+            Boolean reuse = null;
+            if (Table.class.getName().equals(compound.type.toString())) {
+                containsTableAnnotation = true;
+            }
+            if (GenDTOMethod.class.getName().equals(compound.type.toString())) {
+                //没有属性，则判断默认值
+                if (symbolAttributeMap.isEmpty()) {
+                    //基于JDK8实现， 获取GenDTOMethod.reuse()的默认值，赋值到break变量
+//                Scope.Entry entry = compound.type.tsym.members().elems;
+//                Iterator it = entry.scope.getElements().iterator();
+//                while (it.hasNext()) {
+//                    Symbol.MethodSymbol methodSymbol = (Symbol.MethodSymbol) it.next();
+//                    Object reuseValue = methodSymbol.getDefaultValue().getValue();
+//                    if ("reuse".equals(entry.sym.getSimpleName().toString())) {
+//                        reuse = (boolean) reuseValue;
+//                        break;
+//                    }
+//                }
+                    //JDK8以上版本实现， 获取GenDTOMethod.reuse()的默认值，赋值到break变量
+                    List<Symbol.MethodSymbol> methodSymbols = (List) compound.getAnnotationType().asElement().getEnclosedElements();
+                    for (Symbol.MethodSymbol methodSymbol : methodSymbols) {
+                        if (methodSymbol.getSimpleName().toString().equals("reuse")) {
+                            reuse = (boolean) methodSymbol.defaultValue.getValue();
+                            break;
+                        }
+                    }
+                } else {
+                    for (Map.Entry<Symbol.MethodSymbol, Attribute> entry : symbolAttributeMap.entrySet()) {
+                        Object reuseValue = entry.getValue().getValue();
+                        //跳过reuse=false的
+                        if (entry.getKey().getSimpleName().toString().equals("reuse")) {
+                            reuse = (boolean) reuseValue;
+                            break;
+                        }
+                    }
+                }
+                if(null != reuse && !reuse){
+                    continue;
+                }
+            }
+            //是否重复使用，取GenDTOMethod注解中的reuse的值 end
+            //构建当前注解
+            AnnotationSpec.Builder annotationSpecBuilder = AnnotationSpec.builder(Class.forName(compound.getAnnotationType().toString()));
+            for(Map.Entry<Symbol.MethodSymbol, Attribute> entry : symbolAttributeMap.entrySet()){
+                Object value = entry.getValue().getValue();
+                if(value instanceof String){
+                    annotationSpecBuilder.addMember(entry.getKey().getSimpleName().toString(), CodeBlock.builder().add("$S", value).build());
+                }else if(entry.getValue() instanceof Attribute.Enum){
+                    annotationSpecBuilder.addMember(entry.getKey().getSimpleName().toString(), CodeBlock.builder().add("$T.$L", ((Attribute.Enum) entry.getValue()).type, value.toString()).build());
+                }else{
+                    annotationSpecBuilder.addMember(entry.getKey().getSimpleName().toString(), CodeBlock.builder().add("$L", value).build());
+                }
+            }
+            annotationSpecs.add(annotationSpecBuilder.build());
+        }
+        if(!containsTableAnnotation){
+            //添加Table注解
+            AnnotationSpec.Builder annotationSpecBuilder = AnnotationSpec.builder(Table.class);
+            annotationSpecBuilder.addMember("name", CodeBlock.builder().add("$S", "`"+POJOUtils.humpToLineFast(simpleName)+"`").build());
+            annotationSpecs.add(annotationSpecBuilder.build());
+        }
+
+        //构建父接口
+        com.sun.tools.javac.util.List<Type> interfacesType = ((Symbol.ClassSymbol) element).getInterfaces();
+        List<TypeName> typeNames = new ArrayList<>(interfacesType.size());
+        for (Type type : interfacesType) {
+            typeNames.add(ParameterizedTypeName.get(type));
+        }
+        //构建父类
+//        Type superclass = ((Symbol.ClassSymbol) element).getSuperclass();
+//        builder.addAnnotations(annotationSpecs).addSuperinterfaces(typeNames).superclass(ParameterizedTypeName.get(superclass));
+        interfaceBuilder.addAnnotations(annotationSpecs).addSuperinterfaces(typeNames);
+        //构建属性和方法
+        List<? extends Element> elements = element.getEnclosedElements();
+        for(Element ele : elements) {
+            //构建属性
+            if (ele.getKind().equals(ElementKind.FIELD)) {
+                messager.printMessage(Diagnostic.Kind.OTHER, "根据属性" + ele.getSimpleName() + "构建getter/setter.");
+                buildMethodByField(interfaceBuilder, (Symbol.VarSymbol) ele);
+            } else if (ele.getKind().equals(ElementKind.METHOD)) {
+                //javabean类方法不构建
+//                buildMethod(builder, (Symbol.MethodSymbol) ele);
+            }
+        }
+        return interfaceBuilder.build();
+    }
+
+    /**
+     * 根据element接口中的属性构建getter/setter方法，原有方法和方法上的注解保留
+     * @param element
+     */
+    private TypeSpec buildIntfSource(Element element) throws ClassNotFoundException {
         String simpleName = element.getSimpleName().toString();
         //构建类
         TypeSpec.Builder builder = TypeSpec.interfaceBuilder(simpleName)
@@ -267,6 +383,19 @@ public class DtoProcessor extends BaseProcessor {
         //初始化getter
         String getterName = "get" + fieldSimpleName.substring(0, 1).toUpperCase() + fieldSimpleName.substring(1);
         MethodSpec.Builder getMethodBuilder = MethodSpec.methodBuilder(getterName).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
+        //构建javax.persistence.Column注解
+        AnnotationSpec.Builder columnAnnotationSpecBuilder = AnnotationSpec.builder(Column.class);
+        StringBuilder fieldSimpleNameStringBuilder = new StringBuilder();
+        columnAnnotationSpecBuilder.addMember("name", CodeBlock.builder().add("$S", fieldSimpleNameStringBuilder.append("`").append(POJOUtils.humpToLineFast(fieldSimpleName)).append("`").toString()).build());
+        getMethodBuilder.addAnnotation(columnAnnotationSpecBuilder.build());
+        if("id".equals(fieldSimpleName)){
+            //构建javax.persistence.Id注解
+            getMethodBuilder.addAnnotation(Id.class);
+            //构建javax.persistence.GeneratedValue注解
+            AnnotationSpec.Builder generatedValueAnnotationSpecBuilder = AnnotationSpec.builder(GeneratedValue.class);
+            generatedValueAnnotationSpecBuilder.addMember("strategy", CodeBlock.builder().add("$T.$L", GenerationType.class, "IDENTITY").build());
+            getMethodBuilder.addAnnotation(generatedValueAnnotationSpecBuilder.build());
+        }
         //初始化setter
         String setterName = "set" + fieldSimpleName.substring(0, 1).toUpperCase() + fieldSimpleName.substring(1);
         MethodSpec.Builder setMethodBuilder = MethodSpec.methodBuilder(setterName).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).returns(void.class);

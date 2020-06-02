@@ -256,7 +256,9 @@ public class ValueProviderUtils {
 				}
 			}
 		}else{
-            valuePairs.add(0, new ValuePairImpl<String>(emptyText, ""));
+			if(providerObj != null && !valuePairs.isEmpty() && !"".equals(valuePairs.get(0).getValue())) {
+				valuePairs.add(0, new ValuePairImpl<String>(emptyText, ""));
+			}
         }
 		return valuePairs;
 	}
