@@ -3,10 +3,6 @@ package com.dili.ss.mbg;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.dto.IBaseDomain;
 import com.dili.ss.dto.IDTO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.mybatis.generator.api.GeneratedJavaFile;
 import org.mybatis.generator.api.IntrospectedTable;
@@ -81,8 +77,8 @@ public class MyControllerPlugin extends PluginAdapter {
                 addAutowiredService(clazz, controllerTargetPackage, shortName);
 
                 //添加和引入注解
-                clazz.addImportedType(Api.class.getName());
-                clazz.addAnnotation("@Api(\"/"+StringUtils.uncapitalize(shortName)+"\")");
+//                clazz.addImportedType(Api.class.getName());
+//                clazz.addAnnotation("@Api(\"/"+StringUtils.uncapitalize(shortName)+"\")");
                 clazz.addImportedType("org.springframework.stereotype.Controller");
                 clazz.addAnnotation("@Controller");
                 clazz.addImportedType("org.springframework.web.bind.annotation.RequestMapping");
@@ -155,9 +151,9 @@ public class MyControllerPlugin extends PluginAdapter {
         clazz.addImportedType(ResponseBody.class.getName());
         clazz.addImportedType(List.class.getName());
         clazz.addImportedType(RequestMethod.class.getName());
-        clazz.addImportedType(ApiOperation.class.getName());
-        clazz.addImportedType(ApiImplicitParams.class.getName());
-        clazz.addImportedType(ApiImplicitParam.class.getName());
+//        clazz.addImportedType(ApiOperation.class.getName());
+//        clazz.addImportedType(ApiImplicitParams.class.getName());
+//        clazz.addImportedType(ApiImplicitParam.class.getName());
 
         addIndexMethod(clazz, unit);
 //        addListMethod(clazz, unit);
@@ -179,7 +175,7 @@ public class MyControllerPlugin extends PluginAdapter {
         bodyLines.add(returnLine);
         listMethod.addBodyLines(bodyLines);
 
-        listMethod.addAnnotation("@ApiOperation(\"跳转到" + unit.getType().getShortName() + "页面\")");
+//        listMethod.addAnnotation("@ApiOperation(\"跳转到" + unit.getType().getShortName() + "页面\")");
         listMethod.addAnnotation("@RequestMapping(value=\"/index.html\", method = RequestMethod.GET)");
 
         listMethod.addJavaDocLine("/**");
@@ -210,12 +206,12 @@ public class MyControllerPlugin extends PluginAdapter {
         bodyLines.add(returnLine);
         listMethod.addBodyLines(bodyLines);
 
-        listMethod.addAnnotation("@ApiOperation(value=\"查询" + baseModelJavaType.getShortName() + "\", notes = \"查询"+baseModelJavaType.getShortName() + "，返回列表信息\")");
-        StringBuilder sb = new StringBuilder();
-        sb.append("@ApiImplicitParams({"+LINE_SEPARATOR);
-        sb.append("\t\t@ApiImplicitParam(name=\"" + baseModelJavaType.getShortName() + "\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的form信息\", required = false, dataType = \"string\")"+LINE_SEPARATOR);
-        sb.append("\t})");
-        listMethod.addAnnotation(sb.toString());
+//        listMethod.addAnnotation("@ApiOperation(value=\"查询" + baseModelJavaType.getShortName() + "\", notes = \"查询"+baseModelJavaType.getShortName() + "，返回列表信息\")");
+//        StringBuilder sb = new StringBuilder();
+//        sb.append("@ApiImplicitParams({"+LINE_SEPARATOR);
+//        sb.append("\t\t@ApiImplicitParam(name=\"" + baseModelJavaType.getShortName() + "\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的form信息\", required = false, dataType = \"string\")"+LINE_SEPARATOR);
+//        sb.append("\t})");
+//        listMethod.addAnnotation(sb.toString());
         listMethod.addAnnotation("@RequestMapping(value=\"/list.action\", method = {RequestMethod.GET, RequestMethod.POST})");
 
         listMethod.addJavaDocLine("/**");
@@ -245,12 +241,12 @@ public class MyControllerPlugin extends PluginAdapter {
         bodyLines.add(returnLine);
         listPageMethod.addBodyLines(bodyLines);
 
-        listPageMethod.addAnnotation("@ApiOperation(value=\"分页查询" + baseModelJavaType.getShortName() + "\", notes = \"分页查询"+baseModelJavaType.getShortName() + "，返回easyui分页信息\")");
-        StringBuilder sb = new StringBuilder();
-        sb.append("@ApiImplicitParams({"+LINE_SEPARATOR);
-        sb.append("\t\t@ApiImplicitParam(name=\"" + baseModelJavaType.getShortName() + "\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的form信息\", required = false, dataType = \"string\")"+LINE_SEPARATOR);
-        sb.append("\t})");
-        listPageMethod.addAnnotation(sb.toString());
+//        listPageMethod.addAnnotation("@ApiOperation(value=\"分页查询" + baseModelJavaType.getShortName() + "\", notes = \"分页查询"+baseModelJavaType.getShortName() + "，返回easyui分页信息\")");
+//        StringBuilder sb = new StringBuilder();
+//        sb.append("@ApiImplicitParams({"+LINE_SEPARATOR);
+//        sb.append("\t\t@ApiImplicitParam(name=\"" + baseModelJavaType.getShortName() + "\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的form信息\", required = false, dataType = \"string\")"+LINE_SEPARATOR);
+//        sb.append("\t})");
+//        listPageMethod.addAnnotation(sb.toString());
         listPageMethod.addAnnotation("@RequestMapping(value=\"/listPage.action\", method = {RequestMethod.GET, RequestMethod.POST})");
 
         listPageMethod.addJavaDocLine("/**");
@@ -280,12 +276,12 @@ public class MyControllerPlugin extends PluginAdapter {
         bodyLines.add(returnLine);
         method.addBodyLines(bodyLines);
 
-        method.addAnnotation("@ApiOperation(\"新增" + baseModelJavaType.getShortName() + "\")");
-        StringBuilder sb = new StringBuilder();
-        sb.append("@ApiImplicitParams({"+LINE_SEPARATOR);
-        sb.append("\t\t@ApiImplicitParam(name=\"" + baseModelJavaType.getShortName() + "\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的form信息\", required = true, dataType = \"string\")"+LINE_SEPARATOR);
-        sb.append("\t})");
-        method.addAnnotation(sb.toString());
+//        method.addAnnotation("@ApiOperation(\"新增" + baseModelJavaType.getShortName() + "\")");
+//        StringBuilder sb = new StringBuilder();
+//        sb.append("@ApiImplicitParams({"+LINE_SEPARATOR);
+//        sb.append("\t\t@ApiImplicitParam(name=\"" + baseModelJavaType.getShortName() + "\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的form信息\", required = true, dataType = \"string\")"+LINE_SEPARATOR);
+//        sb.append("\t})");
+//        method.addAnnotation(sb.toString());
         method.addAnnotation("@RequestMapping(value=\"/insert.action\", method = {RequestMethod.GET, RequestMethod.POST})");
 
         method.addJavaDocLine("/**");
@@ -314,12 +310,12 @@ public class MyControllerPlugin extends PluginAdapter {
         bodyLines.add(returnLine);
         method.addBodyLines(bodyLines);
 
-        method.addAnnotation("@ApiOperation(\"修改" + baseModelJavaType.getShortName() + "\")");
-        StringBuilder sb = new StringBuilder();
-        sb.append("@ApiImplicitParams({"+LINE_SEPARATOR);
-        sb.append("\t\t@ApiImplicitParam(name=\"" + baseModelJavaType.getShortName() + "\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的form信息\", required = true, dataType = \"string\")"+LINE_SEPARATOR);
-        sb.append("\t})");
-        method.addAnnotation(sb.toString());
+//        method.addAnnotation("@ApiOperation(\"修改" + baseModelJavaType.getShortName() + "\")");
+//        StringBuilder sb = new StringBuilder();
+//        sb.append("@ApiImplicitParams({"+LINE_SEPARATOR);
+//        sb.append("\t\t@ApiImplicitParam(name=\"" + baseModelJavaType.getShortName() + "\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的form信息\", required = true, dataType = \"string\")"+LINE_SEPARATOR);
+//        sb.append("\t})");
+//        method.addAnnotation(sb.toString());
         method.addAnnotation("@RequestMapping(value=\"/update.action\", method = {RequestMethod.GET, RequestMethod.POST})");
 
         method.addJavaDocLine("/**");
@@ -345,12 +341,12 @@ public class MyControllerPlugin extends PluginAdapter {
         bodyLines.add(returnLine);
         method.addBodyLines(bodyLines);
 
-        method.addAnnotation("@ApiOperation(\"删除" + baseModelJavaType.getShortName() + "\")");
-        StringBuilder sb = new StringBuilder();
-        sb.append("@ApiImplicitParams({"+LINE_SEPARATOR);
-        sb.append("\t\t@ApiImplicitParam(name=\"id\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的主键\", required = true, dataType = \"long\")"+LINE_SEPARATOR);
-        sb.append("\t})");
-        method.addAnnotation(sb.toString());
+//        method.addAnnotation("@ApiOperation(\"删除" + baseModelJavaType.getShortName() + "\")");
+//        StringBuilder sb = new StringBuilder();
+//        sb.append("@ApiImplicitParams({"+LINE_SEPARATOR);
+//        sb.append("\t\t@ApiImplicitParam(name=\"id\", paramType=\"form\", value = \""+ baseModelJavaType.getShortName() +"的主键\", required = true, dataType = \"long\")"+LINE_SEPARATOR);
+//        sb.append("\t})");
+//        method.addAnnotation(sb.toString());
         method.addAnnotation("@RequestMapping(value=\"/delete.action\", method = {RequestMethod.GET, RequestMethod.POST})");
 
         method.addJavaDocLine("/**");
