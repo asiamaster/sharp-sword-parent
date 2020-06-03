@@ -11,7 +11,6 @@ import com.dili.ss.service.CommonService;
 import com.dili.ss.util.POJOUtils;
 import com.dili.ss.util.ReflectionUtils;
 import com.github.pagehelper.Page;
-import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
@@ -31,8 +30,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-
-@Api(value = "common-api", description = "通用控制器操作", position = 1)
+/**
+ * 通用控制器操作
+ */
 @Controller
 @ConditionalOnBean(name = "commonMapper")
 @RequestMapping("/common")
