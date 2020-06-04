@@ -123,7 +123,13 @@
         <dependency>
             <groupId>com.ibeetl</groupId>
             <artifactId>beetl</artifactId>
-            <version>3.0.16.RELEASE</version>
+            <version>3.1.7.RELEASE</version>
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.ow2.asm</groupId>-->
+<!--                    <artifactId>asm-commons</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
 <!--            <exclusions>-->
 <!--                <exclusion>-->
 <!--                    <groupId>org.antlr</groupId>-->
@@ -131,6 +137,14 @@
 <!--                </exclusion>-->
 <!--            </exclusions>-->
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm-commons -->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-commons</artifactId>
+            <version>7.1</version>
+        </dependency>
+
         <!-- beelt中用到，这里是换了个版本，为了去掉警告 -->
 <!--        <dependency>-->
 <!--            <groupId>org.antlr</groupId>-->

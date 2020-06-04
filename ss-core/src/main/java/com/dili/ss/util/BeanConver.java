@@ -37,6 +37,8 @@ public class BeanConver {
      * 实例类转换
      * 支持DTO、DTOInstance和javaBean转为javaBean
      * 不支持转为DTO
+     * 比copyBean(srouceObj, targetObj)的性能慢3-5倍
+     * DTO转换最慢，循环100W次需要3000ms以上
      * @param source 源对象
      * @param target 目标对象
      * @param <T> 源对象
@@ -62,6 +64,47 @@ public class BeanConver {
         }
         copier.copy(source,result,null);
         return result;
+    }
+
+    /**
+     * 实例类转换
+     * 支持DTO、DTOInstance和javaBean转为javaBean
+     * 不支持转为DTO
+     * 比cglibBeanCopy的性能慢2-3倍
+     * @param source 源对象
+     * @param target 目标对象
+     * @param <T> 源对象
+     * @param <K> 目标对象
+     */
+    public static<T,K> K copyBean(T source, K target){
+        if (source == null) {
+            return null;
+        }
+        String beanKey = generateKey(source.getClass(), target.getClass());
+        BeanCopier copier = null;
+        if (!beanCopierMap.containsKey(beanKey)) {
+            copier = BeanCopier.create(source.getClass(), target.getClass(), false);
+            beanCopierMap.put(beanKey, copier);
+        } else {
+            copier = beanCopierMap.get(beanKey);
+        }
+        copier.copy(source,target,null);
+        return target;
+    }
+
+    /**
+     * cglib方式实现beancopy，支持dto接口、instance和javabean，但是dto接口性能较差
+     * @param source    源对象
+     * @param target    目标对象
+     * @param <T>
+     * @param <K>
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    public static <T,K> void cglibBeanCopy(T source, K target) {
+        final net.sf.cglib.beans.BeanCopier copier = net.sf.cglib.beans.BeanCopier.create(source.getClass(), target.getClass(), false);
+        copier.copy(source, target, null);
     }
 
     /**
