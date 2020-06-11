@@ -54,7 +54,7 @@
             </resource>
         </resources>
         <plugins>
-            
+
 
             <!--<plugin>-->
                 <!--<groupId>org.springframework.boot</groupId>-->
@@ -77,23 +77,6 @@
                     <!--<skipTests>true</skipTests>-->
                 <!--</configuration>-->
             <!--</plugin>-->
-            <plugin>
-                <groupId>org.mybatis.generator</groupId>
-                <artifactId>mybatis-generator-maven-plugin</artifactId>
-                <version>1.3.7</version>
-                <configuration>
-                    <configurationFile>${basedir}/src/main/resources/generator/generatorConfig.xml</configurationFile>
-                    <overwrite>true</overwrite>
-                    <verbose>true</verbose>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.dili</groupId>
-                        <artifactId>ss-mbg</artifactId>
-                        <version>${project.parent.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
         </plugins>
     </build>
 
@@ -105,25 +88,10 @@
 			<artifactId>ss-mvc</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-
-        <!-- https://mvnrepository.com/artifact/com.ibeetl/beetl-framework-starter -->
-<!--        <dependency>-->
-<!--            <groupId>com.ibeetl</groupId>-->
-<!--            <artifactId>beetl-framework-starter</artifactId>-->
-<!--            <version>1.2.20.RELEASE</version>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.antlr</groupId>-->
-<!--                    <artifactId>antlr4-runtime</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
-
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.ibeetl/beetl &ndash;&gt;-->
         <dependency>
             <groupId>com.ibeetl</groupId>
             <artifactId>beetl</artifactId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.0.16.RELEASE</version>
 <!--            <exclusions>-->
 <!--                <exclusion>-->
 <!--                    <groupId>org.ow2.asm</groupId>-->

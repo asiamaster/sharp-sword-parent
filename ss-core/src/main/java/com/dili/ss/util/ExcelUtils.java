@@ -136,8 +136,10 @@ public class ExcelUtils {
         switch (cell.getCellTypeEnum()) {
             case STRING:
                 return cell.getStringCellValue();
-            case NUMERIC:
-                return cell.getNumericCellValue();
+            case NUMERIC: {
+                Double value = cell.getNumericCellValue();
+                return isInteger(value) ? value.intValue() : value;
+            }
             case BOOLEAN:
                 return cell.getBooleanCellValue();
             case ERROR:
@@ -149,5 +151,9 @@ public class ExcelUtils {
             default:
                 return cell.getStringCellValue();
         }
+    }
+
+    private static boolean isInteger(double d){
+        return d % 1 ==0;
     }
 }
