@@ -138,7 +138,11 @@ public class ExcelUtils {
                 return cell.getStringCellValue();
             case NUMERIC: {
                 Double value = cell.getNumericCellValue();
-                return isInteger(value) ? value.longValue() : value;
+                if(isInteger(value)){
+                    return value.longValue();
+                }else{
+                    return value;
+                }
             }
             case BOOLEAN:
                 return cell.getBooleanCellValue();
