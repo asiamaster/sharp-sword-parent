@@ -138,7 +138,7 @@ public class ExcelUtils {
                 return cell.getStringCellValue();
             case NUMERIC: {
                 Double value = cell.getNumericCellValue();
-                return isInteger(value) ? value.intValue() : value;
+                return isInteger(value) ? value.longValue() : value;
             }
             case BOOLEAN:
                 return cell.getBooleanCellValue();
@@ -153,6 +153,11 @@ public class ExcelUtils {
         }
     }
 
+    /**
+     * 判断是整数
+     * @param d
+     * @return
+     */
     private static boolean isInteger(double d){
         return d % 1 ==0;
     }
