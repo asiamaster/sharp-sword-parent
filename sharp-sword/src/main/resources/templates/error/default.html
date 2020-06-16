@@ -60,6 +60,9 @@
     <div class="error-des">
         <h3>报错了-_-!&nbsp;&nbsp;您可以:&nbsp;&nbsp;<a href="#" onclick="history.go(-1)">返回上一页</a>&nbsp;&nbsp;<#config has="error.page.indexPage">|&nbsp;&nbsp;<a href="#" onclick="location.href='<#config name="error.page.indexPage"/>'" class="primary-btn dili-btn">去网站首页</a></#config></h3>
         <a href="#" class="error-more-btn">更多</a>
+        <% if(has(exMsg)){%>
+        <p class="error-detail">${exMsg}</p>
+        <%}%>
         <p class="error-detail">${@com.dili.ss.util.ExceptionUtils.getExceptionString(exception, 2000)}</p>
     </div>
     <div class="error-pic-show">
