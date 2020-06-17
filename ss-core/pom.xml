@@ -112,7 +112,7 @@
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.9.3</version>
+            <version>1.9.4</version>
         </dependency>
 
         <!-- 参数校验包 -->
@@ -131,7 +131,7 @@
         <!--<dependency>-->
         <!--<groupId>com.alibaba</groupId>-->
         <!--<artifactId>druid</artifactId>-->
-        <!--<version>1.1.8</version>-->guava
+        <!--<version>1.1.8</version>-->
         <!--</dependency>-->
         <dependency>
             <groupId>com.alibaba</groupId>

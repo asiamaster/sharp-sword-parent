@@ -1,14 +1,16 @@
 package com.dili.ss.mvc.boot;
 
-import com.dili.http.okhttp.utils.B;
 import com.dili.ss.mvc.converter.JsonHttpMessageConverter;
 import com.dili.ss.util.SpringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.env.Environment;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -24,10 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -40,6 +39,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 //@EnableWebMvc //不能使用@EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
 
+	@Value("${web.instanceResolver:false}")
+	private Boolean instanceResolver;
 	@Autowired
 	public Environment env;
 
@@ -125,6 +126,11 @@ public class WebConfig implements WebMvcConfigurer {
 			}
 		}
 		JsonHttpMessageConverter fastJsonHttpMessageConverter = new JsonHttpMessageConverter();
+		List<MediaType> supportedMediaTypes = new ArrayList<>();
+		supportedMediaTypes.add(MediaType.APPLICATION_JSON);
+		supportedMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
+		supportedMediaTypes.add(MediaType.TEXT_PLAIN);
+		fastJsonHttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
 //		String dateFormat = env.getProperty("spring.fastjson.date-format");
 //		if(StringUtils.isNotBlank(dateFormat)){
 //			fastJsonHttpMessageConverter.setDateFormat(dateFormat);
@@ -141,9 +147,10 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-		try {
-			argumentResolvers.add((HandlerMethodArgumentResolver)((Class)B.b.g("argumentResolver")).newInstance());
-		} catch (Exception e) {
+		if(instanceResolver){
+			argumentResolvers.add(new DTOInstArgumentResolver());
+		}else {
+			argumentResolvers.add(new DTOArgumentResolver());
 		}
 	}
 
@@ -186,14 +193,14 @@ public class WebConfig implements WebMvcConfigurer {
 		return simpleMappingExceptionResolver;
 	}
 
-    /**
-     * Springboot的异步线程池
-     * @param configurer
-     */
+	/**
+	 * Springboot的异步线程池
+	 * @param configurer
+	 */
 	@Override
 	public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        //核心线程数10：线程池创建时候初始化的线程数
+		//核心线程数10：线程池创建时候初始化的线程数
 		executor.setCorePoolSize(10);
 		//最大线程数20：线程池最大的线程数，只有在缓冲队列满了之后才会申请超过核心线程数的线程
 		executor.setMaxPoolSize(20);
@@ -209,5 +216,18 @@ public class WebConfig implements WebMvcConfigurer {
 		executor.setWaitForTasksToCompleteOnShutdown(true);
 		//同时，这里还设置了setAwaitTerminationSeconds(60)，该方法用来设置线程池中任务的等待时间，如果超过这个时候还没有销毁就强制销毁，以确保应用最后能够被关闭，而不是阻塞住。
 		executor.setAwaitTerminationSeconds(60);
+	}
+
+	@Override
+	public void addFormatters(FormatterRegistry registry) {
+		registry.addFormatterForFieldAnnotation(new Cent2YuanAnnotationFormatterFactory());
+	}
+
+	public Boolean getInstanceResolver() {
+		return instanceResolver;
+	}
+
+	public void setInstanceResolver(Boolean instanceResolver) {
+		this.instanceResolver = instanceResolver;
 	}
 }

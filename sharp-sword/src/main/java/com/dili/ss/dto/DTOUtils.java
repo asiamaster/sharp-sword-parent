@@ -910,7 +910,7 @@ public class DTOUtils {
 		for (int i = 0; i < propertyDescriptors.length; i++) {
 			PropertyDescriptor descriptor = propertyDescriptors[i];
 			String propertyName = descriptor.getName();
-			if (!"class".equals(propertyName)) {
+			if (!"class".equals(propertyName) && !"fields".equals(propertyName)) {
 				Method readMethod = descriptor.getReadMethod();
 				//可能该属性并没有getter方法
 				if(readMethod == null){

@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.env.Environment;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -215,6 +216,11 @@ public class WebConfig implements WebMvcConfigurer {
 		executor.setWaitForTasksToCompleteOnShutdown(true);
 		//同时，这里还设置了setAwaitTerminationSeconds(60)，该方法用来设置线程池中任务的等待时间，如果超过这个时候还没有销毁就强制销毁，以确保应用最后能够被关闭，而不是阻塞住。
 		executor.setAwaitTerminationSeconds(60);
+	}
+
+	@Override
+	public void addFormatters(FormatterRegistry registry) {
+		registry.addFormatterForFieldAnnotation(new Cent2YuanAnnotationFormatterFactory());
 	}
 
 	public Boolean getInstanceResolver() {
