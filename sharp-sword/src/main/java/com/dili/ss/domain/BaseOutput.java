@@ -104,6 +104,10 @@ public class BaseOutput<T> {
         return this;
     }
 
+    public static <T> BaseOutput<T> successData(T data) {
+        return success().setData(data);
+    }
+
     public static <T> BaseOutput<T> create(String code, String result) {
         return new BaseOutput<T>(code, result);
     }
