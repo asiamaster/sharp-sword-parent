@@ -1,6 +1,5 @@
 package com.dili.ss.boot;
 
-import com.dili.http.okhttp.utils.B;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;

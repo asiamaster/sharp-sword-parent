@@ -1,6 +1,5 @@
 package com.dili.ss.component;
 
-import com.dili.http.okhttp.utils.B;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;

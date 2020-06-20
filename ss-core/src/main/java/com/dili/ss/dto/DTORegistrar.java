@@ -1,6 +1,5 @@
 package com.dili.ss.dto;
 
-import com.dili.http.okhttp.utils.B;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;

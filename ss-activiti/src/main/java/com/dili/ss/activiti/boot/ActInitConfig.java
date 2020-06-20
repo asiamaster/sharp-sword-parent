@@ -1,6 +1,5 @@
 package com.dili.ss.activiti.boot;
 
-import com.dili.http.okhttp.utils.B;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;

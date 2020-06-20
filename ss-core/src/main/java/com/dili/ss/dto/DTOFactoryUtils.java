@@ -1,6 +1,5 @@
 package com.dili.ss.dto;
 
-import com.dili.http.okhttp.utils.B;
 import javassist.CtClass;
 import org.springframework.core.type.AnnotationMetadata;
 

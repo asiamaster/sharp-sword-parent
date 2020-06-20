@@ -1,6 +1,5 @@
 package com.dili.ss.oplog.aop;
 
-import com.dili.http.okhttp.utils.B;
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.exception.ParamErrorException;
 import com.dili.ss.oplog.annotation.LogParam;

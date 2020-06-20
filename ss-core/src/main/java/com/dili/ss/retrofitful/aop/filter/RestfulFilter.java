@@ -1,6 +1,5 @@
 package com.dili.ss.retrofitful.aop.filter;
 
-import com.dili.http.okhttp.utils.B;
 import com.dili.ss.retrofitful.aop.annotation.Order;
 import com.dili.ss.retrofitful.aop.invocation.Invocation;
 import com.dili.ss.retrofitful.aop.service.RestfulService;

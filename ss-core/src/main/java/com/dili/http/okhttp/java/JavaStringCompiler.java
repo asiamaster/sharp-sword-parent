@@ -1,6 +1,5 @@
 package com.dili.http.okhttp.java;
 
-import com.dili.http.okhttp.utils.B;
 import com.dili.ss.util.SpringUtil;
 import com.dili.ss.util.ZipUtils;
 import org.slf4j.Logger;
