@@ -128,6 +128,9 @@ public class BaseOutput<T> {
         return create(ResultCode.APP_ERROR, msg);
     }
 
+    public static <T> BaseOutput<T> failure(String code, String msg) {
+        return create(code, msg);
+    }
 
     public String getErrorData() {
         return errorData;

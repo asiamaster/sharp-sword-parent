@@ -149,16 +149,18 @@ public class ValueProviderUtils {
 			} else {//普通值提供者
 				for (Map dataMap : results) {
 					String field = key;
+					//处理provider中field为object.field的场景，只取一级对象，框架不主动获取未知对象的属性
+					String dataKey = key.contains(".") ? key.substring(0, key.indexOf(".")) : key;
 					jsonValue.put(ValueProvider.ROW_DATA_KEY, dataMap);
 					ValueProvider valueProvider = (ValueProvider) bean;
-					FieldMeta fieldMeta = objectMeta == null ? null : objectMeta.getFieldMetaById(field);
+					FieldMeta fieldMeta = objectMeta == null ? null : objectMeta.getFieldMetaById(dataKey);
 					try {
-						String text = valueProvider.getDisplayText(dataMap.get(field), jsonValue, fieldMeta);
+						String text = valueProvider.getDisplayText(dataMap.get(dataKey), jsonValue, fieldMeta);
 						//保留原值，用于在修改时提取表单加载，但是需要过滤掉日期类型，
 						// 因为前台无法转换Long类型的日期格式,并且也没法判断是日期格式
 						// 配合批量提供者处理，如果转换后的显示值返回null，则不保留原值
-						if (text != null &&  !(dataMap.get(field) instanceof Date)) {
-							dataMap.put(ORIGINAL_KEY_PREFIX + field, dataMap.get(field));
+						if (text != null &&  !(dataMap.get(dataKey) instanceof Date)) {
+							dataMap.put(ORIGINAL_KEY_PREFIX + field, dataMap.get(dataKey));
 						}
 						//批量提供者只put转换后不为null的值
 						if(text != null && valueProvider instanceof BatchValueProvider) {
