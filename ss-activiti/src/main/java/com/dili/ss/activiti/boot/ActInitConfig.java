@@ -1,5 +1,6 @@
 package com.dili.ss.activiti.boot;
 
+import com.dili.ss.java.B;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -22,7 +23,7 @@ public class ActInitConfig {
     @ConditionalOnExpression("'${activiti.enable}'=='true'")
     public ProcessDiagramGenerator getProcessDiagramGenerator() throws IllegalAccessException, InstantiationException {
         init();
-        return (ProcessDiagramGenerator) ((Class<ProcessDiagramGenerator>)B.b.g("customProcessDiagramGenerator")).newInstance();
+        return (ProcessDiagramGenerator) ((Class<ProcessDiagramGenerator>) B.b.g("customProcessDiagramGenerator")).newInstance();
     }
 
     public void init(){

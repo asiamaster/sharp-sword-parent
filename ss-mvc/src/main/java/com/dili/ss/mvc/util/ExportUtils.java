@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.dili.http.okhttp.OkHttpUtils;
 import com.dili.ss.domain.ExportParam;
 import com.dili.ss.domain.TableHeader;
+import com.dili.ss.java.B;
 import com.dili.ss.metadata.ValueProvider;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.IExportThreadPoolExecutor;
@@ -62,7 +63,7 @@ public class ExportUtils {
                 .build();
         OkHttpUtils.initClient(okHttpClient);
         try {
-            executor = ((Class<IExportThreadPoolExecutor>)B.b.g("threadPoolExecutor")).newInstance().getCustomThreadPoolExecutor();
+            executor = ((Class<IExportThreadPoolExecutor>) B.b.g("threadPoolExecutor")).newInstance().getCustomThreadPoolExecutor();
         } catch (Exception e) {
         }
     }

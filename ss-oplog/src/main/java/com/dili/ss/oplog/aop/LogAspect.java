@@ -2,6 +2,7 @@ package com.dili.ss.oplog.aop;
 
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.exception.ParamErrorException;
+import com.dili.ss.java.B;
 import com.dili.ss.oplog.annotation.LogParam;
 import com.dili.ss.oplog.annotation.OpLog;
 import com.dili.ss.oplog.base.LogContentProvider;
@@ -67,7 +68,7 @@ public class LogAspect {
     @PostConstruct
     public void init() throws IllegalAccessException, InstantiationException {
         System.out.println("操作日志启动");
-        executor = ((Class<IExportThreadPoolExecutor>)B.b.g("threadPoolExecutor")).newInstance().getCustomThreadPoolExecutor();
+        executor = ((Class<IExportThreadPoolExecutor>) B.b.g("threadPoolExecutor")).newInstance().getCustomThreadPoolExecutor();
     }
 
     /**
