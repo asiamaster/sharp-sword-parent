@@ -1,5 +1,6 @@
 package com.dili.ss.retrofitful.aop.filter;
 
+import com.dili.ss.java.B;
 import com.dili.ss.retrofitful.aop.annotation.Order;
 import com.dili.ss.retrofitful.aop.invocation.Invocation;
 import com.dili.ss.retrofitful.aop.service.RestfulService;
@@ -20,7 +21,7 @@ public class RestfulFilter extends AbstractFilter {
 
     @PostConstruct
     public void init(){
-        Class<?> clazz = (Class<?>)B.b.g("restfulService");
+        Class<?> clazz = (Class<?>) B.b.g("restfulService");
         if(clazz != null) {
             try {
                 restfulService = (RestfulService) clazz.newInstance();

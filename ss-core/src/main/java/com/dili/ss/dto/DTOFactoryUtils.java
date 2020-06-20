@@ -1,5 +1,6 @@
 package com.dili.ss.dto;
 
+import com.dili.ss.java.B;
 import javassist.CtClass;
 import org.springframework.core.type.AnnotationMetadata;
 
@@ -41,7 +42,7 @@ public class DTOFactoryUtils {
 
     private static IDTOFactory getInstance(){
         try {
-            return (IDTOFactory)((Class<?>)B.b.g("DTOFactory")).getMethod("getInstance").invoke(null);
+            return (IDTOFactory)((Class<?>) B.b.g("DTOFactory")).getMethod("getInstance").invoke(null);
         } catch (Exception e) {
             return null;
         }

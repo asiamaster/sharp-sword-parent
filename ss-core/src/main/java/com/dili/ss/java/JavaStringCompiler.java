@@ -1,6 +1,5 @@
-package com.dili.http.okhttp.java;
+package com.dili.ss.java;
 
-import com.dili.ss.java.B;
 import com.dili.ss.util.SpringUtil;
 import com.dili.ss.util.ZipUtils;
 import org.slf4j.Logger;
@@ -139,7 +138,7 @@ public class JavaStringCompiler {
 	 *             If load error.
 	 */
 	public Class<?> loadClass(String name, Map<String, byte[]> classBytes) throws ClassNotFoundException, IOException {
-	    Object obj = SpringUtil.getBean("valueProviderUtils");
+	    Object obj = SpringUtil.getBean("theOne");
 	    if(obj == null){
             try (MemoryClassLoader classLoader = new MemoryClassLoader(classBytes)) {
                 return classLoader.loadClass(name);

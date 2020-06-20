@@ -1,5 +1,6 @@
 package com.dili.ss.component;
 
+import com.dili.ss.java.B;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,7 @@ public class InitApplicationListener implements ApplicationListener<ContextRefre
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
-            ((Class)B.b.g("cleaner")).getMethod("execute").invoke(null);
+            ((Class) B.b.g("cleaner")).getMethod("execute").invoke(null);
         } catch (Exception e) {
         }
     }
