@@ -1,5 +1,6 @@
 package com.dili.ss.metadata.provider;
 
+import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.metadata.*;
 import com.dili.ss.metadata.handler.DefaultMismatchHandler;
@@ -50,46 +51,14 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
         //列头上必须要有field字段
         if (metaMap.containsKey(FIELD_KEY)){
             String field = (String)metaMap.get(FIELD_KEY);
+            Map<String, String> escapeFields = getEscapeFileds(metaMap);
             //只要第一个字段匹配就统一转换所有的字段，再次进来就不转换了，因为一次批量转换只关联一张表
-            for(Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()){
+            for(Map.Entry<String, String> entry : escapeFields.entrySet()){
                 if(entry.getKey().equals(field)){
                     int size = list.size();
                     int capacity = size/2 < 10 ? size : size/2;
-                    //收集所有的需要转义的id，不重复
-                    List<String> relationIds = new ArrayList(capacity);
-                    if(list.get(0) instanceof IDTO) {
-                        for(Object obj : list) {
-                            IDTO dto = (IDTO) obj;
-                            Object fkValue = dto.aget(getFkField(metaMap));
-                            if(fkValue == null){
-                                continue;
-                            }
-                            if (!relationIds.contains(fkValue)) {
-                                relationIds.add(fkValue.toString());
-                            }
-                        }
-                    }else if(list.get(0) instanceof Map) {
-                        for(Object obj : list) {
-                            Map map = (Map) obj;
-                            Object fkValue = map.get(getFkField(metaMap));
-                            if(fkValue == null){
-                                continue;
-                            }
-                            if (!relationIds.contains(fkValue)) {
-                                relationIds.add(fkValue.toString());
-                            }
-                        }
-                    }else{
-                        for(Object obj : list) {
-                            Object fkValue = POJOUtils.getProperty(obj, getFkField(metaMap));
-                            if(null == fkValue){
-                                continue;
-                            }
-                            if (!relationIds.contains(fkValue)) {
-                                relationIds.add(fkValue.toString());
-                            }
-                        }
-                    }
+                    //构建关联id List
+                    List<String> relationIds = buildRelationIdList(list, capacity, metaMap);
                     if(relationIds.isEmpty()){
                         break;
                     }
@@ -100,14 +69,17 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                     }
                     //缓存key为id，value为关联DTO
                     Map<String, Map> id2RelTable = new HashMap<>(relationDatas.size());
+                    //关联(数据库)表的主键的字段名
+                    String relactionTablePkField = getRelationTablePkField(metaMap);
+                    boolean ignoreCaseToRef = ignoreCaseToRef(metaMap);
                     for(Object obj : relationDatas){
                         try {
                             Map map = BeanConver.transformObjectToMap(obj);
                             //这里有可能关联表的字段为空
-                            Object relationTablePkFieldValue = map.get(getRelationTablePkField(metaMap));
+                            Object relationTablePkFieldValue = map.get(relactionTablePkField);
                             if(relationTablePkFieldValue != null) {
                                 //如果大小写不敏感，则统一关联字段转小写
-                                if(ignoreCaseToRef(metaMap)) {
+                                if(ignoreCaseToRef) {
                                     id2RelTable.put(relationTablePkFieldValue.toString().toLowerCase(), map);
                                 }else{
                                     id2RelTable.put(relationTablePkFieldValue.toString(), map);
@@ -127,99 +99,70 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
     }
 
     /**
+     * 构建DTO列表的关联id
+     * @param list
+     * @param capacity
+     * @param metaMap
+     * @return
+     */
+    private List<String> buildRelationIdList(List list, int capacity, Map metaMap){
+        List<String> relationIds = new ArrayList(capacity);
+        String fkField = getFkField(metaMap);
+        if(fkField.contains(".")) {
+            String childKey = fkField.substring(fkField.indexOf(".") + 1, fkField.length());
+            fkField = fkField.substring(0, fkField.indexOf("."));
+            for(Object obj : list) {
+                Object fkObj = getObjectValueByKey(obj, fkField);
+                if(fkObj == null){
+                    continue;
+                }
+                Object fkValue = getObjectValueByKey(fkObj, childKey);
+                if(fkValue == null){
+                    continue;
+                }
+                relationIds.add(fkValue.toString());
+            }
+        }else {
+            for (Object obj : list) {
+                Object fkValue = getObjectValueByKey(obj, fkField);
+                if (fkValue == null) {
+                    continue;
+                }
+                relationIds.add(fkValue.toString());
+            }
+        }
+        return relationIds;
+    }
+
+    /**
+     * 根据key获取对象中的属性，key支持obj.field形式
+     * @param obj
+     * @param key
+     */
+    private Object getObjectValueByKey(Object obj, String key){
+        if(obj instanceof Map){
+            Map map = (Map)obj;
+            return map.get(key);
+        }else if(IDTO.class.isAssignableFrom(DTOUtils.getDTOClass(obj))){
+            //代理类
+            if(DTOUtils.isProxy(obj)){
+                return ((IDTO) obj).aget(key);
+            }//实例类
+            else{
+                return POJOUtils.getProperty(obj, key);
+            }
+        }
+        //其它javaBean
+        return POJOUtils.getProperty(obj, key);
+    }
+
+    /**
      * 判断是否忽略大小写进行主表和外表数据关联
      * 子类可以实现，默认大小写敏感
      * @return
      */
     protected boolean ignoreCaseToRef(Map metaMap){
         return false;
-    }
-
-    /**
-     * 设置转义值，支持dto,map和javaBean
-     * @param list 原始列表
-     * @param id2RelTable key为id，value为关联DTO
-     */
-    private void setDtoData(List list, Map<String, Map> id2RelTable, Map metaMap){
-        if(list.get(0) instanceof IDTO && list.get(0).getClass().isInterface()) {
-            for (Object obj : list) {
-                IDTO dto = (IDTO) obj;
-                //记录要转义的字段，避免被覆盖
-                Object keyObj = dto.aget(getFkField(metaMap));
-                //判断如果主表的外键没值就跳过
-                if(keyObj == null){
-                    continue;
-                }
-                String key = keyObj.toString();
-                //如果大小写不敏感，则统一关联字段转小写
-                if(ignoreCaseToRef(metaMap)) {
-                    key = key.toLowerCase();
-                }
-                for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
-                    //有可能外键有值，但是关联表没数据，即是左关联为空的场景
-                    if(id2RelTable.get(key) == null){
-                        //记录原始值
-                        dto.aset(ValueProviderUtils.ORIGINAL_KEY_PREFIX + entry.getKey(), keyObj);
-                        dto.aset(entry.getKey(), getMismatchHandler(metaMap).apply(keyObj));
-                    }else {
-                        //记录原始值
-                        dto.aset(ValueProviderUtils.ORIGINAL_KEY_PREFIX + entry.getKey(), keyObj);
-                        dto.aset(entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
-                    }
-                }
-            }
-        }else if(list.get(0) instanceof Map) {
-            for (Object obj : list) {
-                Map map = (Map) obj;
-                Object keyObj = map.get(getFkField(metaMap));
-                //判断如果主表的外键没值就跳过
-                if(keyObj == null){
-                    continue;
-                }
-                //记录要转义的字段，避免被覆盖
-                String key = keyObj.toString();
-                //如果大小写不敏感，则统一关联字段转小写
-                if(ignoreCaseToRef(metaMap)) {
-                    key = key.toLowerCase();
-                }
-                for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
-                    //有可能外键有值，但是关联表没数据，即是左关联为空的场景
-                    if(id2RelTable.get(key) == null){
-                        //记录原始值
-                        map.put(ValueProviderUtils.ORIGINAL_KEY_PREFIX + entry.getKey(), keyObj);
-                        map.put(entry.getKey(), getMismatchHandler(metaMap).apply(keyObj));
-                    }else {
-                        //记录原始值
-                        map.put(ValueProviderUtils.ORIGINAL_KEY_PREFIX + entry.getKey(), keyObj);
-                        map.put(entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
-                    }
-                }
-            }
-        }else{//java bean
-            //注意java bean如果没有关联属性可能报错，而且非字符串和字符串转换也可能报错，所以不建议使用javaBean
-            for (Object obj : list) {
-                Object keyObj = POJOUtils.getProperty(obj, getFkField(metaMap));
-                //判断如果主表的外键没值就跳过
-                if(keyObj == null){
-                    continue;
-                }
-                //记录要转义的字段，避免被覆盖
-                String key = keyObj.toString();
-                //如果大小写不敏感，则统一关联字段转小写
-                if(ignoreCaseToRef(metaMap)) {
-                    key = key.toLowerCase();
-                }
-                for (Map.Entry<String, String> entry : getEscapeFileds(metaMap).entrySet()) {
-                    //有可能外键有值，但是关联表没数据，即是左关联为空的场景
-                    if(id2RelTable.get(key) == null){
-                        POJOUtils.setProperty(obj, entry.getKey(), getMismatchHandler(metaMap).apply(keyObj));
-                    }else {
-                        //java bean无法记录原始值，而且设置转义值也可能因为类型转换报错
-                        POJOUtils.setProperty(obj, entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -288,4 +231,176 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
     protected Function getMismatchHandler(Map metaMap){
         return defaultMismatchHandler;
     }
+
+    /**
+     * 设置转义值，支持dto,map和javaBean
+     * @param list 原始列表
+     * @param id2RelTable key为id，value为关联DTO
+     */
+    private void setDtoData(List list, Map<String, Map> id2RelTable, Map metaMap){
+        if(list.get(0) instanceof IDTO && list.get(0).getClass().isInterface()) {
+            handleDtoData(list, id2RelTable, metaMap);
+        }else if(list.get(0) instanceof Map) {
+            handleMapData(list, id2RelTable, metaMap);
+        }else{//java bean
+            handleBeanData(list, id2RelTable, metaMap);
+        }
+    }
+
+    /**
+     * 处理DTO接口
+     * @param list
+     * @param id2RelTable
+     * @param metaMap
+     */
+    private void handleDtoData(List list, Map<String, Map> id2RelTable, Map metaMap){
+        String fkField = getFkField(metaMap);
+        String childField = null;
+        boolean hasChild = false;
+        Map<String, String> escapeFields = getEscapeFileds(metaMap);
+        if(fkField.contains(".")) {
+            childField = fkField.substring(fkField.indexOf(".") + 1, fkField.length());
+            fkField = fkField.substring(0, fkField.indexOf("."));
+            hasChild = true;
+        }
+        for (Object obj : list) {
+            IDTO dto = (IDTO) obj;
+            //记录要转义的字段，避免被覆盖
+            Object keyObj = dto.aget(fkField);
+            //判断如果主表的外键没值就跳过
+            if(keyObj == null){
+                continue;
+            }
+            if(hasChild){
+                keyObj = getObjectValueByKey(keyObj, childField);
+                if(keyObj == null){
+                    continue;
+                }
+            }
+            String key = keyObj.toString();
+            //如果大小写不敏感，则统一关联字段转小写
+            if(ignoreCaseToRef(metaMap)) {
+                key = key.toLowerCase();
+            }
+            Function mismatchHandler = getMismatchHandler(metaMap);
+            for (Map.Entry<String, String> entry : escapeFields.entrySet()) {
+                //记录原始值
+                if(hasChild){
+                    //如果有子对象，则原始值格式为object.$_field
+                    String originalKey = new StringBuilder(fkField).append(".").append(ValueProviderUtils.ORIGINAL_KEY_PREFIX).append(childField).toString();
+                    dto.aset(originalKey, keyObj);
+                }else {
+                    dto.aset(ValueProviderUtils.ORIGINAL_KEY_PREFIX + entry.getKey(), keyObj);
+                }
+                //有可能外键有值，但是关联表没数据，即是左关联为空的场景
+                if(id2RelTable.get(key) == null){
+                    dto.aset(entry.getKey(), mismatchHandler.apply(keyObj));
+                }else {
+                    dto.aset(entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
+                }
+            }
+        }
+    }
+
+    /**
+     * 处理Map类型
+     * @param list
+     * @param id2RelTable
+     * @param metaMap
+     */
+    private void handleMapData(List list, Map<String, Map> id2RelTable, Map metaMap){
+        String fkField = getFkField(metaMap);
+        String childField = null;
+        boolean hasChild = false;
+        Map<String, String> escapeFields = getEscapeFileds(metaMap);
+        if(fkField.contains(".")) {
+            childField = fkField.substring(fkField.indexOf(".") + 1, fkField.length());
+            fkField = fkField.substring(0, fkField.indexOf("."));
+            hasChild = true;
+        }
+        for (Object obj : list) {
+            Map map = (Map) obj;
+            Object keyObj = map.get(fkField);
+            //判断如果主表的外键没值就跳过
+            if(keyObj == null){
+                continue;
+            }
+            if(hasChild){
+                keyObj = getObjectValueByKey(keyObj, childField);
+                if(keyObj == null){
+                    continue;
+                }
+            }
+            //记录要转义的字段，避免被覆盖
+            String key = keyObj.toString();
+            //如果大小写不敏感，则统一关联字段转小写
+            if(ignoreCaseToRef(metaMap)) {
+                key = key.toLowerCase();
+            }
+            for (Map.Entry<String, String> entry : escapeFields.entrySet()) {
+                //记录原始值
+                if(hasChild){
+                    //如果有子对象，则原始值格式为object.$_field
+                    String originalKey = new StringBuilder(fkField).append(".").append(ValueProviderUtils.ORIGINAL_KEY_PREFIX).append(childField).toString();
+                    map.put(originalKey, keyObj);
+                }else {
+                    map.put(ValueProviderUtils.ORIGINAL_KEY_PREFIX + entry.getKey(), keyObj);
+                }
+                //有可能外键有值，但是关联表没数据，即是左关联为空的场景
+                if(id2RelTable.get(key) == null){
+                    map.put(entry.getKey(), getMismatchHandler(metaMap).apply(keyObj));
+                }else {
+                    map.put(entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
+                }
+            }
+        }
+    }
+
+    /**
+     * 处理bean类型
+     * @param list
+     * @param id2RelTable
+     * @param metaMap
+     */
+    private void handleBeanData(List list, Map<String, Map> id2RelTable, Map metaMap){
+        String fkField = getFkField(metaMap);
+        String childField = null;
+        boolean hasChild = false;
+        Map<String, String> escapeFields = getEscapeFileds(metaMap);
+        if(fkField.contains(".")) {
+            childField = fkField.substring(fkField.indexOf(".") + 1, fkField.length());
+            fkField = fkField.substring(0, fkField.indexOf("."));
+            hasChild = true;
+        }
+        //注意java bean如果没有关联属性可能报错，而且非字符串和字符串转换也可能报错，所以不建议使用javaBean
+        for (Object obj : list) {
+            Object keyObj = POJOUtils.getProperty(obj, fkField);
+            //判断如果主表的外键没值就跳过
+            if(keyObj == null){
+                continue;
+            }
+            if(hasChild){
+                keyObj = getObjectValueByKey(keyObj, childField);
+                if(keyObj == null){
+                    continue;
+                }
+            }
+            //记录要转义的字段，避免被覆盖
+            String key = keyObj.toString();
+            //如果大小写不敏感，则统一关联字段转小写
+            if(ignoreCaseToRef(metaMap)) {
+                key = key.toLowerCase();
+            }
+            for (Map.Entry<String, String> entry : escapeFields.entrySet()) {
+                //有可能外键有值，但是关联表没数据，即是左关联为空的场景
+                if(id2RelTable.get(key) == null){
+                    POJOUtils.setProperty(obj, entry.getKey(), getMismatchHandler(metaMap).apply(keyObj));
+                }else {
+                    //java bean无法记录原始值，而且设置转义值也可能因为类型转换报错
+                    POJOUtils.setProperty(obj, entry.getKey(), id2RelTable.get(key).get(entry.getValue()));
+                }
+            }
+        }
+    }
+
 }
