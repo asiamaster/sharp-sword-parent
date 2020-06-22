@@ -7,6 +7,7 @@ import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IBaseDomain;
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.util.BeanConver;
+import com.dili.ss.util.POJOUtils;
 import com.dili.ss.util.SpringUtil;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
@@ -147,8 +148,15 @@ public class ValueProviderUtils {
 					LOGGER.error("批量提供者报错:"+batchValueProvider.getClass().getName());
 				}
 			} else {//普通值提供者
+				String field = key;
+				String childField = null;
+				boolean hasChild = false;
+				if(field.contains(".")) {
+					childField = field.substring(field.indexOf(".") + 1, field.length());
+					field = field.substring(0, field.indexOf("."));
+					hasChild = true;
+				}
 				for (Map dataMap : results) {
-					String field = key;
 					//处理provider中field为object.field的场景，只取一级对象，框架不主动获取未知对象的属性
 					String dataKey = key.contains(".") ? key.substring(0, key.indexOf(".")) : key;
 					jsonValue.put(ValueProvider.ROW_DATA_KEY, dataMap);
@@ -160,7 +168,20 @@ public class ValueProviderUtils {
 						// 因为前台无法转换Long类型的日期格式,并且也没法判断是日期格式
 						// 配合批量提供者处理，如果转换后的显示值返回null，则不保留原值
 						if (text != null &&  !(dataMap.get(dataKey) instanceof Date)) {
-							dataMap.put(ORIGINAL_KEY_PREFIX + field, dataMap.get(dataKey));
+							//记录原始值
+							if(hasChild){
+								//如果有子对象，则原始值格式为object.$_field
+								String originalKey = new StringBuilder(field).append(".").append(ValueProviderUtils.ORIGINAL_KEY_PREFIX).append(childField).toString();
+								Object fkValueObj = dataMap.get(dataKey);
+								if(fkValueObj != null){
+									Object fkValue = getObjectValueByKey(fkValueObj, childField);
+									if(fkValue != null){
+										dataMap.put(originalKey, fkValue);
+									}
+								}
+							}else {
+								dataMap.put(ORIGINAL_KEY_PREFIX + field, dataMap.get(dataKey));
+							}
 						}
 						//批量提供者只put转换后不为null的值
 						if(text != null && valueProvider instanceof BatchValueProvider) {
@@ -178,7 +199,27 @@ public class ValueProviderUtils {
 		}
 		return results;
 	}
-
+	/**
+	 * 根据key获取对象中的属性，key支持obj.field形式
+	 * @param obj
+	 * @param key
+	 */
+	private static Object getObjectValueByKey(Object obj, String key){
+		if(obj instanceof Map){
+			Map map = (Map)obj;
+			return map.get(key);
+		}else if(IDTO.class.isAssignableFrom(DTOUtils.getDTOClass(obj))){
+			//代理类
+			if(DTOUtils.isProxy(obj)){
+				return ((IDTO) obj).aget(key);
+			}//实例类
+			else{
+				return POJOUtils.getProperty(obj, key);
+			}
+		}
+		//其它javaBean
+		return POJOUtils.getProperty(obj, key);
+	}
 	/**
 	 * 根据providerId取提供者对象
 	 *
