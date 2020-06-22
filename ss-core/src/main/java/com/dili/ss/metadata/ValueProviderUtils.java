@@ -185,10 +185,10 @@ public class ValueProviderUtils {
 						}
 						//批量提供者只put转换后不为null的值
 						if(text != null && valueProvider instanceof BatchValueProvider) {
-							dataMap.put(field, text);
+							dataMap.put(key, text);
 							//普通值提供者put所有转化后的值(无论是否为空)
 						}else if(!(valueProvider instanceof BatchValueProvider)){
-							dataMap.put(field, text);
+							dataMap.put(key, text);
 						}
 					}catch (Exception e){
 						e.printStackTrace();
