@@ -74,7 +74,7 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 	 * @return 正常情况下不可能为空，但如果程序内部有问题时只能以null返回
 	 */
 	@SuppressWarnings("unchecked")
-	protected <T extends IDTO> T getDTO(Class<T> clazz, NativeWebRequest webRequest, MethodParameter parameter) throws NoSuchMethodException {
+	protected <T extends IDTO> T getDTO(Class<T> clazz, NativeWebRequest webRequest, MethodParameter parameter) {
 		//处理restful调用时，传入的参数不在getParameterMap，而在getInputStream中的情况
 		//注解掉此处，修正URL上有问号参数，body也有内容时，没有取body的缺陷，此时body内容在servletInputStream中
 //		if(webRequest.getParameterMap().isEmpty()){
@@ -118,7 +118,7 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
                 }
                 //处理普通属性
 				else{
-					Method method = clazz.getMethod("get"+ attrName.substring(0, 1).toUpperCase() + attrName.substring(1));
+					Method method = getMethod(clazz, "get"+ attrName.substring(0, 1).toUpperCase() + attrName.substring(1));
 					if (method == null) {
 						dto.put(attrName, getParamValuesAndConvert(entry, fields));
 					} else {
@@ -186,6 +186,14 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 		return t;
 	}
 
+	@SuppressWarnings("unchecked")
+	private Method getMethod(Class<?> clazz, String methodName){
+		try {
+			return clazz.getMethod(methodName);
+		} catch (NoSuchMethodException e) {
+			return null;
+		}
+	}
 
 	/**
 	 * 元转分
