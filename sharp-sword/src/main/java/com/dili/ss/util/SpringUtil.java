@@ -8,18 +8,26 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.lang.annotation.Annotation;
 import java.util.Map;
 
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class SpringUtil implements ApplicationContextAware, EnvironmentAware {
 
     private static ApplicationContext applicationContext = null;
     private static Environment environment;
 
     public static ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    public ApplicationContext applicationContext() {
         return applicationContext;
     }
 
@@ -86,6 +94,11 @@ public class SpringUtil implements ApplicationContextAware, EnvironmentAware {
     public static <T> T getBean(String name, Class<T> clazz) {
         return getApplicationContext().getBean(name, clazz);
     }
+
+    public static Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType) throws BeansException{
+        return getApplicationContext().getBeansWithAnnotation(annotationType);
+    }
+
 
     @Override
     public void setEnvironment(Environment environment) {

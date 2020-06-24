@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.env.Environment;
-import org.springframework.format.FormatterRegistry;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -218,10 +217,10 @@ public class WebConfig implements WebMvcConfigurer {
 		executor.setAwaitTerminationSeconds(60);
 	}
 
-	@Override
-	public void addFormatters(FormatterRegistry registry) {
-		registry.addFormatterForFieldAnnotation(new Cent2YuanAnnotationFormatterFactory());
-	}
+//	@Override
+//	public void addFormatters(FormatterRegistry registry) {
+//		registry.addFormatterForFieldAnnotation(new Cent2YuanAnnotationFormatterFactory());
+//	}
 
 	public Boolean getInstanceResolver() {
 		return instanceResolver;

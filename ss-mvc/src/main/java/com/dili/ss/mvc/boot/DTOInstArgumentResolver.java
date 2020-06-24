@@ -8,6 +8,7 @@ import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.dto.ReturnTypeHandlerFactory;
 import com.dili.ss.exception.AppException;
+import com.dili.ss.mvc.annotation.Cent2Yuan;
 import com.dili.ss.mvc.servlet.RequestReaderHttpServletRequestWrapper;
 import com.dili.ss.mvc.util.BeanValidator;
 import com.dili.ss.util.POJOUtils;
@@ -28,6 +29,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,7 +74,7 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 	 * @return 正常情况下不可能为空，但如果程序内部有问题时只能以null返回
 	 */
 	@SuppressWarnings("unchecked")
-	protected <T extends IDTO> T getDTO(Class<T> clazz, NativeWebRequest webRequest, MethodParameter parameter) {
+	protected <T extends IDTO> T getDTO(Class<T> clazz, NativeWebRequest webRequest, MethodParameter parameter) throws NoSuchMethodException {
 		//处理restful调用时，传入的参数不在getParameterMap，而在getInputStream中的情况
 		//注解掉此处，修正URL上有问号参数，body也有内容时，没有取body的缺陷，此时body内容在servletInputStream中
 //		if(webRequest.getParameterMap().isEmpty()){
@@ -116,7 +118,7 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
                 }
                 //处理普通属性
 				else{
-					Method method = getMethod(clazz, "get"+ attrName.substring(0, 1).toUpperCase() + attrName.substring(1));
+					Method method = clazz.getMethod("get"+ attrName.substring(0, 1).toUpperCase() + attrName.substring(1));
 					if (method == null) {
 						dto.put(attrName, getParamValuesAndConvert(entry, fields));
 					} else {
@@ -164,17 +166,34 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 				dto.getMetadata().putAll(streamDto.getMetadata());
 			}
 		}
+		//处理DTO接口上的入参注解参数有@Cent2Yuan注解
+		Method[] methods = clazz.getMethods();
+		for(Method method : methods){
+			if(!method.getName().startsWith("get") || !Long.class.isAssignableFrom(method.getReturnType())){
+				continue;
+			}
+			Cent2Yuan cent2Yuan = method.getAnnotation(Cent2Yuan.class);
+			if(cent2Yuan != null){
+				String field = POJOUtils.getBeanField(method);
+				Object fieldValue = dto.get(field);
+				if(fieldValue != null) {
+					dto.put(field, yuan2Cent(fieldValue.toString()));
+				}
+			}
+		}
 		T t = (T) DTOUtils.proxyInstance(dto, (Class<IDTO>) clazz);
 		asetErrorMsg(t, parameter);
 		return t;
 	}
-	@SuppressWarnings("unchecked")
-	private Method getMethod(Class<?> clazz, String methodName){
-		try {
-			return clazz.getMethod(methodName);
-		} catch (NoSuchMethodException e) {
-			return null;
-		}
+
+
+	/**
+	 * 元转分
+	 * @param cent
+	 * @return
+	 */
+	private Long yuan2Cent(String yuan){
+		return new BigDecimal(yuan).multiply(new BigDecimal(100)).longValue();
 	}
 
     /**

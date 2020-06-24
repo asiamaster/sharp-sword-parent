@@ -15,6 +15,7 @@ import java.util.Set;
 
 /**
  * 分转元注解(Cent2Yuan)格式化工厂
+ * 该类需要在WebConfig中注册，并且只能支持实体类，不支持接口，所以停用了
  */
 public class Cent2YuanAnnotationFormatterFactory implements AnnotationFormatterFactory<Cent2Yuan> {
     @Override
