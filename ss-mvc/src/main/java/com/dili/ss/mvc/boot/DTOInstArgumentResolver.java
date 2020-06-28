@@ -197,7 +197,7 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 
 	/**
 	 * 元转分
-	 * @param cent
+	 * @param yuan
 	 * @return
 	 */
 	private Long yuan2Cent(String yuan){

@@ -92,12 +92,12 @@
             <groupId>com.ibeetl</groupId>
             <artifactId>beetl</artifactId>
             <version>3.0.16.RELEASE</version>
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.ow2.asm</groupId>-->
-<!--                    <artifactId>asm-commons</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm-commons</artifactId>
+                </exclusion>
+            </exclusions>
 <!--            <exclusions>-->
 <!--                <exclusion>-->
 <!--                    <groupId>org.antlr</groupId>-->

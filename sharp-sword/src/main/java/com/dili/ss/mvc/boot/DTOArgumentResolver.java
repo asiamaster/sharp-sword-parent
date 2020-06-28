@@ -107,7 +107,7 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 				}
 				//处理普通属性
 				else{
-					Method method = clazz.getMethod("get"+ attrName.substring(0, 1).toUpperCase() + attrName.substring(1));
+					Method method = getMethod(clazz, "get"+ attrName.substring(0, 1).toUpperCase() + attrName.substring(1));
 					if (method == null) {
 						dto.put(attrName, getParamValueByForce(entry.getValue()));
 					} else {
@@ -173,6 +173,15 @@ public class DTOArgumentResolver implements HandlerMethodArgumentResolver {
 		T t = (T) DTOUtils.proxy(dto, (Class<IDTO>) clazz);
 		asetErrorMsg(t, parameter);
 		return t;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Method getMethod(Class<?> clazz, String methodName){
+		try {
+			return clazz.getMethod(methodName);
+		} catch (NoSuchMethodException e) {
+			return null;
+		}
 	}
 
 	/**
