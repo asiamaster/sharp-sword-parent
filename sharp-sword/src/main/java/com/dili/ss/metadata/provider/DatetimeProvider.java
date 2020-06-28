@@ -2,7 +2,6 @@ package com.dili.ss.metadata.provider;
 
 import com.dili.ss.metadata.FieldMeta;
 import com.dili.ss.metadata.ValuePair;
-import com.dili.ss.metadata.ValuePairImpl;
 import com.dili.ss.metadata.ValueProvider;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +10,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -22,16 +20,9 @@ import java.util.Map;
 @Component
 public class DatetimeProvider implements ValueProvider {
 
-    private static final List<ValuePair<?>> buffer;
-
-    static {
-        buffer = new ArrayList<ValuePair<?>>();
-        buffer.add(new ValuePairImpl(EMPTY_ITEM_TEXT, null));
-    }
-
     @Override
     public List<ValuePair<?>> getLookupList(Object obj, Map metaMap, FieldMeta fieldMeta) {
-        return buffer;
+        return null;
     }
 
     @Override
