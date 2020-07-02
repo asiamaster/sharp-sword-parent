@@ -2,6 +2,7 @@ package com.dili.ss.mvc.boot;
 
 import com.dili.ss.mvc.converter.JsonHttpMessageConverter;
 import com.dili.ss.util.SpringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -48,6 +49,9 @@ public class WebConfig implements WebMvcConfigurer {
 		return new Converter<String, Date>() {
 			@Override
 			public Date convert(String source) {
+				if(StringUtils.isBlank(source)){
+					return null;
+				}
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				Date date = null;
 				try {
