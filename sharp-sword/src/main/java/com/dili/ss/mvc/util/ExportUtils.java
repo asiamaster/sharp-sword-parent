@@ -4,15 +4,16 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.http.okhttp.OkHttpUtils;
-import com.dili.http.okhttp.utils.B;
 import com.dili.ss.domain.ExportParam;
 import com.dili.ss.domain.TableHeader;
+import com.dili.ss.java.B;
 import com.dili.ss.metadata.ValueProvider;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.IExportThreadPoolExecutor;
 import com.dili.ss.util.SpringUtil;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -63,7 +64,7 @@ public class ExportUtils {
                 .build();
         OkHttpUtils.initClient(okHttpClient);
         try {
-            executor = ((Class<IExportThreadPoolExecutor>)B.b.g("threadPoolExecutor")).newInstance().getCustomThreadPoolExecutor();
+            executor = ((Class<IExportThreadPoolExecutor>) B.b.g("threadPoolExecutor")).newInstance().getCustomThreadPoolExecutor();
         } catch (Exception e) {
         }
     }
@@ -152,7 +153,8 @@ public class ExportUtils {
         try {
 //            HSSFWorkbook workbook = new HSSFWorkbook();
             SXSSFWorkbook workbook = new SXSSFWorkbook(FETCH_COUNT);// 创建工作簿对象
-            SXSSFSheet sheet = workbook.createSheet(exportParam.getTitle());
+            String title = exportParam.getTitle();
+            SXSSFSheet sheet = workbook.createSheet(StringUtils.isBlank(title) ? "sheet1" : title);
 //            解决高版本poi autoSizeColumn方法异常的情况
             sheet.trackAllColumnsForAutoSizing();
             //构建表头

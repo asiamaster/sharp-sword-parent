@@ -13,6 +13,7 @@ import com.dili.ss.util.IExportThreadPoolExecutor;
 import com.dili.ss.util.SpringUtil;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -152,7 +153,8 @@ public class ExportUtils {
         try {
 //            HSSFWorkbook workbook = new HSSFWorkbook();
             SXSSFWorkbook workbook = new SXSSFWorkbook(FETCH_COUNT);// 创建工作簿对象
-            SXSSFSheet sheet = workbook.createSheet(exportParam.getTitle());
+            String title = exportParam.getTitle();
+            SXSSFSheet sheet = workbook.createSheet(StringUtils.isBlank(title) ? "sheet1" : title);
 //            解决高版本poi autoSizeColumn方法异常的情况
             sheet.trackAllColumnsForAutoSizing();
             //构建表头
