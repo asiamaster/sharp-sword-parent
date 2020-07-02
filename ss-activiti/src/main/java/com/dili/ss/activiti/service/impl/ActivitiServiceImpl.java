@@ -226,6 +226,8 @@ public class ActivitiServiceImpl implements ActivitiService {
             deployment = repositoryService.createDeployment()
                     .name(modelData.getName())
                     .enableDuplicateFiltering()
+                    //，这里的过滤方式是先查询部署表，得到表中已有的部署对象集合，如果发现有一条部署记录与将要部署的对象相同，就不会重复部署。
+                    // 所以部署时设置的name,category,资源名称和内容，只要有一个不一样就不会被过滤掉
                     .addBpmnModel(processName, bpmnModel)
                     .deploy();
         } catch (org.activiti.bpmn.exceptions.XMLException e) {

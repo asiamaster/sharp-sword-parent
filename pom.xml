@@ -33,11 +33,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-        <springloaded.version>1.2.8.RELEASE</springloaded.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mapper.version>3.3.9</mapper.version>
-        <mysql.version>5.1.40</mysql.version>
-        <aspectj.version>1.8.10</aspectj.version>
         <projectdir>${basedir}</projectdir>
 		<!-- MyBatis Generator -->
 		<!-- Java接口和实体类 -->
