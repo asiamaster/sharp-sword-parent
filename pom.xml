@@ -34,7 +34,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mapper.version>3.3.9</mapper.version>
         <projectdir>${basedir}</projectdir>
 		<!-- MyBatis Generator -->
 		<!-- Java接口和实体类 -->
@@ -44,8 +43,6 @@
 		<!-- XML生成路径 -->
 		<targetResourcesProject>${basedir}/src/main/resources</targetResourcesProject>
 		<targetXMLPackage>mapper</targetXMLPackage>
-
-		
 	</properties>
 
 	<!-- 注意： 这里必须要添加， 否者各种依赖有问题  -->

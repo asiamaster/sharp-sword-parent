@@ -149,11 +149,11 @@
 
         <!-- springloaded -->
         <!-- https://mvnrepository.com/artifact/org.springframework/springloaded -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>springloaded</artifactId>
-            <version>${springloaded.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework</groupId>-->
+<!--            <artifactId>springloaded</artifactId>-->
+<!--            <version>${springloaded.version}</version>-->
+<!--        </dependency>-->
         <!-- 内部包  -->
       
     
