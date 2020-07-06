@@ -1,7 +1,7 @@
 package com.dili.ss.idempotent.aop;
 
-import com.dili.http.okhttp.utils.B;
 import com.dili.ss.idempotent.service.IdempotentTokenService;
+import com.dili.ss.java.B;
 import com.dili.ss.redis.service.RedisDistributedLock;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -30,7 +30,7 @@ public class IdempotentAspect {
     IdempotentAspectHandler idempotentAspectHandler;
     @PostConstruct
     public void init() throws IllegalAccessException, InstantiationException {
-        idempotentAspectHandler = (IdempotentAspectHandler)((Class)B.b.g("aspectHandlerImpl")).newInstance();
+        idempotentAspectHandler = (IdempotentAspectHandler)((Class) B.b.g("aspectHandlerImpl")).newInstance();
     }
 
     /**

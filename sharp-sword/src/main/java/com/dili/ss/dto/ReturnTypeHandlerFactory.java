@@ -218,7 +218,7 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
-            return StringUtils.isBlank(value.toString())?null:getClobString((java.sql.Clob)value);
+            return StringUtils.isBlank(value.toString())?null:getClobString((Clob)value);
         }
     }
 
@@ -301,7 +301,7 @@ public class ReturnTypeHandlerFactory {
         }
     }
 
-    private static String getClobString(java.sql.Clob c) {
+    private static String getClobString(Clob c) {
         try {
             Reader reader=c.getCharacterStream();
             if (reader == null) {

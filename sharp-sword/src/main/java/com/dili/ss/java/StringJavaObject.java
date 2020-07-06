@@ -1,4 +1,4 @@
-package com.dili.http.okhttp.java;
+package com.dili.ss.java;
 
 import javax.tools.SimpleJavaFileObject;
 import java.io.IOException;

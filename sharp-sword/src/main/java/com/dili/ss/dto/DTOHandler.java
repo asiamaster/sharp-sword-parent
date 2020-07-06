@@ -66,7 +66,7 @@ public class DTOHandler<T extends DTO> implements InvocationHandler, Serializabl
 					delegate.put(field, fieldDef.handler().newInstance().apply(args[0]));
 				}
 
-				// 取值情况
+			// 取值情况
 			} else {
 				//getter方法返回类型
 				Class<?> returnType = method.getReturnType();

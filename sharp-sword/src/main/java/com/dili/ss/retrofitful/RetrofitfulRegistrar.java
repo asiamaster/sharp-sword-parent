@@ -1,7 +1,7 @@
 package com.dili.ss.retrofitful;
 
-import com.dili.http.okhttp.utils.B;
 import com.dili.ss.domain.BaseDomain;
+import com.dili.ss.java.B;
 import com.dili.ss.retrofitful.annotation.Restful;
 import com.dili.ss.retrofitful.annotation.RestfulScan;
 import org.slf4j.Logger;

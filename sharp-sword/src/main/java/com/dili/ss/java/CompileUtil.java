@@ -1,4 +1,4 @@
-package com.dili.http.okhttp.java;
+package com.dili.ss.java;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,7 +15,18 @@ public class CompileUtil {
 	}
 
 	/**
-	 * 编译
+	 * 编译字节码
+	 * @param fileName
+	 * @param source
+	 * @return
+	 * @throws IOException
+	 */
+	public static Map<String, byte[]> compileFile(String fileName, String source) throws IOException {
+		return compiler.compile(fileName, source);
+	}
+
+	/**
+	 * 编译类
 	 * @param classContent 字符串类内容
 	 * @param classFullname	类全名: com.xxx.service.XxxService
 	 * @return
@@ -28,8 +39,26 @@ public class CompileUtil {
 //		System.out.println("compile:"+classContent);
 //		System.out.println("========================================================");
 		try {
-			String cn = classFullname.substring(classFullname.lastIndexOf(".")+1).trim();
-			Map<String, byte[]> results = compiler.compile(cn+".java", classContent);
+			String cn = classFullname.substring(classFullname.lastIndexOf(".")+1);
+			Map<String, byte[]> results = compileFile(cn+".java", classContent);
+			Class<?> clazz = compiler.loadClass(classFullname, results);
+			classes.put(clazz.getName(), clazz);
+			return clazz;
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
+	 * 根据字节码编译类
+	 * @param results
+	 * @param classFullname
+	 * @return
+	 */
+	@SuppressWarnings("all")
+	public static Class<?> compile(Map<String, byte[]> results, String classFullname)  {
+		try {
 			Class<?> clazz = compiler.loadClass(classFullname, results);
 			classes.put(clazz.getName(), clazz);
 			return clazz;

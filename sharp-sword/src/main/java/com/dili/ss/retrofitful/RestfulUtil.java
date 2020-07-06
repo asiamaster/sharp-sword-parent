@@ -1,6 +1,6 @@
 package com.dili.ss.retrofitful;
 
-import com.dili.http.okhttp.utils.B;
+import com.dili.ss.java.B;
 import com.dili.ss.retrofitful.annotation.Restful;
 import org.apache.commons.lang3.StringUtils;
 

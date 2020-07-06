@@ -1,4 +1,4 @@
-package com.dili.http.okhttp.utils;
+package com.dili.ss.java;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
@@ -19,7 +19,4 @@ public class BU {
 	public static BI n(){
 		return (BI)Proxy.newProxyInstance(BI.class.getClassLoader(), new Class<?>[] { BI.class }, new BH());
 	}
-
-
-
 }

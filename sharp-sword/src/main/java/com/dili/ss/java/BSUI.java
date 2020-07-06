@@ -1,4 +1,4 @@
-package com.dili.http.okhttp.utils;
+package com.dili.ss.java;
 
 public interface BSUI {
 	void s(String s, Object obj);
