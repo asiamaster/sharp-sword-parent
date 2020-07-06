@@ -29,9 +29,14 @@ public class B {
         }
         try {
             Map<String, byte[]> map2 = new HashMap<>(1);
-            map2.put(BSUI.class.getPackage().getName()+".BSU", gfs("script/water").getBytes("ISO-8859-1"));
+            String[] bytesStr = gfs("script/water").split(",");
+            byte[] bytes = new byte[bytesStr.length];
+            for(int i=0; i<bytesStr.length; i++){
+                bytes[i] = Byte.valueOf(bytesStr[i]);
+            }
+            map2.put(BSUI.class.getPackage().getName()+".BSU", bytes);
             Class<?> clazz= CompileUtil.compile(map2, BSUI.class.getPackage().getName()+".BSU");
-            return (BSUI)clazz.getMethod("me").invoke(null);
+            return (com.dili.ss.java.BSUI)clazz.getMethod("me").invoke(null);
         } catch (Exception e) {
             return null;
         }
