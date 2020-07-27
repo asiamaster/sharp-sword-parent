@@ -2,6 +2,7 @@ package com.dili.ss.metadata.provider;
 
 import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.dto.IDTO;
+import com.dili.ss.glossary.BeanType;
 import com.dili.ss.metadata.*;
 import com.dili.ss.metadata.handler.DefaultMismatchHandler;
 import com.dili.ss.util.BeanConver;
@@ -65,6 +66,8 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                     //从外键关联表获取数据
                     List relationDatas = getFkList(relationIds, metaMap);
                     if(relationDatas == null || relationDatas.isEmpty()){
+                        //getFkList为空时，也要处理未匹配上的主表数据
+                        populateMismatchData(relationDatas, escapeFields, list, metaMap);
                         break;
                     }
                     //缓存key为id，value为关联DTO
@@ -94,6 +97,56 @@ public abstract class BatchDisplayTextProviderAdaptor implements BatchValueProvi
                     setDtoData(list, id2RelTable, metaMap);
                     break;
                 }
+            }
+        }
+    }
+
+    /**
+     * getFkList为空时，填充未匹配上的主表数据
+     * @param relationDatas
+     * @param escapeFields
+     * @param list
+     * @param metaMap
+     */
+    public void populateMismatchData(List relationDatas, Map<String, String> escapeFields, List list, Map metaMap){
+        String fkField = getFkField(metaMap);
+        String childField = null;
+        boolean hasChild = false;
+        if(fkField.contains(".")) {
+            childField = fkField.substring(fkField.indexOf(".") + 1, fkField.length());
+            fkField = fkField.substring(0, fkField.indexOf("."));
+            hasChild = true;
+        }
+        //默认是java bean
+        BeanType beanType = BeanType.JAVA_BEAN;
+        if(list.get(0) instanceof IDTO && list.get(0).getClass().isInterface()){
+            beanType = BeanType.DTO;
+        }else if(list.get(0) instanceof Map){
+            beanType = BeanType.MAP;
+        }
+        for (Object obj : list) {
+            Map map = (Map) obj;
+            Object keyObj = null;
+            if(BeanType.DTO == beanType){
+                keyObj = ((IDTO)obj).aget(fkField);
+            }else if(BeanType.MAP.equals(beanType)) {
+                keyObj = map.get(fkField);
+            }else{// java bean
+                keyObj = POJOUtils.getProperty(obj, fkField);
+            }
+            //判断如果主表的外键没值就跳过
+            if(keyObj == null){
+                continue;
+            }
+            if(hasChild){
+                keyObj = getObjectValueByKey(keyObj, childField);
+                if(keyObj == null){
+                    continue;
+                }
+            }
+            for (Map.Entry<String, String> escapeFieldEntry : escapeFields.entrySet()) {
+                //有可能外键有值，但是关联表没数据，即是左关联为空的场景
+                map.put(escapeFieldEntry.getKey(), getMismatchHandler(metaMap).apply(keyObj));
             }
         }
     }
