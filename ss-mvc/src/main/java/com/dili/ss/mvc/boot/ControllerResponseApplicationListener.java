@@ -23,6 +23,7 @@ import java.util.Map;
 
 /**
  * 控制器响应监听
+ * 目前用于分转元注解
  */
 @Component
 @ConditionalOnExpression("'${responseBodyAdvice.enable}'=='true'")

@@ -909,7 +909,7 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 	 * @param columnName
 	 * @param operatorValue
 	 * @param value
-	 * @return 当操作符为IN并且为空集合，返回false，需要跳过
+	 * @return 当操作符和类型不匹配(如当操作符为IN并且为空集合)，返回false，需要跳过
 	 */
 	private boolean andOerator(Example.Criteria criteria, String columnName, Class<?> fieldType, String operatorValue, Object value){
 		if(operatorValue.equals(Operator.IN) || operatorValue.equals(Operator.NOT_IN)){
@@ -937,10 +937,57 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 				sb.append(", '").append(value).append("'");
 			}
 			criteria = criteria.andCondition(columnName + " " + operatorValue + "(" + sb.substring(1) + ")");
+		}else if(operatorValue.equals(Operator.BETWEEN) || operatorValue.equals(Operator.NOT_BETWEEN)){
+			StringBuilder sb = new StringBuilder();
+			if(List.class.isAssignableFrom(fieldType)){
+				List list = (List)value;
+				//只支持长度为2的List
+				if((CollectionUtils.isEmpty(list) || list.size() != 2)){
+					return false;
+				}
+				if(list.get(0) instanceof String){
+					sb.append("'").append(list.get(0)).append("' and '").append(list.get(1)).append("'");
+				}else {
+					sb.append(list.get(0)).append(" and ").append(list.get(1));
+				}
+			}else if(fieldType.isArray()){
+				Object[] arrays = (Object[])value;
+				//只支持长度为2的数组
+				if((arrays == null || arrays.length != 2)){
+					return false;
+				}
+				sb = buildBetweenStringBuilderByArray(arrays);
+			}else if(String.class.isAssignableFrom(fieldType)){
+				String[] arrays = value.toString().split(",");
+				//只支持长度为2的数组
+				if((arrays == null || arrays.length != 2)){
+					return false;
+				}
+				sb = buildBetweenStringBuilderByArray(arrays);
+			}else{//不支持其它类型
+				return false;
+			}
+			sb.append(columnName).append(" ").append(operatorValue).append(sb);
+			criteria = criteria.andCondition(sb.toString());
 		}else {
 			criteria = criteria.andCondition(columnName + " " + operatorValue + " '" + value + "' ");
 		}
 		return true;
+	}
+
+	/**
+	 * 根据数组构建between and
+	 * @param arrays
+	 * @return
+	 */
+	private StringBuilder buildBetweenStringBuilderByArray(Object[] arrays){
+		StringBuilder sb = new StringBuilder(" ");
+		if(arrays[0] instanceof String){
+			sb.append("'").append(arrays[0]).append("' and '").append(arrays[1]).append("'");
+		}else {
+			sb.append(arrays[0]).append(" and ").append(arrays[1]);
+		}
+		return sb;
 	}
 
 
