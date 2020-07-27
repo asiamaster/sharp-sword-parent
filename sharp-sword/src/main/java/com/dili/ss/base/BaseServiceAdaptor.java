@@ -15,6 +15,7 @@ import com.dili.ss.dto.IDTO;
 import com.dili.ss.dto.IMybatisForceParams;
 import com.dili.ss.exception.ParamErrorException;
 import com.dili.ss.metadata.ValueProviderUtils;
+import com.dili.ss.util.DateUtils;
 import com.dili.ss.util.POJOUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -33,6 +34,9 @@ import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 import java.io.Serializable;
 import java.lang.reflect.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -945,6 +949,8 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 				if((CollectionUtils.isEmpty(list) || list.size() != 2)){
 					return false;
 				}
+				//将日期类型转变为字符串处理
+				convertDatetimeList(list);
 				if(list.get(0) instanceof String){
 					sb.append("'").append(list.get(0)).append("' and '").append(list.get(1)).append("'");
 				}else {
@@ -956,6 +962,8 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 				if((arrays == null || arrays.length != 2)){
 					return false;
 				}
+				//将日期类型转变为字符串处理
+				arrays = convertDatetimeArray(arrays);
 				sb = buildBetweenStringBuilderByArray(arrays);
 			}else if(String.class.isAssignableFrom(fieldType)){
 				String[] arrays = value.toString().split(",");
@@ -973,6 +981,45 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 			criteria = criteria.andCondition(columnName + " " + operatorValue + " '" + value + "' ");
 		}
 		return true;
+	}
+
+	/**
+	 * 将日期类型的List转成字符串类型，用于between
+	 * @param list
+	 * @return
+	 */
+	private void convertDatetimeList(List list){
+		String DATE_TIME = "yyyy-MM-dd HH:mm:ss";
+		if(list.get(0) instanceof Date){
+			list.set(0, DateUtils.format((Date) list.get(0)));
+			list.set(1, DateUtils.format((Date) list.get(1)));
+		}else if(list.get(0) instanceof LocalDateTime){
+			list.set(0, DateUtils.format((LocalDateTime)list.get(0), DATE_TIME));
+			list.set(1, DateUtils.format((LocalDateTime)list.get(1), DATE_TIME));
+		}else if(list.get(0) instanceof LocalDate){
+			list.set(0, DateUtils.format(LocalDateTime.of((LocalDate) list.get(0), LocalTime.ofSecondOfDay(0)), DATE_TIME));
+			list.set(1, DateUtils.format(LocalDateTime.of((LocalDate) list.get(1), LocalTime.ofSecondOfDay(0)), DATE_TIME));
+		}
+	}
+
+	/**
+	 * 将日期类型的List转成字符串类型，用于between
+	 * @param objs
+	 * @return
+	 */
+	private Object[] convertDatetimeArray(Object[] objs){
+		String DATE_TIME = "yyyy-MM-dd HH:mm:ss";
+		if(objs[0] instanceof Date){
+			objs[0] = DateUtils.format((Date) objs[0]);
+			objs[1] = DateUtils.format((Date) objs[1]);
+		}else if(objs[0] instanceof LocalDateTime){
+			objs[0] =  DateUtils.format((LocalDateTime)objs[0], DATE_TIME);
+			objs[1] =  DateUtils.format((LocalDateTime)objs[1], DATE_TIME);
+		}else if(objs[0] instanceof LocalDate){
+			objs[0] = DateUtils.format(LocalDateTime.of((LocalDate) objs[0], LocalTime.ofSecondOfDay(0)), DATE_TIME);
+			objs[1] = DateUtils.format(LocalDateTime.of((LocalDate) objs[1], LocalTime.ofSecondOfDay(0)), DATE_TIME);
+		}
+		return objs;
 	}
 
 	/**
