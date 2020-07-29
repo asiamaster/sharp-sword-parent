@@ -446,9 +446,50 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 			//List需要转换数组
 			//这里entry.getValue()肯定是String[]
 			if(List.class.isAssignableFrom(returnType)){
-				paramValue = Lists.newArrayList((Object[])getParamObjValue(entryValue));
+				Type genericReturnType = getMethod.getGenericReturnType();
+				//没有泛型参数
+				if(genericReturnType instanceof Class){
+					paramValue = Lists.newArrayList((Object[])getParamObjValue(entryValue));
+				}else{
+					//有泛型参数，只处理基本类型，如Long, Integer和String
+					Type retType = ((java.lang.reflect.ParameterizedType)getMethod.getGenericReturnType()).getActualTypeArguments()[0];
+					Object[] paramObjValue = (Object[]) getParamObjValue(entryValue);
+					List objects = new ArrayList(paramObjValue.length);
+					if(Long.class.isAssignableFrom(returnType)){
+						for (Object o : paramObjValue) {
+							objects.add(Long.parseLong(o.toString()));
+						}
+					}else if(Integer.class.isAssignableFrom(returnType)){
+						for (Object o : paramObjValue) {
+							objects.add(Integer.parseInt(o.toString()));
+						}
+					}else{//String
+						for (Object o : paramObjValue) {
+							objects.add(o.toString());
+						}
+					}
+					paramValue = objects;
+				}
 			}else if(returnType.isArray()){
-				paramValue = getParamObjValue(entryValue);
+				//其实这里就是String[]
+				Object[] paramObjValue = (Object[]) getParamObjValue(entryValue);
+				//只处理Long型数组和Integer型数组，其它都是按String数组处理
+				if(Long.class.equals(returnType.getComponentType())){
+					Long[] longs = new Long[paramObjValue.length];
+					for (int i = 0; i < paramObjValue.length; i++) {
+						longs[i] = Long.parseLong(paramObjValue[i].toString());
+					}
+					paramValue = longs;
+				}//处理Integer型数组
+				else if(Integer.class.equals(returnType.getComponentType())){
+					Integer[] integers = new Integer[paramObjValue.length];
+					for (int i = 0; i < paramObjValue.length; i++) {
+						integers[i] = Integer.parseInt(paramObjValue[i].toString());
+					}
+					paramValue = integers;
+				}else{
+					paramValue = getParamObjValue(entryValue);
+				}
 			}else{//默认就是数组
 				paramValue = getParamObjValue(entryValue);
 			}
