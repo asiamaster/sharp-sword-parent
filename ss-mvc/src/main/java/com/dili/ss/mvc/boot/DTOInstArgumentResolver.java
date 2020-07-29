@@ -455,11 +455,11 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 					Type retType = ((java.lang.reflect.ParameterizedType)getMethod.getGenericReturnType()).getActualTypeArguments()[0];
 					Object[] paramObjValue = (Object[]) getParamObjValue(entryValue);
 					List objects = new ArrayList(paramObjValue.length);
-					if(Long.class.isAssignableFrom(returnType)){
+					if(Long.class.equals(retType)){
 						for (Object o : paramObjValue) {
 							objects.add(Long.parseLong(o.toString()));
 						}
-					}else if(Integer.class.isAssignableFrom(returnType)){
+					}else if(Integer.class.equals(retType)){
 						for (Object o : paramObjValue) {
 							objects.add(Integer.parseInt(o.toString()));
 						}
