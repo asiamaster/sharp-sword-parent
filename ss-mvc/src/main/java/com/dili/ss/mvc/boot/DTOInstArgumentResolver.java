@@ -124,7 +124,35 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 					} else {
 						//返回值为数组或List，统一在这里放List，在下面的代码将进行转换
 						if(List.class.isAssignableFrom(method.getReturnType()) || method.getReturnType().isArray()){
-							dto.put(attrName, Lists.newArrayList(getParamValuesAndConvert(entry, fields)));
+							Type genericReturnType = method.getGenericReturnType();
+							//没有泛型参数
+							if(genericReturnType instanceof Class){
+								dto.put(attrName, Lists.newArrayList(entry.getValue()));
+							}else{
+								//取第一个泛型参数，然后转型
+								Type retType = ((java.lang.reflect.ParameterizedType)genericReturnType).getActualTypeArguments()[0];
+								//这里有可能前端转了一个数组参数，但是参数名又不是以[]结尾的，因为该数组只有一个元素
+								if(entry.getValue().getClass().isArray()){
+									Object[] arrays = (Object[])entry.getValue();
+									List objects = new ArrayList(arrays.length);
+									if(Long.class.equals(retType)){
+										for (Object o : arrays) {
+											objects.add(Long.parseLong(o.toString()));
+										}
+									}else if(Integer.class.equals(retType)){
+										for (Object o : arrays) {
+											objects.add(Integer.parseInt(o.toString()));
+										}
+									}else{//String
+										for (Object o : arrays) {
+											objects.add(o.toString());
+										}
+									}
+									dto.put(attrName, objects);
+								}else{
+									dto.put(attrName, ReturnTypeHandlerFactory.convertValue((Class) retType, entry.getValue()));
+								}
+							}
 						}else{
 							dto.put(attrName, getParamValuesAndConvert(entry, fields));
 						}
