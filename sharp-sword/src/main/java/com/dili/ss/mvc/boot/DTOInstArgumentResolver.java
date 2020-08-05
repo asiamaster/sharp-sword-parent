@@ -195,6 +195,18 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 			}
 		}
 		//处理DTO接口上的入参注解参数有@Cent2Yuan注解
+		handleCent2Yuan(clazz, dto);
+		T t = (T) DTOUtils.proxyInstance(dto, (Class<IDTO>) clazz);
+		asetErrorMsg(t, parameter);
+		return t;
+	}
+
+	/**
+	 * 处理DTO接口上的入参注解参数有@Cent2Yuan注解
+	 * @param clazz
+	 * @param dto
+	 */
+	private void handleCent2Yuan(Class clazz, DTO dto){
 		Method[] methods = clazz.getMethods();
 		for(Method method : methods){
 			if(!method.getName().startsWith("get") || !Long.class.isAssignableFrom(method.getReturnType())){
@@ -209,9 +221,6 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 				}
 			}
 		}
-		T t = (T) DTOUtils.proxyInstance(dto, (Class<IDTO>) clazz);
-		asetErrorMsg(t, parameter);
-		return t;
 	}
 
 	@SuppressWarnings("unchecked")

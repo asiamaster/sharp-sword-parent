@@ -11,6 +11,7 @@ import java.sql.Clob;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +36,7 @@ public class ReturnTypeHandlerFactory {
         cache.put(Clob.class, new ClobStrategy());
         cache.put(Instant.class, new InstantStrategy());
         cache.put(LocalDateTime.class, new LocalDateTimeStrategy());
+        cache.put(LocalDate.class, new LocalDateStrategy());
         cache.put(List.class, new ListStrategy());
         cache.put(String.class, new StringStrategy());
         cache.put(Map.class, new MapStrategy());
@@ -49,8 +51,11 @@ public class ReturnTypeHandlerFactory {
      */
     public static Object convertValue(Class<?> type, Object value) {
         Strategy strategy = cache.get(type);
-        if(strategy == null){
-            return null;
+        if(strategy == null || value == null){
+            return value;
+        }
+        if(type.isAssignableFrom(value.getClass())){
+            return value;
         }
         try {
             return strategy.convert(value);
@@ -80,10 +85,7 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
-            if(value instanceof String){
-                return (String)value;
-            }
-            return value == null ? null :value.toString();
+            return value.toString();
         }
     }
 
@@ -94,10 +96,7 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
-            if(value instanceof Map){
-                return (Map)value;
-            }
-            return value == null ? null : JSONObject.parseObject(value.toString());
+            return JSONObject.parseObject(value.toString());
         }
     }
 
@@ -110,9 +109,6 @@ public class ReturnTypeHandlerFactory {
         public Object convert(Object value) {
             if(value instanceof IDTO){
                 return (IDTO)value;
-            }
-            if(value == null){
-                return null;
             }
             DTO dto = new DTO();
             dto.putAll(JSONObject.parseObject(value.toString()));
@@ -127,10 +123,7 @@ public class ReturnTypeHandlerFactory {
 
         @Override
         public Object convert(Object value) {
-            if(value instanceof List){
-                return value;
-            }
-            return value instanceof List ? value : Lists.newArrayList(new Object[]{value});
+            return Lists.newArrayList(new Object[]{value});
         }
     }
 
@@ -273,6 +266,29 @@ public class ReturnTypeHandlerFactory {
     }
 
     /**
+     * LocalDate转换策略
+     */
+    private static class LocalDateStrategy implements Strategy{
+
+        @Override
+        public Object convert(Object value) {
+            if(StringUtils.isBlank(value.toString())){
+                return null;
+            }
+            if(String.class.equals(value.getClass())){
+                String format = "yyyy-MM-dd HH:mm:ss";
+                if(((String)value).length() == 10){
+                    format = "yyyy-MM-dd";
+                }else if(((String)value).length() == 23){
+                    format = "yyyy-MM-dd HH:mm:ss.SSS";
+                }
+                return LocalDate.parse((String) value, DateTimeFormatter.ofPattern(format).withZone(ZoneId.systemDefault()));
+            }
+            return null;
+        }
+    }
+
+    /**
      * Date转换策略
      */
     private static class DateStrategy implements Strategy{
@@ -284,7 +300,6 @@ public class ReturnTypeHandlerFactory {
             }
             // 如果当前字段的值不是日期型, 转换返回值，并且将新的返回值填入委托对象中
             if(String.class.equals(value.getClass())){
-
                 try {
                     return StringUtils.isNumeric(value.toString()) ? new Date(Long.parseLong(value.toString())) : DateUtils.parseDate(value.toString(), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss.SSS", "E MMM dd yyyy HH:mm:ss");
                 } catch (ParseException e) {
