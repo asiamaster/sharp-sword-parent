@@ -1,4 +1,5 @@
 package com.dili.ss.mvc.boot;
+
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.dto.IDTO;
 import com.dili.ss.mvc.annotation.Cent2Yuan;
@@ -6,9 +7,8 @@ import com.dili.ss.mvc.controller.DTOResponseBodyAdvice;
 import com.dili.ss.util.AopTargetUtils;
 import com.dili.ss.util.POJOUtils;
 import com.dili.ss.util.SpringUtil;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,10 +27,10 @@ import java.util.Map;
  */
 @Component
 @ConditionalOnExpression("'${responseBodyAdvice.enable}'=='true'")
-public class ControllerResponseApplicationListener implements ApplicationListener<ContextRefreshedEvent> {
+public class ControllerResponseApplicationListener implements CommandLineRunner {
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    public void run(String... args) throws Exception {
         Map<String, Object> controllerBeans = SpringUtil.getBeansWithAnnotation(Controller.class);
         if(controllerBeans == null){
             controllerBeans = SpringUtil.getBeansWithAnnotation(RestController.class);
@@ -192,4 +192,5 @@ public class ControllerResponseApplicationListener implements ApplicationListene
         }
         return cent2YuanMethodFields;
     }
+
 }
