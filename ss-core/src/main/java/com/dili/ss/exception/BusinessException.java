@@ -1,24 +1,20 @@
 package com.dili.ss.exception;
 
 /**
+ * 业务异常
  * Created by Administrator on 2016/10/11.
  */
-public class BusinessException extends RuntimeException {
-    private String errorCode;
-    private String errorMsg;
+public class BusinessException extends InternalException {
 
-    public BusinessException(String errorCode, String errorMsg) {
-        super(String.format("BusinessException{errorCode:%s, errorMsg:%s}", new Object[]{errorCode, errorMsg}));
-        this.errorCode = errorCode;
-        this.errorMsg = errorMsg;
+    private static final String DEFAULT_MESSAGE = "业务异常!";
+
+    public BusinessException() {
+        super(DEFAULT_MESSAGE);
     }
 
-    public String getErrorCode() {
-        return this.errorCode;
+    public BusinessException(String code, String message) {
+        super(code, message);
     }
 
-    public String getErrorMsg() {
-        return this.errorMsg;
-    }
 }
 

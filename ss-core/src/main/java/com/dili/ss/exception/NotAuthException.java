@@ -5,12 +5,12 @@
 package com.dili.ss.exception;
 
 /**
- * AppException
- * @author dev-center
- * @since 2014-05-15
+ * NotAuthException
+ * @author asiamastor
+ * @since 2020-08-12
  */
 public class NotAuthException extends AppException{
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 987123460090011111L;
 	public NotAuthException() {
 		super();
 	}
@@ -33,8 +33,6 @@ public class NotAuthException extends AppException{
     
     @Override
     public String toString() {
-        return "NotAuthException [code=" + getCode() + ", errorData="
-                + getErrorData() + ", message=" + getMessage()
-                + ", cause=" + getCause() + "]";
+        return super.toString();
     }
 }

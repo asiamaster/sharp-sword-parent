@@ -5,12 +5,13 @@
 package com.dili.ss.exception;
 
 /**
- * AppException
- * @author dev-center
- * @since 2014-05-15
+ * ParamErrorException
+ * @author asiamastor
+ * @since 2020-08-12
  */
 public class ParamErrorException extends AppException{
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1790823459807213450L;
+	
 	public ParamErrorException() {
 		super();
 	}
@@ -37,8 +38,6 @@ public class ParamErrorException extends AppException{
     
     @Override
     public String toString() {
-        return "ParamErrorException [code=" + getCode() + ", errorData="
-                + getErrorData() + ", message=" + getMessage()
-                + ", cause=" + getCause() + "]";
+        return super.toString();
     }
 }

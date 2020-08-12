@@ -7,11 +7,11 @@ package com.dili.ss.exception;
 
 /**
  * AppException
- * @author dev-center
- * @since 2014-05-15
+ * @author asiamastor
+ * @since 2020-08-12
  */
 public class DataErrorException extends AppException{
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 178901230987541001L;
 	public DataErrorException() {
 		super();
 	}
@@ -34,8 +34,6 @@ public class DataErrorException extends AppException{
 
     @Override
     public String toString() {
-        return "DataErrorException [code=" + getCode() + ", errorData="
-                + getErrorData() + ", message=" + getMessage()
-                + ", cause=" + getCause() + "]";
+        return super.toString();
     }
 }

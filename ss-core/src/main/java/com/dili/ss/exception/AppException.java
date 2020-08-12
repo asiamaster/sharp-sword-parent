@@ -4,30 +4,35 @@
  */
 package com.dili.ss.exception;
 
+import com.dili.ss.constant.ResultCode;
+
 /**
- * AppException
- * @author dev-center
+ * 应用程序异常
+ * @author asiamastor
  * @since 2014-05-15
  */
-public class AppException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
-    public static final String CODE_NEGLECTABLE = "201";
-	private String code;
+public class AppException extends InternalException {
+	private static final long serialVersionUID = 12489037178905L;
+    private static final String DEFAULT_MESSAGE = "应用程序异常!";
 	private String errorData;
+
 	public AppException() {
-		super();
+		super(DEFAULT_MESSAGE);
 	}
 	
 	public AppException(String message) {
 		super(message);
+		this.code = ResultCode.SERVICE_UNAVALIABLE;
 	}
 	
 	public AppException(String message, Throwable cause) {
 		super(message, cause);
+        this.code = ResultCode.SERVICE_UNAVALIABLE;
 	}
 	
 	public AppException(Throwable cause) {
 		super(cause);
+        this.code = ResultCode.SERVICE_UNAVALIABLE;
 	}
 
 	public AppException(String code, String message) {
@@ -38,31 +43,22 @@ public class AppException extends RuntimeException {
 	public AppException(String code, String errorData, String message) {
         super(message);
         this.code=code;
+        this.message = message;
         this.errorData=errorData;
     }
-	
-	
+
+    @Override
     public String getCode() {
         return code;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-    
-    
     public String getErrorData() {
         return errorData;
     }
 
-    
-    public void setErrorData(String errorData) {
-        this.errorData = errorData;
-    }
-
     @Override
     public String toString() {
-        return "AppException [code=" + getCode() + ", errorData="
+        return getClass().getSimpleName() + " [code=" + getCode() + ", errorData="
                 + getErrorData() + ", message=" + getMessage()
                 + ", cause=" + getCause() + "]";
     }
