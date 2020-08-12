@@ -2,8 +2,8 @@ package com.dili.ss.mvc.boot;
 
 import com.alibaba.fastjson.JSON;
 import com.dili.ss.domain.BaseOutput;
+import com.dili.ss.exception.InternalException;
 import com.dili.ss.util.SpringUtil;
-import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
