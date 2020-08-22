@@ -397,7 +397,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
             <version>5.2.3.RELEASE</version>
-            <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.javassist/javassist -->
         <dependency>
