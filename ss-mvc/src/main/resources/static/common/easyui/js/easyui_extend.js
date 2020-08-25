@@ -246,8 +246,9 @@ function convertTree(rows){
             var row = rows[i];
             if (row.parentId == node.id){
                 var child = {
-                    id:row.id,
-                    text:row.text,
+                    id:row["id"],
+                    text:row["text"],
+                    iconCls:row["iconCls"],
                     state:row["state"],
                     checked: row["checked"],
                     attributes:row["attributes"]
