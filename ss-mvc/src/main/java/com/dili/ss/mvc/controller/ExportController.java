@@ -65,6 +65,9 @@ public class ExportController {
      * @param columns
      * @param queryParams
      * @param title
+     * @param url
+     * @param contentType 默认为application/x-www-form-urlencoded
+     * @param token
      */
     @RequestMapping("/serverExport.action")
     public @ResponseBody String serverExport(HttpServletRequest request, HttpServletResponse response,
@@ -72,6 +75,7 @@ public class ExportController {
                                              @RequestParam("queryParams") String queryParams,
                                              @RequestParam("title") String title,
                                              @RequestParam("url") String url,
+                                             @RequestParam(name="contentType", required = false) String contentType,
                                              @RequestParam("token") String token) {
         try {
             if(StringUtils.isBlank(token)){
@@ -88,7 +92,8 @@ public class ExportController {
                 return "服务器忙，请稍候再试";
             }
             SsConstants.EXPORT_FLAG.put(token, 0L);
-            exportUtils.export(request, response, buildExportParam(columns, queryParams, title, url));
+
+            exportUtils.export(request, response, buildExportParam(columns, queryParams, title, url, contentType));
             SsConstants.EXPORT_FLAG.put(token, System.currentTimeMillis());
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,12 +101,22 @@ public class ExportController {
         return null;
     }
 
-    private ExportParam buildExportParam(String columns, String queryParams, String title, String url){
+    /**
+     * 构建导出参数
+     * @param columns
+     * @param queryParams
+     * @param title
+     * @param url
+     * @param contentType
+     * @return
+     */
+    private ExportParam buildExportParam(String columns, String queryParams, String title, String url, String contentType){
         ExportParam exportParam = new ExportParam();
         exportParam.setTitle(title);
         exportParam.setQueryParams((Map) JSONObject.parseObject(queryParams));
         exportParam.setColumns((List)JSONArray.parseArray(columns).toJavaList(List.class));
         exportParam.setUrl(url);
+        exportParam.setContentType(contentType);
         return exportParam;
     }
 

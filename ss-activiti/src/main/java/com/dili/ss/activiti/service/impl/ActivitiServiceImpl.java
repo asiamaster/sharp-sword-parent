@@ -66,6 +66,8 @@ public class ActivitiServiceImpl implements ActivitiService {
     @Autowired
     private FormService formService;
     @Autowired
+    private TaskService taskService;
+    @Autowired
     private SpringProcessEngineConfiguration springProcessEngineConfiguration;
 
     private final Logger log = LoggerFactory.getLogger(ActivitiServiceImpl.class);
@@ -565,4 +567,81 @@ public class ActivitiServiceImpl implements ActivitiService {
         return highFlows;
     }
 
+    /**
+     * 流程重定向
+     */
+//    public void revoke(String objId) throws Exception {
+//
+//        Task task = taskService.createTaskQuery().processInstanceBusinessKey(objId).singleResult();
+//        if(task==null) {
+//            throw new ServiceException("流程未启动或已执行完成，无法撤回");
+//        }
+//
+//        LoginUser loginUser = SessionContext.getLoginUser();
+//        List<HistoricTaskInstance> htiList = historyService.createHistoricTaskInstanceQuery()
+//                .processInstanceBusinessKey(objId)
+//                .orderByTaskCreateTime()
+//                .asc()
+//                .list();
+//        String myTaskId = null;
+//        HistoricTaskInstance myTask = null;
+//        for(HistoricTaskInstance hti : htiList) {
+//            if(loginUser.getUsername().equals(hti.getAssignee())) {
+//                myTaskId = hti.getId();
+//                myTask = hti;
+//                break;
+//            }
+//        }
+//        if(null==myTaskId) {
+//            throw new ServiceException("该任务非当前用户提交，无法撤回");
+//        }
+//
+//        String processDefinitionId = myTask.getProcessDefinitionId();
+//        ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
+//        BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
+//
+//        //变量
+////		Map<String, VariableInstance> variables = runtimeService.getVariableInstances(currentTask.getExecutionId());
+//        String targetActivityId = null;
+//        List<HistoricActivityInstance> haiList = historyService.createHistoricActivityInstanceQuery()
+//                .executionId(myTask.getExecutionId()).finished().list();
+//        for(HistoricActivityInstance hai : haiList) {
+//            if(myTaskId.equals(hai.getTaskId())) {
+//                targetActivityId = hai.getActivityId();
+//                break;
+//            }
+//        }
+//        FlowNode targetFlowNode = (FlowNode) bpmnModel.getMainProcess().getFlowElement(targetActivityId);
+//
+//
+//        Execution execution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
+//        String sourceActivityId = execution.getActivityId();
+//        logger.warn("------->> activityId:" + sourceActivityId);
+//        FlowNode flowNode = (FlowNode) bpmnModel.getMainProcess().getFlowElement(sourceActivityId);
+//
+//        //记录原活动方向
+//        List<SequenceFlow> oriSequenceFlows = new ArrayList<SequenceFlow>();
+//        oriSequenceFlows.addAll(flowNode.getOutgoingFlows());
+//
+//        //清理活动方向
+//        flowNode.getOutgoingFlows().clear();
+//        //建立新方向
+//        List<SequenceFlow> newSequenceFlowList = new ArrayList<SequenceFlow>();
+//        SequenceFlow newSequenceFlow = new SequenceFlow();
+//        newSequenceFlow.setId("newSequenceFlowId");
+//        newSequenceFlow.setSourceRef(sourceActivityId);
+//        newSequenceFlow.setTargetRef(targetActivityId);
+//        newSequenceFlowList.add(newSequenceFlow);
+//        flowNode.setOutgoingFlows(newSequenceFlowList);
+//
+//        Authentication.setAuthenticatedUserId(loginUser.getUsername());
+//        taskService.addComment(task.getId(), task.getProcessInstanceId(), "撤回");
+//
+//        Map<String,Object> currentVariables = new HashMap<String,Object>();
+//        currentVariables.put("applier", loginUser.getUsername());
+//        //完成任务
+//        taskService.complete(task.getId(),currentVariables);
+//        //恢复原方向
+//        flowNode.setOutgoingFlows(oriSequenceFlows);
+//    }
 }

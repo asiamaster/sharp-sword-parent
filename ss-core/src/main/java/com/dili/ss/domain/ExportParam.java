@@ -28,6 +28,11 @@ public class ExportParam {
      */
     private String url;
 
+    /**
+     * 请求类型，默认为application/x-www-form-urlencoded
+     */
+    private String contentType;
+
     public String getTitle() {
         return title;
     }
@@ -58,5 +63,13 @@ public class ExportParam {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 }
