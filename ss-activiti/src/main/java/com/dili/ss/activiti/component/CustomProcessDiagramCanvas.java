@@ -72,7 +72,7 @@ public class CustomProcessDiagramCanvas extends DefaultProcessDiagramCanvas {
         Stroke originalStroke = g.getStroke();
 
         g.setPaint(CONNECTION_COLOR);
-        if (connectionType.equals("association")) {
+        if ("association".equals(connectionType)) {
             g.setStroke(ASSOCIATION_STROKE);
         } else if (highLighted) {
             g.setPaint(color);
