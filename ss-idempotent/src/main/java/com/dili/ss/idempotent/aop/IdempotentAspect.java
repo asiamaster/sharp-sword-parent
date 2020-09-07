@@ -37,7 +37,7 @@ public class IdempotentAspect {
      * @return
      * @throws Throwable
      */
-    @Around( "@annotation(com.dili.ss.idempotent.annotation.Token)")
+    @Around("@annotation(com.dili.ss.idempotent.annotation.Token)")
     public Object token(ProceedingJoinPoint point) throws Throwable {
         return idempotentAspectHandler.aroundToken(point, idempotentTokenService);
     }
@@ -48,7 +48,7 @@ public class IdempotentAspect {
      * @return
      * @throws Throwable
      */
-    @Around( "@annotation(com.dili.ss.idempotent.annotation.Idempotent)")
+    @Around("@annotation(com.dili.ss.idempotent.annotation.Idempotent)")
     public Object idempotent(ProceedingJoinPoint point) throws Throwable {
         return idempotentAspectHandler.aroundIdempotent(point, redisDistributedLock);
     }

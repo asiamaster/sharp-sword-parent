@@ -10,6 +10,9 @@ import com.github.pagehelper.PageInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.cglib.beans.BeanCopier;
 
 import java.beans.BeanInfo;
@@ -19,10 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by asiamastor on 2017/1/9.
@@ -64,6 +64,15 @@ public class BeanConver {
         }
         copier.copy(source,result,null);
         return result;
+    }
+
+    /**
+     * 复制bean， 忽略空属性
+     * @param src
+     * @param target
+     */
+    public static void copyPropertiesIgnoreNull(Object src, Object target){
+        BeanUtils.copyProperties(src, target, getNullPropertyNames(src));
     }
 
     /**
@@ -426,5 +435,20 @@ public class BeanConver {
         } catch (NoSuchMethodException e) {
             return false;
         }
+    }
+
+    private static String[] getNullPropertyNames (Object source) {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+        Set<String> emptyNames = new HashSet<String>();
+        for(java.beans.PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue == null) {
+                emptyNames.add(pd.getName());
+            }
+        }
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
     }
 }

@@ -26,5 +26,5 @@ public @interface Idempotent {
     String value() default "header";
 
     @AliasFor("value")
-    String type() default "";
+    String type() default "header";
 }
