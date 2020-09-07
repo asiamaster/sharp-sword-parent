@@ -57,7 +57,7 @@ public class IdempotentAspectHandlerImpl implements IdempotentAspectHandler{
             redisDistributedLock.releaseLock(tokenValue, tokenValue);
         }
         //进行拦截
-        return BaseOutput.class.isAssignableFrom(currentMethod.getReturnType()) ? BaseOutput.failure("幂等接口调用失败") : false;
+        return BaseOutput.class.isAssignableFrom(currentMethod.getReturnType()) ? BaseOutput.failure("幂等接口调用失败") : null;
     }
 
     @Override
