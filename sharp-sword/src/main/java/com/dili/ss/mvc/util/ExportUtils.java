@@ -274,23 +274,28 @@ public class ExportUtils {
             cell.setCellValue("");
         }else if(value instanceof Integer){
             //数据格式只显示整数
-            dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,#0"));
-            cell.setCellValue(((Integer)value).doubleValue());
+            dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
+            cell.setCellValue(value.toString());
         }else if(value instanceof Long){
-            dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,#0"));
-            cell.setCellValue(((Long)value).doubleValue());
+            dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
+            cell.setCellValue(Double.parseDouble(value.toString()));
         }else if(value instanceof Short){
-            dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,#0"));
-            cell.setCellValue(((Short)value).doubleValue());
+            dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
+            cell.setCellValue(value.toString());
         }else if(value instanceof Float){
+            //float支持小数点后8位
+            dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0.00000000"));
             cell.setCellValue(((Float)value).doubleValue());
         }else if(value instanceof Double){
+            //double支持小数点后10位(Double最大支持17位)
+            dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0.0000000000"));
             cell.setCellValue((Double)value);
         }else if(value instanceof BigDecimal){
             cell.setCellValue(((BigDecimal)value).doubleValue());
         }else{
             cell.setCellValue(value.toString());
         }
+        cell.setCellStyle(dataColumnStyle);
     }
 
     /**
@@ -641,7 +646,6 @@ public class ExportUtils {
         style.setAlignment(HorizontalAlignment.CENTER);
         //设置垂直对齐的样式为居中对齐;
         style.setVerticalAlignment(VerticalAlignment.CENTER);
-
         return style;
     }
 }
