@@ -1,5 +1,6 @@
 package com.dili.ss.dto;
 
+import javassist.ClassPath;
 import javassist.CtClass;
 import org.springframework.core.type.AnnotationMetadata;
 
@@ -26,4 +27,16 @@ public interface IDTOFactory {
      * @throws Exception
      */
     <T extends IDTO> CtClass createCtClass(Class<T> clazz) throws Exception;
+
+    /**
+     * 插入classPath
+     * @param classPath
+     */
+    void insertClassPath(ClassPath classPath);
+
+    /**
+     * 导入默认包
+     * @param packageName
+     */
+    void importPackage(String packageName);
 }
