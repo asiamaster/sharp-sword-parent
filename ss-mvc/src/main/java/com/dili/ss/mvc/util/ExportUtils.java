@@ -451,30 +451,31 @@ public class ExportUtils {
 //                }
 //                RequestBody requestBody = builder.build();
 //                String json = paramObj instanceof String ? (String)paramObj : JSON.toJSONString(paramObj);
-                //构建查询参数，主要是为了处理metadata信息以及其它类型的值转为String
-                Map<String, String> param = new HashMap<>();
-                if (paramJo!=null&&!paramJo.isEmpty()){
-                    for(Map.Entry<String,Object> entry:paramJo.entrySet()){
-                        if(entry.getValue() instanceof JSONObject){
-                            JSONObject valueJo = (JSONObject)entry.getValue();
-                            //解决spring mvc参数注入@ModelAttribute Domain domain时，metadata作为Map类型的注入问题
-                            for(Map.Entry<String,Object> tmpEntry:valueJo.entrySet()) {
-                            	if(tmpEntry.getValue() == null) {
+
+                if(StringUtils.isBlank(contentType) || contentType.indexOf(CONTENT_TYPE_FORM) >= 0) {
+                    //构建查询参数，主要是为了处理metadata信息以及其它类型的值转为String
+                    Map<String, String> param = new HashMap<>();
+                    if (paramJo!=null&&!paramJo.isEmpty()){
+                        for(Map.Entry<String,Object> entry:paramJo.entrySet()){
+                            if(entry.getValue() instanceof JSONObject){
+                                JSONObject valueJo = (JSONObject)entry.getValue();
+                                //解决spring mvc参数注入@ModelAttribute Domain domain时，metadata作为Map类型的注入问题
+                                for(Map.Entry<String,Object> tmpEntry:valueJo.entrySet()) {
+                                    if(tmpEntry.getValue() == null) {
+                                        continue;
+                                    }
+                                    param.put(entry.getKey() + "[" +tmpEntry.getKey()+"]", tmpEntry.getValue().toString());
+                                }
+                            }else {
+                                //避免为空(null)的值(value)在okhttp调用时报错，这里就不传入了
+                                if(entry.getValue() == null) {
                                     continue;
                                 }
-                                param.put(entry.getKey() + "[" +tmpEntry.getKey()+"]", tmpEntry.getValue().toString());
-                            }
-                        }else {
-                        	//避免为空(null)的值(value)在okhttp调用时报错，这里就不传入了
-	                        if(entry.getValue() == null) {
-                                continue;
-                            }
 //                            String value = entry.getValue() == null ? null : entry.getValue().toString();
-                            param.put(entry.getKey(),entry.getValue().toString());
+                                param.put(entry.getKey(),entry.getValue().toString());
+                            }
                         }
                     }
-                }
-                if(StringUtils.isBlank(contentType) || contentType.indexOf(CONTENT_TYPE_FORM) >= 0) {
                     resp = OkHttpUtils
                             .post().headers(headersMap)
                             .url(url).params(param)
@@ -489,7 +490,7 @@ public class ExportUtils {
                 }else if(contentType.indexOf(CONTENT_TYPE_JSON) >= 0){
                     resp = OkHttpUtils
                             .postString().headers(headersMap)
-                            .url(url).content(JSONObject.toJSONString(param))
+                            .url(url).content(paramJo.toJSONString())
                             .mediaType(MediaType.parse("application/json; charset=utf-8"))
 //                        .mediaType(MediaType.parse("application/x-www-form-urlencoded; charset=UTF-8"))
                             .build()
