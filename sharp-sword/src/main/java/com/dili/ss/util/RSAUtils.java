@@ -256,6 +256,7 @@ public class RSAUtils {
     public static void main1(String[] args) throws Exception {
         //初始化密钥
         //生成密钥对
+        //默认512的长度为53，1024的长度为117，2048的长度为245
         Map<String, Object> keyMap = RSAUtils.initKey();
         //公钥
         byte[] publicKey = RSAUtils.getPublicKey(keyMap);
