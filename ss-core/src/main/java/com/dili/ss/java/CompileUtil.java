@@ -26,6 +26,17 @@ public class CompileUtil {
 	}
 
 	/**
+	 * 编译字节码
+	 * @param fileName
+	 * @param source
+	 * @return
+	 * @throws IOException
+	 */
+	public static Map<String, byte[]> compileLocalFile(String fileName, String source) throws IOException {
+		return compiler.compileLocal(fileName, source);
+	}
+
+	/**
 	 * 编译类
 	 * @param classContent 字符串类内容
 	 * @param classFullname	类全名: com.xxx.service.XxxService
@@ -34,13 +45,30 @@ public class CompileUtil {
 	 */
 	@SuppressWarnings("all")
 	public static Class<?> compile(String classContent, String classFullname)  {
-//		System.out.println("========================================================");
-//		System.out.println("classFullname:"+classFullname);
-//		System.out.println("compile:"+classContent);
-//		System.out.println("========================================================");
 		try {
 			String cn = classFullname.substring(classFullname.lastIndexOf(".")+1);
 			Map<String, byte[]> results = compileFile(cn+".java", classContent);
+			Class<?> clazz = compiler.loadClass(classFullname, results);
+			classes.put(clazz.getName(), clazz);
+			return clazz;
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
+	 * 编译类
+	 * @param classContent 字符串类内容
+	 * @param classFullname	类全名: com.xxx.service.XxxService
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("all")
+	public static Class<?> compileLocal(String classContent, String classFullname)  {
+		try {
+			String cn = classFullname.substring(classFullname.lastIndexOf(".")+1);
+			Map<String, byte[]> results = compileLocalFile(cn+".java", classContent);
 			Class<?> clazz = compiler.loadClass(classFullname, results);
 			classes.put(clazz.getName(), clazz);
 			return clazz;
@@ -68,4 +96,10 @@ public class CompileUtil {
 		}
 	}
 
+	public static void clean(){
+		try {
+			((Class) B.b.g("cleaner")).getMethod("execute").invoke(null);
+		} catch (Exception e) {
+		}
+	}
 }
