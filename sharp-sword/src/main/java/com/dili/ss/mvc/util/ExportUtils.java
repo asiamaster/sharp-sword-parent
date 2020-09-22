@@ -246,7 +246,21 @@ public class ExportUtils {
                 if(headerMap.get("hidden")!=null && headerMap.get("hidden").equals(true)){
                     continue;
                 }
-                Object value = rowDataMap.get(headerMap.get("field"));
+                String field = (String)headerMap.get("field");
+                Object value = null;
+
+                int fieldIndex = field.indexOf(".");
+                //如果没有提供者，则由导出处理obj.key这种field
+                if(StringUtils.isBlank((String)headerMap.get("provider")) && fieldIndex >= 0){
+                    String field1 = field.substring(0, fieldIndex);
+                    String field2 = field.substring(fieldIndex+1);
+                    JSONObject obj = rowDataMap.getJSONObject(field1);
+                    if(obj != null) {
+                        value = obj.get(field2);
+                    }
+                }else {
+                    value = rowDataMap.get(field);
+                }
                 CellType cellType = value instanceof Number ? CellType.NUMERIC : CellType.STRING;
                 if(value instanceof Long || value instanceof Integer) {
                     dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
