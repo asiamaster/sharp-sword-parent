@@ -37,11 +37,13 @@
     //判断导出是否完成
     function isFinished(token) {
         var flag = false;
+        let exporterPath = '<#config name="exporter.contextPath" defValue=""/>';
+        let url = exporterPath == "" ? "${contextPath}/export/isFinished.action?token=" + token : exporterPath + "/exporter/isFinished.action?token=" + token;
         $.ajax({
             type: "POST",
-            url: "${contextPath}/export/isFinished.action?token="+token,
+            url: url,
             processData:true,
-            dataType: "json",
+            //dataType: "json",
             async : false,
             success: function (data) {
                 if(data==true || data=="true"){
@@ -73,7 +75,8 @@
         _gridExportQueryParams["order"] = opts.sortOrder;
         param.queryParams = JSON.stringify(_gridExportQueryParams);
         param.title = opts.title;
-        param.url = opts.url;
+        var serverPath = '<#config name="project.serverPath" defValue=""/>';
+        param.url = serverPath + opts.url;
         param.token = token;
         if($("#_exportForm").length <= 0) {
             var formStr = "<div id='_exportFormDiv'><form id='_exportForm' class='easyui-form' method='post'>" +
@@ -95,7 +98,10 @@
 //        });
         load();
         if(!exportUrl){
-            exportUrl = "${contextPath}/export/serverExport.action";
+            // exportUrl = "${contextPath}/export/serverExport.action";
+            var exporterPath = '<#config name="exporter.contextPath" defValue=""/>';
+            //如果配置了exporter.contextPath, 则使用导出器
+            exportUrl = exporterPath == "" ? '${contextPath}/export/serverExport.action' : exporterPath+'/exporter/serverExport.action';
         }
         $('#_exportForm').form("load", param);
         $('#_exportForm').form("submit",{

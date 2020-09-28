@@ -190,19 +190,24 @@ public class ExportUtils {
     private void buildData(ExportParam exportParam, SXSSFWorkbook workbook, Sheet sheet, HttpServletRequest request){
         //渲染数据列
         CellStyle dataColumnStyle = getDataColumnStyle(workbook);//获取列头样式对象
-        String basePath = SpringUtil.getProperty("project.serverPath", request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort());
+        String url = exportParam.getUrl();
+        if(!url.startsWith("http")){
+            url = url.startsWith("/") ? url : "/" + url;
+            String basePath = SpringUtil.getProperty("project.serverPath", request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort());
+            url = basePath + url;
+        }
         //这里获取到的是nginx转换后的(IP)地址和端口号，如果是跳板机这种，有可能会禁止访问，后续改为从配置读取
 //        String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
-        String url = exportParam.getUrl().startsWith("/") ? exportParam.getUrl() : "/" + exportParam.getUrl();
+
 //        Map<String, String> queryParams = exportParam.getQueryParams();
         //先获取总数
-        int total = getCount(basePath+url, exportParam.getContentType(), exportParam.getQueryParams(), request);
+        int total = getCount(url, exportParam.getContentType(), exportParam.getQueryParams(), request);
         //查询次数
         int queryCount = total % FETCH_COUNT == 0 ? total/ FETCH_COUNT : total/ FETCH_COUNT +1;
 
         //如果只查一次，就不启线程了，直接在主线程查
         if(queryCount == 1) {
-            JSONArray rowDatas = new ExportDataThread(0, exportParam.getQueryParams(), basePath + url, exportParam.getContentType(), request).queryThreadData();
+            JSONArray rowDatas = new ExportDataThread(0, exportParam.getQueryParams(), url, exportParam.getContentType(), request).queryThreadData();
             buildSingleData(0, exportParam.getColumns(), rowDatas, sheet, dataColumnStyle);
         }else {
             //分别进行取数
@@ -212,7 +217,7 @@ public class ExportUtils {
                 //注意这里直接使用exportParam.getQueryParams()会产生多线程并发缺陷，所有深putAll进行半深拷贝
                 //然而putAll也不完全是深拷贝，但它的性能优于字节拷贝，它只能深拷贝基本类型，不过这里也只有基本类型
                 queryParams.putAll(exportParam.getQueryParams());
-                Future<JSONArray> future = executor.submit(new ExportDataThread(current, queryParams, basePath + url, exportParam.getContentType(), request));
+                Future<JSONArray> future = executor.submit(new ExportDataThread(current, queryParams, url, exportParam.getContentType(), request));
                 futures.add(future);
             }
             int current = 0;
