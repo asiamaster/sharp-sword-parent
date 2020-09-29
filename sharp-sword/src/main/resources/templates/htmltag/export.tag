@@ -43,7 +43,6 @@
             type: "POST",
             url: url,
             processData:true,
-            //dataType: "json",
             async : false,
             success: function (data) {
                 if(data==true || data=="true"){
@@ -78,24 +77,7 @@
         var serverPath = '<#config name="project.serverPath" defValue=""/>';
         param.url = serverPath + opts.url;
         param.token = token;
-        if($("#_exportForm").length <= 0) {
-            var formStr = "<div id='_exportFormDiv'><form id='_exportForm' class='easyui-form' method='post'>" +
-                "<input type='hidden' id='columns' name='columns'/>" +
-                "<input type='hidden' id='queryParams' name='queryParams'/>" +
-                "<input type='hidden' id='title' name='title'/>" +
-                "<input type='hidden' id='url' name='url'/>" +
-                "<input type='hidden' id='token' name='token'/>" +
-                "</form></div>";
-            $(formStr).appendTo("body");
-            $.parser.parse("#_exportFormDiv");
-        }
-        // 显示进度条
-//        $.messager.progress({
-//            title : "提示",
-//            msg : "",
-//            text : '数据导出中,请耐心等候...',
-//            interval : 300
-//        });
+        param.contentType = opts.contentType;
         load();
         if(!exportUrl){
             // exportUrl = "${contextPath}/export/serverExport.action";
@@ -103,21 +85,7 @@
             //如果配置了exporter.contextPath, 则使用导出器
             exportUrl = exporterPath == "" ? '${contextPath}/export/serverExport.action' : exporterPath+'/exporter/serverExport.action';
         }
-        $('#_exportForm').form("load", param);
-        $('#_exportForm').form("submit",{
-            url: exportUrl,
-            onSubmit: function(formParam) {
-                //定时查看是否导出完成
-                timeoutId = window.setTimeout(checkFinished, 1);
-            },
-            success: function(data){
-//                $.messager.progress('close');	// 如果提交成功则隐藏进度条
-                if(data != null && data != ''){
-                    $.messager.alert('导出错误', data, "error");
-                }
-                disLoad();
-            }
-        });
+        exportByUrl(exportUrl, param);
     }
 
     /**
@@ -132,17 +100,20 @@
         //没有url就没有查询过，不作导出
         if(url == null || url == '')
             return;
-        if($("#_exportByUrlForm").length <= 0) {
-            var formStr = "<div id='_exportByUrlFormDiv'><form id='_exportByUrlForm' class='easyui-form' iframe='false' method='post'>" +
+        if($("#_exportForm").length <= 0) {
+            var formStr = "<div id='_exportFormDiv'><form id='_exportForm' class='easyui-form' method='post'>" +
+                "<input type='hidden' id='columns' name='columns'/>" +
                 "<input type='hidden' id='queryParams' name='queryParams'/>" +
+                "<input type='hidden' id='title' name='title'/>" +
+                "<input type='hidden' id='url' name='url'/>" +
+                "<input type='hidden' id='token' name='token'/>" +
+                "<input type='hidden' id='contentType' name='contentType'/>" +
                 "</form></div>";
             $(formStr).appendTo("body");
-            $.parser.parse("#_exportByUrlFormDiv");
+            $.parser.parse("#_exportFormDiv");
         }
-        var param = {};
-        param.queryParams = JSON.stringify(params);
-        $('#_exportByUrlForm').form("load", param);
-        $('#_exportByUrlForm').form("submit",{
+        $('#_exportForm').form("load", params);
+        $('#_exportForm').form("submit",{
             url:url,
             onSubmit: function(formParam) {
                 //定时查看是否导出完成
