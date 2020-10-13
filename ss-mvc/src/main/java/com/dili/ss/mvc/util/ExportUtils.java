@@ -310,9 +310,12 @@ public class ExportUtils {
             dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0.0000000000"));
             cell.setCellValue((Double)value);
         }else if(value instanceof BigDecimal){
+            dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0.0000000000"));
             cell.setCellValue(((BigDecimal)value).doubleValue());
         }else{
-            cell.setCellValue(value.toString());
+            dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("@"));
+            RichTextString text = new XSSFRichTextString(value.toString());
+            cell.setCellValue(text);
         }
         cell.setCellStyle(dataColumnStyle);
     }
