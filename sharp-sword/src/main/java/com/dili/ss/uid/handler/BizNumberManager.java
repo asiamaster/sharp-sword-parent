@@ -2,6 +2,16 @@ package com.dili.ss.uid.handler;
 
 public interface BizNumberManager {
 
+    /**
+     * 清除缓存
+     * @param type
+     */
+    void clear(String type);
+
+    /**
+     * setter
+     * @param bizNumberComponent
+     */
     void setBizNumberComponent(BizNumberComponent bizNumberComponent);
 
     /**

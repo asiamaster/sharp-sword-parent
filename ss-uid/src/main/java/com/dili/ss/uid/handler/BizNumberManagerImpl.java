@@ -51,6 +51,13 @@ public class BizNumberManagerImpl implements BizNumberManager{
     //获取失败后的重试次数
     protected static final int RETRY = 5;
 
+    @Override
+    public void clear(String type){
+        if(bizNumberMap.containsKey(type)) {
+            bizNumberMap.remove(type);
+        }
+    }
+
     /**
      * 根据业务类型获取业务号
      * @param type
