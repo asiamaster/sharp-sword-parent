@@ -62,6 +62,15 @@ public class BizNumberServiceImpl extends BaseServiceImpl<BizNumber, Long> imple
         return getActualDao().selectOne(bizNumber);
     }
 
+    /**
+     * 清除缓存
+     * @param type
+     */
+    @Override
+    public void clear(String type){
+        bizNumberHandler.clear(type);
+    }
+
     @Override
     public String getBizNumberByType(BizNumberRule bizNumberRule) {
         if(bizNumberRule == null){

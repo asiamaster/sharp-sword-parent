@@ -10,6 +10,12 @@ import com.dili.ss.uid.domain.BizNumberRule;
 public interface BizNumberService extends BaseService<BizNumber, Long> {
 
 	/**
+	 * 清除缓存
+	 * @param type
+	 */
+	void clear(String type);
+
+	/**
 	 * 根据业务类型规则获取编号
 	 * @param bizNumberRule 业务类型规则
 	 * @return

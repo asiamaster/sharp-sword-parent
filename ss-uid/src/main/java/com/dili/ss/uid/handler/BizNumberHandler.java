@@ -64,6 +64,15 @@ public class BizNumberHandler {
         bizNumberManager = new BizNumberManagerImpl();
         bizNumberManager.setBizNumberComponent(bizNumberComponent);
     }
+
+    /**
+     * 清除缓存
+     * @param type
+     */
+    public void clear(String type){
+        bizNumberManager.clear(type);
+    }
+
     /**
      * 根据业务类型获取业务号
      * @param type
