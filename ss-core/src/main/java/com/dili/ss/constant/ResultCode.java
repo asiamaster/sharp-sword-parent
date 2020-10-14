@@ -73,6 +73,11 @@ public class ResultCode {
     public static final String UNSUPPORTED_MEDIA_TYPE ="415";
 
     /**
+     * 429 Flow Limit - [*]：Spring Cloud Gateway 限流
+     */
+    public static final String FLOW_LIMIT ="429";
+
+    /**
      * 500 INTERNAL SERVER ERROR - [*]：服务器发生错误，用户将无法判断发出的请求是否成功。
      */
     public static final String INTERNAL_SERVER_ERROR ="500";
