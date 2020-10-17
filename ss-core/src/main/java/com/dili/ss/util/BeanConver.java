@@ -276,7 +276,7 @@ public class BeanConver {
         result.setDatas(page.getResult());
         result.setPage(page.getPageNum());
         result.setRows(page.getPageSize());
-        result.setTotalItem(Integer.parseInt(String.valueOf(page.getTotal())));
+        result.setTotalItem(page.getTotal());
         result.setTotalPage(page.getPages());
         result.setStartIndex(page.getStartRow());
         return result;
@@ -393,7 +393,7 @@ public class BeanConver {
         result.setDatas(page.getList());
         result.setPage(page.getPageNum());
         result.setRows(page.getPageSize());
-        result.setTotalItem(Integer.parseInt(String.valueOf(page.getTotal())));
+        result.setTotalItem(page.getTotal());
         result.setTotalPage(page.getPages());
         result.setStartIndex(page.getStartRow());
         return result;
@@ -411,11 +411,11 @@ public class BeanConver {
         result.setDatas(page.getContent());
         result.setPage(page.getNumber()+1);
         result.setRows(page.getSize());
-        result.setTotalItem(Integer.parseInt(String.valueOf(page.getTotalElements())));
+        result.setTotalItem(page.getTotalElements());
         result.setTotalPage(page.getTotalPages());
-        Integer startIndex = (result.getPage() - 1)*result.getRows()+1; //计算出页开始行数
+        Long startIndex = (long)(result.getPage() - 1)*result.getRows()+1; //计算出页开始行数
         if(startIndex<1){
-            startIndex = 1;
+            startIndex = 1L;
         }
         if(startIndex>result.getTotalItem()){
             startIndex = result.getTotalItem();

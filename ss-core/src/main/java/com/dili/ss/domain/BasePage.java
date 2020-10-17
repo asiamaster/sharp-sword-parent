@@ -5,6 +5,7 @@ import java.util.List;
 
 /**
  * 基本分页结果对象
+ * 建议使用com.github.pagehelper.Page
  * @param <T>
  */
 //@ApiModel(value = "basePage",description = "分页查询对象")
@@ -31,12 +32,12 @@ public class BasePage<T> extends BaseQuery{
 //	@ApiParam
 	private Integer totalPage = 0; //总页数
 
-	private transient Integer startIndex = 1;// 开始索引
+	private transient Long startIndex = 1L;// 开始索引
 
 	/**
 	 * total count
 	 */
-	private Integer totalItem = 0;	//总记录数
+	private Long totalItem = 0L;	//总记录数
 
 
 	public BasePage() {
@@ -45,10 +46,10 @@ public class BasePage<T> extends BaseQuery{
 
 
 //	@JSONField(serialize=false)
-	public Integer getStartIndex() {
+	public Long getStartIndex() {
 		return startIndex;
 	}
-	public void setStartIndex(Integer startIndex) {
+	public void setStartIndex(Long startIndex) {
 		this.startIndex = startIndex;
 	}
 
@@ -121,7 +122,7 @@ public class BasePage<T> extends BaseQuery{
 	 * 取得总页数
 	 * @return
 	 */
-	public Integer pageCount() {
+	public Long pageCount() {
 		if (totalItem % rows == 0) {
 			return totalItem / rows;
 		} else {
@@ -133,7 +134,7 @@ public class BasePage<T> extends BaseQuery{
 	 * 取总记录数.
 	 * @return
 	 */
-	public Integer getTotalItem() {
+	public Long getTotalItem() {
 		return this.totalItem;
 	}
 
@@ -200,7 +201,7 @@ public class BasePage<T> extends BaseQuery{
 	/**
 	 * 设置总记录条数
 	 */
-	public void setTotalItem(Integer totalItem) {
+	public void setTotalItem(Long totalItem) {
 		this.totalItem = totalItem;
 //		repaginate();
 	}
@@ -214,14 +215,14 @@ public class BasePage<T> extends BaseQuery{
 
 	public void repaginate() {
 		if (totalItem > 0) {
-			setTotalPage( totalItem / rows + (totalItem % rows > 0 ? 1 : 0));//计算出最大页数
+			setTotalPage((int) (totalItem / rows + (totalItem % rows > 0 ? 1 : 0)));//计算出最大页数
 			if(page > totalPage) {//当前页数大于最大页，设置为最大页
 				setPage(totalPage); //最大页
 			}
 			this.setTotalPage(totalPage);
-			setStartIndex((page - 1)* rows); //计算出页开始行数
+			setStartIndex((long) ((page - 1)* rows)); //计算出页开始行数
 			if(startIndex<0){
-				setStartIndex(0);
+				setStartIndex(0L);
 			}
 			if(startIndex>totalItem){
 				setStartIndex(totalItem);

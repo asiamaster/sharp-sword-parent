@@ -314,7 +314,7 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 		result.setDatas(list);
 		result.setPage(page.getPageNum());
 		result.setRows(page.getPageSize());
-		result.setTotalItem(Integer.parseInt(String.valueOf(page.getTotal())));
+		result.setTotalItem(Long.parseLong(String.valueOf(page.getTotal())));
 		result.setTotalPage(page.getPages());
 		result.setStartIndex(page.getStartRow());
 		return result;
@@ -425,15 +425,15 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 			Page<T> page = (Page) list;
 			result.setPage(page.getPageNum());
 			result.setRows(page.getPageSize());
-			result.setTotalItem(Integer.parseInt(String.valueOf(page.getTotal())));
+			result.setTotalItem(Long.parseLong(String.valueOf(page.getTotal())));
 			result.setTotalPage(page.getPages());
 			result.setStartIndex(page.getStartRow());
 		}else{
 			result.setPage(1);
 			result.setRows(list.size());
-			result.setTotalItem(list.size());
+			result.setTotalItem((long)list.size());
 			result.setTotalPage(1);
-			result.setStartIndex(1);
+			result.setStartIndex(1L);
 		}
 		return result;
 	}

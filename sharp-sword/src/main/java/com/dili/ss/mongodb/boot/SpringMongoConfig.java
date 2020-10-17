@@ -1,19 +1,6 @@
 package com.dili.ss.mongodb.boot;
 
-import com.google.common.collect.Lists;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
-
+//升级Spring-Boot 2.3.2后，因类变动，注释掉
 /**
  * 多了_class的意义，在下面这个链接有很好的解答：
  http://stackoverflow.com/questions/6810488/spring-data-mongodb-mappingmongoconverter-remove-class/
@@ -22,77 +9,79 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
  MappingMongoConverter
  * Created by asiamastor on 2017/1/3.
  */
-@Configuration
-@ConfigurationProperties(prefix = "spring.data.mongodb", ignoreInvalidFields=true)
-@ConditionalOnExpression("'${mongodb.enable}'=='true'")
-public class SpringMongoConfig extends AbstractMongoConfiguration {
+//@Configuration
+//@ConfigurationProperties(prefix = "spring.data.mongodb", ignoreInvalidFields=true)
+//@ConditionalOnExpression("'${mongodb.enable}'=='true'")
+//public class SpringMongoConfig extends AbstractMongoConfiguration {
+//
+//    private String database;
+//    private String host;
+//    private int port;
+//
+//    public String getUsername() {
+//        return username;
+//    }
+//
+//    public void setUsername(String username) {
+//        this.username = username;
+//    }
+//
+//    public String getPassword() {
+//        return password;
+//    }
+//
+//    public void setPassword(String password) {
+//        this.password = password;
+//    }
+//
+//    private String username;
+//    private String password;
+//
+//    @Override
+//    protected String getDatabaseName() {
+//        return database;
+//    }
+//
+//    @Override
+//    public MongoClient mongoClient() {
+//        if(StringUtils.isBlank(password) || StringUtils.isBlank(username)){
+//            return new MongoClient(host, port);
+//        }else {
+//            return new MongoClient(new ServerAddress(host, port), Lists.newArrayList(MongoCredential.createCredential(username, database, password.toCharArray())));
+//        }
+//    }
+//
+//    @Override
+//    @Bean
+//    public MongoTemplate mongoTemplate() {
+//        // overwrite type mbg to get rid of the _class column
+////      get the converter from the base class instead of creating it
+////      def converter = new MappingMongoConverter(mongoDbFactory(), new MongoMappingContext())
+//        MappingMongoConverter converter = null;
+//        try {
+//            converter = mappingMongoConverter();
+//            converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+//            return new MongoTemplate(mongoDbFactory(), converter);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+//
+//    public void setDatabase(String database) {
+//        this.database = database;
+//    }
+//
+//    public void setHost(String host) {
+//        this.host = host;
+//    }
+//
+//    public void setPort(int port) {
+//        this.port = port;
+//    }
+//}
 
-    private String database;
-    private String host;
-    private int port;
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    private String username;
-    private String password;
-
-    @Override
-    protected String getDatabaseName() {
-        return database;
-    }
-
-    @Override
-    public MongoClient mongoClient() {
-        if(StringUtils.isBlank(password) || StringUtils.isBlank(username)){
-            return new MongoClient(host, port);
-        }else {
-            return new MongoClient(new ServerAddress(host, port), Lists.newArrayList(MongoCredential.createCredential(username, database, password.toCharArray())));
-        }
-    }
-
-    @Override
-    @Bean
-    public MongoTemplate mongoTemplate() {
-        // overwrite type mbg to get rid of the _class column
-//      get the converter from the base class instead of creating it
-//      def converter = new MappingMongoConverter(mongoDbFactory(), new MongoMappingContext())
-        MappingMongoConverter converter = null;
-        try {
-            converter = mappingMongoConverter();
-            converter.setTypeMapper(new DefaultMongoTypeMapper(null));
-            return new MongoTemplate(mongoDbFactory(), converter);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public void setDatabase(String database) {
-        this.database = database;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-}
 
 //    public
 //    @Bean
