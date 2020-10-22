@@ -8,12 +8,16 @@ import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.stereotype.Component;
 
 /**
  * 解决创建子流程时，businesskey 不传递。
  * @author: WM
  * @time: 2020/10/22 15:42
  */
+@Component
+@ConditionalOnExpression("'${activiti.enable}'=='true'")
 public class BusinessKeyInjectionActivitiEventListener implements ActivitiEventListener {
     private Logger log = LoggerFactory.getLogger(getClass());
     @Override
