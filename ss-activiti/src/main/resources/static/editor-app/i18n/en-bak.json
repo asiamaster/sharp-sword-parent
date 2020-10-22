@@ -282,6 +282,7 @@
     "EVENT_TYPE.MEMBERSHIP.CREATED.TOOLTIP": "A new membership has been created",
     "EVENT_TYPE.MEMBERSHIP.DELETED.TOOLTIP": "A single membership has been deleted",
     "EVENT_TYPE.MEMBERSHIPS.DELETED.TOOLTIP": "All memberships in the related group have been deleted. No individual events will be dispatched due to possible performance reasons",
+    "EVENT_TYPE.TASK.CREATED.TOOLTIP": "A task as been created. This is thrown alongside with an ENTITY_UPDATED event",
     "EVENT_TYPE.TASK.ASSIGNED.TOOLTIP": "A task as been assigned. This is thrown alongside with an ENTITY_UPDATED event",
     "EVENT_TYPE.TASK.COMPLETED.TOOLTIP": "A task has been completed. Dispatched before the task entity is deleted",
     "EVENT_TYPE.UNCAUGHT.BPMNERROR.TOOLTIP": "When a BPMN Error was thrown, but was not caught within in the process",

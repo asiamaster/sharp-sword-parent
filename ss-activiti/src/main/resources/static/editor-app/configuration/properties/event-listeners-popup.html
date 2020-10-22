@@ -32,6 +32,8 @@
             	            	<select id="eventField" class="form-control" ng-model="eventDefinition.event" ng-change="listenerDetailsChanged()">
             	            		<option title="{{'EVENT_TYPE.ACTIVITY.COMPENSATE.TOOLTIP' | translate}}">ACTIVITY_COMPENSATE</option>
             	            		<option title="{{'EVENT_TYPE.ACTIVITY.COMPLETED.TOOLTIP' | translate}}">ACTIVITY_COMPLETED</option>
+            	            		<option>PROCESS_STARTED</option>
+            	            		<option>PROCESS_COMPLETED</option>
             	            		<option title="bla">ACTIVITY_ERROR_RECEIVED</option>
             	            		<option>ACTIVITY_MESSAGE_RECEIVED</option>
             	            		<option>ACTIVITY_SIGNALED</option>
@@ -50,6 +52,7 @@
             	                	<option title="{{'EVENT_TYPE.MEMBERSHIP.CREATED.TOOLTIP' | translate}}">MEMBERSHIP_CREATED</option>
             	                	<option title="{{'EVENT_TYPE.MEMBERSHIP.DELETED.TOOLTIP' | translate}}">MEMBERSHIP_DELETED</option>
             	                	<option title="{{'EVENT_TYPE.MEMBERSHIPS.DELETED.TOOLTIP' | translate}}">MEMBERSHIPS_DELETED</option>
+            	                	<option title="{{'EVENT_TYPE.TASK.CREATED.TOOLTIP' | translate}}">TASK_CREATED</option>
             	                	<option title="{{'EVENT_TYPE.TASK.ASSIGNED.TOOLTIP' | translate}}">TASK_ASSIGNED</option>
             	                	<option title="{{'EVENT_TYPE.TASK.COMPLETED.TOOLTIP' | translate}}">TASK_COMPLETED</option>
             	                	<option>TIMER_FIRED</option>
