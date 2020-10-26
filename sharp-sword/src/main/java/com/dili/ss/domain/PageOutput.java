@@ -21,15 +21,15 @@ public class PageOutput<T> extends BaseOutput<T> {
     /**
      * 总记录数
      */
-    private Integer total;
+    private Long total;
     /**
      * 起始行
      */
-    private Integer startRow;
+    private Long startRow;
     /**
      * 末行
      */
-    private Integer endRow;
+    private Long endRow;
     /**
      * 总页数
      */
@@ -89,28 +89,28 @@ public class PageOutput<T> extends BaseOutput<T> {
     /**
      * 总记录数
      */
-    public Integer getTotal() {
+    public Long getTotal() {
         return total;
     }
 
-    public PageOutput setTotal(Integer total) {
+    public PageOutput setTotal(Long total) {
         this.total = total;
         return this;
     }
 
-    public Integer getStartRow() {
+    public Long getStartRow() {
         return startRow;
     }
 
-    public void setStartRow(Integer startRow) {
+    public void setStartRow(Long startRow) {
         this.startRow = startRow;
     }
 
-    public Integer getEndRow() {
+    public Long getEndRow() {
         return endRow;
     }
 
-    public void setEndRow(Integer endRow) {
+    public void setEndRow(Long endRow) {
         this.endRow = endRow;
     }
 
