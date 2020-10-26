@@ -294,13 +294,13 @@ public class ExportUtils {
         }else if(value instanceof Integer){
             //数据格式只显示整数
             dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-            cell.setCellValue(value.toString());
+            cell.setCellValue(((Integer)value).doubleValue());
         }else if(value instanceof Long){
             dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-            cell.setCellValue(Double.parseDouble(value.toString()));
+            cell.setCellValue(((Long)value).doubleValue());
         }else if(value instanceof Short){
             dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-            cell.setCellValue(value.toString());
+            cell.setCellValue(((Short)value).doubleValue());
         }else if(value instanceof Float){
             //float支持小数点后8位
             dataColumnStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0.00000000"));
