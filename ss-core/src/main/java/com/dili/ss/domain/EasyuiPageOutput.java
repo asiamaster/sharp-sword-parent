@@ -9,21 +9,21 @@ import java.util.List;
  * Created by asiamaster on 2017/5/26 0026.
  */
 public class EasyuiPageOutput {
-    private Integer total;
+    private Long total;
     private List rows;
     private List footer;
 
     public EasyuiPageOutput(){}
-    public EasyuiPageOutput(Integer total, List rows){
+    public EasyuiPageOutput(Long total, List rows){
         this.total = total;
         this.rows = rows;
     }
 
-    public Integer getTotal() {
+    public Long getTotal() {
         return total;
     }
 
-    public void setTotal(Integer total) {
+    public void setTotal(Long total) {
         this.total = total;
     }
 
