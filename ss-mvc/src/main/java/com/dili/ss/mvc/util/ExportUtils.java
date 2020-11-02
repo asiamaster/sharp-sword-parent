@@ -379,7 +379,12 @@ public class ExportUtils {
         if(json.trim().startsWith("[") && json.trim().endsWith("]")){
         	return JSON.parseArray(json).size();
         }else {
-	        return (int) JSON.parseObject(json).get("total");
+            try {
+                return (int) JSON.parseObject(json).get("total");
+            }catch (Exception e){
+                log.error("getCount远程访问失败，结果:"+json);
+                throw e;
+            }
         }
     }
 
@@ -462,6 +467,9 @@ public class ExportUtils {
 		        while(enumeration.hasMoreElements()) {
 			        String key = enumeration.nextElement();
                     if("Accept-Encoding".equalsIgnoreCase(key.trim())) {
+                        continue;
+                        //解决nginx不用完整路径，用header中的Host的问题，可能导致导出器使用错误的host路径
+                    }else if("Host".equalsIgnoreCase(key.trim())) {
                         continue;
                     }
 			        headersMap.put(key, request.getHeader(key));
