@@ -140,7 +140,7 @@ public class CommonController {
         List<JSONObject> list = commonService.selectJSONObject(sql, page, rows);
         Page<T> pageList = (Page)list;
         ValueProviderUtils.buildDataByProvider(conditionItems.getMetadata(), list);
-        return new EasyuiPageOutput(Integer.parseInt(String.valueOf(pageList.getTotal())), pageList).toString();
+        return new EasyuiPageOutput(pageList.getTotal(), pageList).toString();
     }
 
 

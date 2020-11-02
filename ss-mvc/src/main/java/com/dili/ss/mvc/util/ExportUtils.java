@@ -201,7 +201,13 @@ public class ExportUtils {
 
 //        Map<String, String> queryParams = exportParam.getQueryParams();
         //先获取总数
-        int total = getCount(url, exportParam.getContentType(), exportParam.getQueryParams(), request);
+        int total = 0;
+        try {
+            total = getCount(url, exportParam.getContentType(), exportParam.getQueryParams(), request);
+        } catch (Exception e) {
+            log.error(String.format("构建导出数据异常, url:'%s', 参数:(%s)" , url, JSON.toJSONString(exportParam.getQueryParams())), e);
+            throw e;
+        }
         //查询次数
         int queryCount = total % FETCH_COUNT == 0 ? total/ FETCH_COUNT : total/ FETCH_COUNT +1;
 

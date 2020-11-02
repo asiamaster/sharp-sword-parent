@@ -448,7 +448,7 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 		List<T> list = listByExample(domain);
 		long total = list instanceof Page ? ( (Page) list).getTotal() : list.size();
 		List results = useProvider ? ValueProviderUtils.buildDataByProvider(domain, list) : list;
-		return new EasyuiPageOutput(Integer.parseInt(String.valueOf(total)), results);
+		return new EasyuiPageOutput(total, results);
 	}
 
 	/**
@@ -465,7 +465,7 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 		List<T> list = getDao().select(domain);
 		long total = list instanceof Page ? ( (Page) list).getTotal() : list.size();
 		List results = useProvider ? ValueProviderUtils.buildDataByProvider(domain, list) : list;
-		return new EasyuiPageOutput(Integer.parseInt(String.valueOf(total)), results);
+		return new EasyuiPageOutput(total, results);
 	}
 
 	@Override
