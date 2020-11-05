@@ -1,5 +1,6 @@
 package com.dili.ss.idempotent.aop;
 
+import com.dili.ss.constant.ResultCode;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.idempotent.annotation.Idempotent;
 import com.dili.ss.idempotent.annotation.Token;
@@ -57,7 +58,7 @@ public class IdempotentAspectHandlerImpl implements IdempotentAspectHandler{
             redisDistributedLock.releaseLock(tokenValue, tokenValue);
         }
         //进行拦截
-        return BaseOutput.class.isAssignableFrom(currentMethod.getReturnType()) ? BaseOutput.failure("幂等接口调用失败") : null;
+        return BaseOutput.class.isAssignableFrom(currentMethod.getReturnType()) ? BaseOutput.failure(ResultCode.IDEMPOTENT_ERROR, "幂等接口调用失败") : null;
     }
 
     @Override

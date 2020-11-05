@@ -135,8 +135,15 @@ public class ResultCode {
     public static final String APP_ERROR="5000";
 
     /**
+     * 5001 IDEMPOTENT_ERROR: 幂等接口调用失败异常
+     */
+    public static final String IDEMPOTENT_ERROR = "5001";
+
+    /**
      * 6000：权限错误(未登录，数据权限不满足，功能权限不满足等错误)<br/>
      */
     public static final String NOT_AUTH_ERROR="6000";
+
+
 
 }
