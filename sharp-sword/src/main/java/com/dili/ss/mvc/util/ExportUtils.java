@@ -304,7 +304,7 @@ public class ExportUtils {
                 //强制单元格类型，目前只支持number和string
                 String type = (String) headerMap.get(HEADER_TYPE);
                 //number类型的格式，参见org.apache.poi.ss.usermodel.BuiltinFormats,默认为0
-                String format = (String) headerMap.getOrDefault(HEADER_FORMAT, getDefaultFormat(value));
+                String format = headerMap.getOrDefault(HEADER_FORMAT, getDefaultFormat(value)).toString();
                 //判断是否有值提供者需要转义(此功能已经在datagrid的查询中封装，这里不需要处理了)
 //                if(headerMap.containsKey("HEADER_PROVIDER")){
 //                    value = valueProviderUtils.setDisplayText(headerMap.get("HEADER_PROVIDER").toString(), value, null);
