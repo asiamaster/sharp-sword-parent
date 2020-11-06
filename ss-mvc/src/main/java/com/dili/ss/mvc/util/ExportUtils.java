@@ -34,10 +34,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * 通用导出工具
@@ -59,11 +56,6 @@ public class ExportUtils {
     private static final String HEADER_FORMAT = "format";
 
     /**
-     * 全局缓存数据列格式， key为format
-     */
-    private static ThreadLocal<Map<String, CellStyle>> DATA_COLUMN_STYLE = new ThreadLocal<>();
-
-    /**
      * 表单参数
      */
     private final static String CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
@@ -76,6 +68,8 @@ public class ExportUtils {
 
     //    多线程执行器
     private ExecutorService executor;
+
+    private CompletionService completionService;
 
     @PostConstruct
     public void init() {
@@ -132,6 +126,10 @@ public class ExportUtils {
             cell.setCellValue(text);                                 //设置列头单元格的值
             cell.setCellStyle(columnTopStyle);                       //设置列头单元格样式
         }
+        /**
+         * 全局缓存数据列格式， key为format
+         */
+        Map<String, CellStyle> DATA_COLUMN_STYLE = new HashMap<String, CellStyle>();
         //构建数据
         //用于缓存providerBean
         Map<String, ValueProvider> providerBuffer = new HashMap<>();
@@ -145,7 +143,7 @@ public class ExportUtils {
                 Object value = rowDataMap.get(tableHeader.getField());
                 String format = tableHeader.getFormat() == null ? getDefaultFormat(value) : tableHeader.getFormat();
                 //获取列头样式对象
-                CellStyle dataColumnStyle = getDataColumnStyle(workbook, format);
+                CellStyle dataColumnStyle = getDataColumnStyle(workbook, format, DATA_COLUMN_STYLE);
                 if (providerMeta != null && providerMeta.containsKey(tableHeader.getField())) {
                     ValueProvider valueProvider = null;
                     //value是provider的beanId
@@ -228,7 +226,9 @@ public class ExportUtils {
                 //注意这里直接使用exportParam.getQueryParams()会产生多线程并发缺陷，所有深putAll进行半深拷贝
                 //然而putAll也不完全是深拷贝，但它的性能优于字节拷贝，它只能深拷贝基本类型，不过这里也只有基本类型
                 queryParams.putAll(exportParam.getQueryParams());
-                Future<JSONArray> future = executor.submit(new ExportDataThread(current, queryParams, url, exportParam.getContentType(), request));
+                CompletionService<JSONArray> completionService = new ExecutorCompletionService<JSONArray>(executor);
+                Future<JSONArray> future = completionService.submit(new ExportDataThread(current, queryParams, url, exportParam.getContentType(), request));
+//                Future<JSONArray> future = executor.submit(new ExportDataThread(current, queryParams, url, exportParam.getContentType(), request));
                 futures.add(future);
             }
             int current = 0;
@@ -275,6 +275,10 @@ public class ExportUtils {
         List<Map<String, Object>> headers = columns.get(columns.size() - 1);
         int headerSize = headers.size();
         int rowDataSize = rowDatas.size();
+        /**
+         * 全局缓存数据列格式， key为format
+         */
+        Map<String, CellStyle> DATA_COLUMN_STYLE = new HashMap<String, CellStyle>();
         //迭代数据
         for (int i = 0; i < rowDataSize; i++) {
             JSONObject rowDataMap = (JSONObject) rowDatas.get(i);
@@ -309,7 +313,7 @@ public class ExportUtils {
 //                if(headerMap.containsKey("HEADER_PROVIDER")){
 //                    value = valueProviderUtils.setDisplayText(headerMap.get("HEADER_PROVIDER").toString(), value, null);
 //                }
-                CellStyle dataColumnStyle = getDataColumnStyle(workbook, format);
+                CellStyle dataColumnStyle = getDataColumnStyle(workbook, format, DATA_COLUMN_STYLE);
                 setCellValue(row, cellIndex, value, dataColumnStyle, type);
                 cellIndex++;
             }
@@ -694,12 +698,9 @@ public class ExportUtils {
      * @param format
      * @return
      */
-    private CellStyle getDataColumnStyle(SXSSFWorkbook workbook, String format) {
-        if(DATA_COLUMN_STYLE.get() == null){
-            DATA_COLUMN_STYLE.set(new HashMap<String, CellStyle>());
-        }
-        if(DATA_COLUMN_STYLE.get().containsKey(format)){
-            return DATA_COLUMN_STYLE.get().get(format);
+    private CellStyle getDataColumnStyle(SXSSFWorkbook workbook, String format, Map<String, CellStyle> DATA_COLUMN_STYLE) {
+        if(DATA_COLUMN_STYLE.containsKey(format)){
+            return DATA_COLUMN_STYLE.get(format);
         }
         // 设置字体
         Font font = workbook.createFont();
@@ -736,7 +737,7 @@ public class ExportUtils {
         //设置垂直对齐的样式为居中对齐;
         style.setVerticalAlignment(VerticalAlignment.CENTER);
         style.setDataFormat(HSSFDataFormat.getBuiltinFormat(format));
-        DATA_COLUMN_STYLE.get().put(format, style);
+        DATA_COLUMN_STYLE.put(format, style);
         return style;
     }
 
