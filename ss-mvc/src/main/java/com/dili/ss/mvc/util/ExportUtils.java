@@ -301,7 +301,7 @@ public class ExportUtils {
                 } else {
                     value = rowDataMap.get(field);
                 }
-                //强制单元格类型，目前只支持number
+                //强制单元格类型，目前只支持number和string
                 String type = (String) headerMap.get(HEADER_TYPE);
                 //number类型的格式，参见org.apache.poi.ss.usermodel.BuiltinFormats,默认为0
                 String format = (String) headerMap.getOrDefault(HEADER_FORMAT, getDefaultFormat(value));
@@ -330,9 +330,24 @@ public class ExportUtils {
             cellType = CellType.NUMERIC;
         }
         Cell cell = row.createCell(cellIndex, cellType);
+        cell.setCellStyle(dataColumnStyle);
         if (value == null) {
             cell.setCellValue("");
-        } else if (value instanceof Integer) {
+            return;
+        }
+        //优先使用type
+        if(StringUtils.isNotBlank(type)){
+            if(type.equals("number")){
+                cell.setCellValue(new Double(value.toString()));
+            }else if(type.equals("string")){
+                cell.setCellValue(new XSSFRichTextString(value.toString()));
+            }else{
+                cell.setCellValue(value.toString());
+            }
+            return;
+        }
+        //没有type则根据值类型确定格式
+        if (value instanceof Integer) {
             cell.setCellValue(((Integer) value).doubleValue());
         } else if (value instanceof Long) {
             cell.setCellValue(((Long) value).doubleValue());
@@ -345,14 +360,9 @@ public class ExportUtils {
         } else if (value instanceof BigDecimal) {
             cell.setCellValue(((BigDecimal) value).doubleValue());
         } else {
-            if(StringUtils.isNotBlank(type) && type.equals("number")){
-                cell.setCellValue(new Double(value.toString()));
-            }else {
-                RichTextString text = new XSSFRichTextString(value.toString());
-                cell.setCellValue(text);
-            }
+            RichTextString text = new XSSFRichTextString(value.toString());
+            cell.setCellValue(text);
         }
-        cell.setCellStyle(dataColumnStyle);
     }
 
     /**
