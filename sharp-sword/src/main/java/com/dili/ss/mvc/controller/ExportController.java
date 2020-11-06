@@ -92,7 +92,6 @@ public class ExportController {
                 return "服务器忙，请稍候再试";
             }
             SsConstants.EXPORT_FLAG.put(token, 0L);
-
             exportUtils.export(request, response, buildExportParam(columns, queryParams, title, url, contentType));
             SsConstants.EXPORT_FLAG.put(token, System.currentTimeMillis());
         } catch (Exception e) {
