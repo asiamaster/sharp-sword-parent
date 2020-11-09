@@ -43,7 +43,7 @@ public class BizNumberManagerImpl implements BizNumberManager{
     public static ReentrantLock rangeIdLock = new ReentrantLock(false);
 
     public static ReentrantLock lock = new ReentrantLock(false);
-
+    public static ReentrantLock newDayLock = new ReentrantLock(false);
     private BizNumberComponent bizNumberComponent;
 
     protected ConcurrentHashMap<String, SequenceNo> bizNumberMap = new ConcurrentHashMap<>();
@@ -92,8 +92,15 @@ public class BizNumberManagerImpl implements BizNumberManager{
         Long orderId = getNextSequenceId(type, null, dateFormat, length, step, increment);
         //如果不是同天，重新获取从1开始的编号
         if (StringUtils.isNotBlank(dateStr) && !dateStr.equals(StringUtils.substring(String.valueOf(orderId), 0, 8))) {
-            orderId = getNextSequenceId(type, getInitBizNumber(dateStr, length), dateFormat, length, step, increment);
+            //新一天，需要加锁
+            newDayLock.lock();
+            try {
+                orderId = getNextSequenceId(type, getInitBizNumber(dateStr, length), dateFormat, length, step, increment);
+            } finally {
+                newDayLock.unlock();
+            }
         }
+
         return orderId;
     }
 
@@ -127,26 +134,27 @@ public class BizNumberManagerImpl implements BizNumberManager{
      * @return
      */
     private Long getNextSeqId(String type, Long startSeq, String dateFormat, int length, long step, int increment) {
+        SequenceNo idSequence;
         rangeIdLock.lock();
-        SequenceNo idSequence = bizNumberMap.get(type);
-        if (idSequence == null) {
-            idSequence = new SequenceNo(step);
-            bizNumberMap.putIfAbsent(type, idSequence);
-            idSequence = bizNumberMap.get(type);
-        }
-        //如果是新的一天，startSeq不为空，而是计算的initNumber
-        //如果bizNumberMap.get(type)为空，StartSeq >= FinishSeq
-        if (startSeq != null || idSequence.getStartSeq() >= idSequence.getFinishSeq()) {
-            idSequence = bizNumberComponent.getSeqNoByNewTransactional(idSequence, type, startSeq, dateFormat, length);
-            if (idSequence == null) {
-                return -1L;
-            }
-        }
         try {
-            return increment == 1 ? idSequence.next() : idSequence.next(increment);
-        }finally {
+            idSequence = bizNumberMap.get(type);
+            if (idSequence == null) {
+                idSequence = new SequenceNo(step);
+                bizNumberMap.putIfAbsent(type, idSequence);
+                idSequence = bizNumberMap.get(type);
+            }
+            //如果是新的一天，startSeq不为空，而是计算的initNumber
+            //如果bizNumberMap.get(type)为空，StartSeq >= FinishSeq
+            if (startSeq != null || idSequence.getStartSeq() >= idSequence.getFinishSeq()) {
+                idSequence = bizNumberComponent.getSeqNoByNewTransactional(idSequence, type, startSeq, dateFormat, length);
+                if (idSequence == null) {
+                    return -1L;
+                }
+            }
+        } finally {
             rangeIdLock.unlock();
         }
+        return increment == 1 ? idSequence.next() : idSequence.next(increment);
     }
 
     /**
