@@ -45,44 +45,46 @@ public class RetrofitfulRegistrar implements ImportBeanDefinitionRegistrar {
         B.daeif("script/ri", null, null);
         Set<String> basePackages = getBasePackages(annotationMetadata);
         for (String basePackage : basePackages) {
-            Resource rootResource = getRootResource(basePackage);
-            Resource[] resources = getResources(basePackage);
-            for (Resource resource : resources) {
-                String classFullName = null;
+            Resource[] rootResources = getRootResources(basePackage);
+            if(rootResources == null){
+                break;
+            }
+            for(Resource rootResource : rootResources) {
+                Resource[] resources = getResources(basePackage);
+                for (Resource resource : resources) {
+                    String classFullName = null;
 //                ClassPathResource classPathResource = null;
-                try {
+                    try {
 //                    classPathResource = new ClassPathResource(resource.getURL().getPath());
-                    classFullName = getClassNameByResource(resource, rootResource.getURL(), basePackage);
-                    Class intfClass = Class.forName(classFullName);
-                    if (!intfClass.isInterface() || intfClass.getAnnotation(Restful.class) == null) {
-                        continue;
-                    }
+                        classFullName = getClassNameByResource(resource, rootResource.getURL(), basePackage);
+                        if(StringUtils.isEmpty(classFullName)){
+                            continue;
+                        }
+                        Class intfClass = Class.forName(classFullName);
+                        if (!intfClass.isInterface() || intfClass.getAnnotation(Restful.class) == null) {
+                            continue;
+                        }
 //                System.out.println("jar包里面的类:"+ClassUtils.convertResourcePathToClassName(result));
-
-                    //类的全路径
+                        //类的全路径
 //                    BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(intfClass);
-                    //向里面的属性注入值，提供get set方法
+                        //向里面的属性注入值，提供get set方法
 //                dataSourceBuider.addPropertyValue("name", "wangmi");
-                    GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
-                    beanDefinition.setBeanClass(RestfulFactoryBean.class);
-                    beanDefinition.getPropertyValues().add("intfClass", intfClass);
-                    beanDefinition.setSynthetic(true);
-                    //注册Bean
-                    beanDefinitionRegistry.registerBeanDefinition(buildDefaultBeanName(classFullName), beanDefinition);
-                }
-                catch (IOException e) {
-                    logger.error(e.getMessage());
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    logger.error(e.getMessage());
-                    e.printStackTrace();
+                        GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+                        beanDefinition.setBeanClass(RestfulFactoryBean.class);
+                        beanDefinition.getPropertyValues().add("intfClass", intfClass);
+                        beanDefinition.setSynthetic(true);
+                        //注册Bean
+                        beanDefinitionRegistry.registerBeanDefinition(buildDefaultBeanName(classFullName), beanDefinition);
+                    } catch (IOException e) {
+                        logger.error(e.getMessage());
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        logger.error(e.getMessage());
+                        e.printStackTrace();
+                    }
                 }
             }
         }
-//        GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
-//        beanDefinition.setBeanClass(BaseDomain.class);
-//        beanDefinition.setSynthetic(true);
-//        beanDefinitionRegistry.registerBeanDefinition("baseDomain", beanDefinition);
     }
 
     public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
@@ -152,6 +154,21 @@ public class RetrofitfulRegistrar implements ImportBeanDefinitionRegistrar {
     }
 
     /**
+     * 获取根资源,包括src/main/test
+     * 找不到返回空
+     */
+    private Resource[] getRootResources(String basePackage) {
+        PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+        String basePackagePath = ClassUtils.convertClassNameToResourcePath(basePackage);
+        try {
+            return resourcePatternResolver.getResources("classpath*:" + basePackagePath + "/");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * 扫描所有资源
      * 找不到返回空
      */
@@ -192,7 +209,12 @@ public class RetrofitfulRegistrar implements ImportBeanDefinitionRegistrar {
             } else {
                 String resourcePath = resource.getURL().getPath();
                 String rootDirPath = rootDirURL.getPath();
-                String path = resourcePath.substring(resourcePath.lastIndexOf(rootDirPath) + rootDirPath.length() - basePackage.length() - 1);
+                int index = resourcePath.lastIndexOf(rootDirPath);
+                //有可能存rootDirURL是src/test/java目录，而resourcePath是在src/main/java, 这时候类的路径不匹配就直接返回空串，不作处理。
+                if(index == -1){
+                    return "";
+                }
+                String path = resourcePath.substring(index + rootDirPath.length() - basePackage.length() - 1);
                 String classFullPath = path.substring(0, path.length() - ".class".length());
                 return ClassUtils.convertResourcePathToClassName(classFullPath);
             }
