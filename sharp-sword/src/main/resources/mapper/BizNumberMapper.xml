@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dili.ss.uid.mapper.BizNumberMapper">
+
+	<select id="getBizNumberAndRule" resultType="com.dili.ss.uid.domain.BizNumberAndRule" parameterType="string">
+		SELECT bn.id, bn.type, bn.value, bn.memo, bn.version,
+		bnr.name, bnr.prefix,  bnr.date_format, bnr.length, bnr.range, bnr.is_enable, bnr.step
+		FROM biz_number bn, biz_number_rule bnr
+		WHERE bn.type = bnr.type
+		AND bnr.is_enable=1
+		AND bn.type=#{type}
+	</select>
+
+
+</mapper>

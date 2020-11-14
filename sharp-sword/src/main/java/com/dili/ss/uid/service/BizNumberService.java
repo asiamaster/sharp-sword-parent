@@ -20,7 +20,7 @@ public interface BizNumberService extends BaseService<BizNumber, Long> {
 	 * @param bizNumberRule 业务类型规则
 	 * @return
 	 */
-	String getBizNumberByType(BizNumberRule bizNumberRule);
+	String getBizNumberByRule(BizNumberRule bizNumberRule);
 
 	/**
 	 * 查询一条

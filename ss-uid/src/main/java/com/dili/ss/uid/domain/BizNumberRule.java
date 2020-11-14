@@ -37,4 +37,11 @@ public interface BizNumberRule extends IDTO {
     String getRange();
     void setRange(String range);
 
+    /**
+     * 步长范围
+     * @return
+     */
+    @FieldDef(label="步长")
+    Long getStep();
+    void setStep(Long step);
 }
