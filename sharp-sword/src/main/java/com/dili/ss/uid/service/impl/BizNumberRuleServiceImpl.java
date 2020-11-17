@@ -11,6 +11,7 @@ import com.dili.ss.uid.service.BizNumberService;
 import com.dili.ss.uid.util.BizNumberUtils;
 import com.dili.ss.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
  * This file was generated on 2020-01-21 14:38:55.
  */
 @Service
+@ConditionalOnExpression("'${uid.enable}'=='true'")
 public class BizNumberRuleServiceImpl extends BaseServiceImpl<BizNumberRuleDomain, Long> implements BizNumberRuleService {
 
     @Autowired
