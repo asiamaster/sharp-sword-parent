@@ -2,6 +2,8 @@ package com.dili.ss.uid.component;
 
 import com.dili.ss.uid.constants.BizNumberConstant;
 import com.dili.ss.uid.domain.BizNumberRule;
+import com.dili.ss.uid.domain.BizNumberRuleDomain;
+import com.dili.ss.uid.service.BizNumberRuleService;
 import com.dili.ss.uid.service.BizNumberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -17,6 +19,8 @@ public class BizNumberFunction {
     @Autowired
     private BizNumberService bizNumberService;
 
+    @Autowired
+    private BizNumberRuleService bizNumberRuleService;
     /**
      * 获取枚举获取业务号
      * @param bizNumberType
@@ -32,7 +36,12 @@ public class BizNumberFunction {
      * @return
      */
     private BizNumberRule getBizNumberRule(String bizNumberType){
-        return BizNumberConstant.bizNumberCache.get(bizNumberType);
+        BizNumberRule bizNumberRule = BizNumberConstant.bizNumberCache.get(bizNumberType);
+        if(bizNumberRule == null){
+            BizNumberRuleDomain bizNumberRuleDomain = bizNumberRuleService.getByType(bizNumberType);
+            BizNumberConstant.bizNumberCache.put(bizNumberType, bizNumberRuleDomain);
+        }
+        return  bizNumberRule;
     }
 
     /**
