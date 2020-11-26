@@ -4,17 +4,12 @@ package com.dili.ss.base;
 import com.dili.ss.dao.ExampleExpand;
 import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.domain.BasePage;
-import com.dili.ss.domain.EasyuiPageOutput;
 import com.dili.ss.domain.annotation.FindInSet;
 import com.dili.ss.domain.annotation.Like;
 import com.dili.ss.domain.annotation.Operator;
 import com.dili.ss.domain.annotation.SqlOperator;
-import com.dili.ss.dto.DTOUtils;
-import com.dili.ss.dto.IBaseDomain;
-import com.dili.ss.dto.IDTO;
-import com.dili.ss.dto.IMybatisForceParams;
+import com.dili.ss.dto.*;
 import com.dili.ss.exception.ParamErrorException;
-import com.dili.ss.metadata.ValueProviderUtils;
 import com.dili.ss.util.DateUtils;
 import com.dili.ss.util.POJOUtils;
 import com.github.pagehelper.Page;
@@ -47,7 +42,7 @@ import java.util.regex.Pattern;
  * @author asiamastor
  * @date 2016/12/28
  */
-public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Serializable> implements BaseService<T, KEY> {
+public abstract class BaseServiceAdaptor<T extends IDomain, KEY extends Serializable> implements BaseService<T, KEY> {
 	protected static final Logger LOGGER = LoggerFactory.getLogger(BaseServiceAdaptor.class);
 
 
@@ -436,36 +431,6 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 			result.setStartIndex(1L);
 		}
 		return result;
-	}
-
-	/**
-	 * 用于支持like, order by 的easyui分页查询
-	 * @param domain
-	 * @return
-	 */
-	@Override
-	public EasyuiPageOutput listEasyuiPageByExample(T domain, boolean useProvider) throws Exception {
-		List<T> list = listByExample(domain);
-		long total = list instanceof Page ? ( (Page) list).getTotal() : list.size();
-        List results = useProvider ? ValueProviderUtils.buildDataByProvider(domain, list) : list;
-		return new EasyuiPageOutput(total, results);
-	}
-
-	/**
-	 * 根据实体查询easyui分页结果
-	 * @param domain
-	 * @return
-	 */
-	@Override
-	public EasyuiPageOutput listEasyuiPage(T domain, boolean useProvider) throws Exception {
-		if(domain.getRows() != null && domain.getRows() >= 1) {
-			//为了线程安全,请勿改动下面两行代码的顺序
-			PageHelper.startPage(domain.getPage(), domain.getRows());
-		}
-		List<T> list = getDao().select(domain);
-		long total = list instanceof Page ? ( (Page) list).getTotal() : list.size();
-        List results = useProvider ? ValueProviderUtils.buildDataByProvider(domain, list) : list;
-		return new EasyuiPageOutput(total, results);
 	}
 
 	@Override

@@ -16,6 +16,7 @@ import java.util.Date;
  */
 @Table(name = "`biz_number_rule`")
 public interface BizNumberRuleDomain extends BizNumberRule, IBaseDomain, IMybatisForceParams {
+    @Override
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "`id`")
@@ -23,6 +24,7 @@ public interface BizNumberRuleDomain extends BizNumberRule, IBaseDomain, IMybati
     @EditMode(editor = FieldEditor.Number, required = true)
     Long getId();
 
+    @Override
     void setId(Long id);
 
     @Column(name = "`name`")

@@ -34,6 +34,7 @@ public interface ScheduleJob extends IBaseDomain, IMybatisForceParams {
 //    //同步
 //    public static final Integer CONCURRENT_NOT = 0;
 
+    @Override
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "`id`")
@@ -41,6 +42,7 @@ public interface ScheduleJob extends IBaseDomain, IMybatisForceParams {
     @EditMode(editor = FieldEditor.Number, required = true)
     Long getId();
 
+    @Override
     void setId(Long id);
 
     @Column(name = "`created`")
