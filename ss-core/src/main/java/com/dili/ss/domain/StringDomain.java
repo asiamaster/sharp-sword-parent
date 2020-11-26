@@ -7,4 +7,12 @@ import com.dili.ss.dto.IStringDomain;
  */
 public class StringDomain extends Domain<String> implements IStringDomain {
 
+    @Override
+    public String getId() {
+        return id;
+    }
+    @Override
+    public void setId(String id) {
+        this.id = id;
+    }
 }

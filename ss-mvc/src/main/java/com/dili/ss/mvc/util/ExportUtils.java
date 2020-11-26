@@ -54,6 +54,8 @@ public class ExportUtils {
     private static final String HEADER_FIELD = "field";
     private static final String HEADER_TYPE = "type";
     private static final String HEADER_FORMAT = "format";
+    private static final String HEADER_EXPORT = "export";
+    private static final String HEADER_TITLE = "title";
 
     /**
      * 表单参数
@@ -287,8 +289,12 @@ public class ExportUtils {
             //迭代列头
             for (int j = 0; j < headerSize; j++) {
                 Map<String, Object> headerMap = headers.get(j);
+                Boolean export = (Boolean)headerMap.get(HEADER_EXPORT);
+                if(export != null && !export){
+                    continue;
+                }
                 //隐藏的列不导出
-                if (headerMap.get(HEADER_HIDDEN) != null && headerMap.get(HEADER_HIDDEN).equals(true)) {
+                if (headerMap.get(HEADER_HIDDEN) != null && headerMap.get(HEADER_HIDDEN).equals(true) && (export == null || !export)) {
                     continue;
                 }
                 String field = (String) headerMap.get(HEADER_FIELD);
@@ -457,16 +463,20 @@ public class ExportUtils {
 //            for (int j = 0; j < rowColumns.size(); j++) {
                 //列头信息
                 Map<String, Object> columnMap = it.next();
+                Boolean export = (Boolean)columnMap.get(HEADER_EXPORT);
+                if(export != null && !export){
+                    continue;
+                }
                 //隐藏的列不导出
-                if (columnMap.get("hidden") != null && columnMap.get("hidden").equals(true)) {
+                if (columnMap.get(HEADER_HIDDEN) != null && columnMap.get(HEADER_HIDDEN).equals(true) && (export == null || !export)) {
                     it.remove();
                     continue;
                 }
-                if (columnMap.get("title") == null) {
+                if (columnMap.get(HEADER_TITLE) == null) {
                     it.remove();
                     continue;
                 }
-                String headerTitle = columnMap.get("title").toString().replaceAll("\\n", "").trim();
+                String headerTitle = columnMap.get(HEADER_TITLE).toString().replaceAll("\\n", "").trim();
                 //最后一行的列头，适应宽度
                 if (i == exportParam.getColumns().size() - 1) {
                     sheet.setColumnWidth(columnIndex, headerTitle.getBytes().length * 2 * 256);
