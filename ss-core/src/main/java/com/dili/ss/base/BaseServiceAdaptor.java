@@ -245,18 +245,18 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public int saveOrUpdate(T t) {
-		Long id = 0L;
+		KEY id = null;
 		if (t instanceof IBaseDomain) {
-			id = ((IBaseDomain) t).getId();
+			id = (KEY)((IBaseDomain) t).getId();
 		} else {
 			try {
 				Class<?> clz = t.getClass();
-				id = (Long) clz.getMethod("getId").invoke(t);
+				id = (KEY) clz.getMethod("getId").invoke(t);
 			} catch (Exception e) {
 				LOGGER.warn("获取对象主键值失败!");
 			}
 		}
-		if(id != null && id > 0) {
+		if(id != null) {
 			return this.update(t);
 		}
 		return this.insert(t);
@@ -265,18 +265,18 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public int saveOrUpdateSelective(T t) {
-		Long id = 0L;
+		KEY id = null;
 		if (t instanceof IBaseDomain) {
-			id = ((IBaseDomain) t).getId();
+			id = (KEY)((IBaseDomain) t).getId();
 		} else {
 			try {
 				Class<?> clz = t.getClass();
-				id = (Long) clz.getMethod("getId").invoke(t);
+				id = (KEY) clz.getMethod("getId").invoke(t);
 			} catch (Exception e) {
 				LOGGER.warn("获取对象主键值失败!");
 			}
 		}
-		if(id != null && id > 0) {
+		if(id != null) {
 			return this.updateSelective(t);
 		}
 		return this.insertSelective(t);
