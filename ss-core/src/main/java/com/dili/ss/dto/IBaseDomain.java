@@ -5,6 +5,4 @@ package com.dili.ss.dto;
  */
 public interface IBaseDomain extends IDomain<Long> {
 
-
-
 }
