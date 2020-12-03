@@ -1,10 +1,12 @@
 package com.dili.ss.activiti.boot;
 
+import com.dili.ss.activiti.component.CustomCallActivityXMLConverter;
 import com.dili.ss.activiti.component.CustomProcessDiagramGenerator;
 import com.dili.ss.activiti.consts.ActivitiConstants;
 import com.dili.ss.activiti.listener.GlobalActivitiEventListener;
 import com.dili.ss.activiti.util.ImageGenerator;
 import com.dili.ss.gid.generator.GSN;
+import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.image.ProcessDiagramGenerator;
@@ -59,6 +61,7 @@ public class ActivitiConfig implements ProcessEngineConfigurationConfigurer {
         activitiEventListener.add(globalActivitiEventListener);//配置全局监听器
         springProcessEngineConfiguration.setEventListeners(activitiEventListener);
         springProcessEngineConfiguration.setTransactionManager(platformTransactionManager);
+        BpmnXMLConverter.addConverter(new CustomCallActivityXMLConverter());
     }
 
 }

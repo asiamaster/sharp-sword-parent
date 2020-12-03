@@ -11,12 +11,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
 /**
+ * 业务号事件监听器
  * 解决创建子流程时，businesskey 不传递。
- * @author: WM
- * @time: 2020/10/22 15:42
- */
-/**
- * 解决创建子流程时，businesskey 不传递。
+ * 需要在流程事件监听器中配置事件:PROCESS_STARTED, 委托表达式:${businessKeyInjectionActivitiEventListener}，类型:process-instance
  * @author: WM
  * @time: 2020/10/22 15:42
  */
