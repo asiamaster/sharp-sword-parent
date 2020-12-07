@@ -237,6 +237,9 @@ public class ExportUtils {
             try {
                 for (Future<JSONArray> future : futures) {
                     JSONArray rowDatas = future.get();
+                    if(rowDatas == null){
+                        continue;
+                    }
                     buildSingleData(workbook, current++, exportParam.getColumns(), rowDatas, sheet);
                 }
             } catch (InterruptedException e) {
