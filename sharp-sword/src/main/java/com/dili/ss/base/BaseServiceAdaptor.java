@@ -9,10 +9,7 @@ import com.dili.ss.domain.annotation.FindInSet;
 import com.dili.ss.domain.annotation.Like;
 import com.dili.ss.domain.annotation.Operator;
 import com.dili.ss.domain.annotation.SqlOperator;
-import com.dili.ss.dto.DTOUtils;
-import com.dili.ss.dto.IBaseDomain;
-import com.dili.ss.dto.IDTO;
-import com.dili.ss.dto.IMybatisForceParams;
+import com.dili.ss.dto.*;
 import com.dili.ss.exception.ParamErrorException;
 import com.dili.ss.metadata.ValueProviderUtils;
 import com.dili.ss.util.DateUtils;
@@ -47,9 +44,8 @@ import java.util.regex.Pattern;
  * @author asiamastor
  * @date 2016/12/28
  */
-public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Serializable> implements BaseService<T, KEY> {
+public abstract class BaseServiceAdaptor<T extends IDomain, KEY extends Serializable> implements BaseService<T, KEY> {
 	protected static final Logger LOGGER = LoggerFactory.getLogger(BaseServiceAdaptor.class);
-
 
 	/**
 	 * 如果不使用通用mapper，可以自行在子类覆盖getDao方法
@@ -438,6 +434,31 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 		return result;
 	}
 
+	@Override
+	public List<T> selectByExample(Object example){
+		return getDao().selectByExample(example);
+	}
+
+	@Override
+	public boolean existsWithPrimaryKey(KEY key){
+		return getDao().existsWithPrimaryKey(key);
+	}
+
+	@Override
+	public int insertExact(T t){
+		return getDao().insertExact(t);
+	}
+
+	@Override
+	public int insertExactSimple(T t){
+		try {
+			buildExactDomain(t, "insertForceParams");
+		} catch (Exception e) {
+			LOGGER.error(e.getLocalizedMessage());
+		}
+		return getDao().insertExact(t);
+	}
+
 	/**
 	 * 用于支持like, order by 的easyui分页查询
 	 * @param domain
@@ -466,31 +487,6 @@ public abstract class BaseServiceAdaptor<T extends IBaseDomain, KEY extends Seri
 		long total = list instanceof Page ? ( (Page) list).getTotal() : list.size();
 		List results = useProvider ? ValueProviderUtils.buildDataByProvider(domain, list) : list;
 		return new EasyuiPageOutput(total, results);
-	}
-
-	@Override
-	public List<T> selectByExample(Object example){
-		return getDao().selectByExample(example);
-	}
-
-	@Override
-	public boolean existsWithPrimaryKey(KEY key){
-		return getDao().existsWithPrimaryKey(key);
-	}
-
-	@Override
-	public int insertExact(T t){
-		return getDao().insertExact(t);
-	}
-
-	@Override
-	public int insertExactSimple(T t){
-		try {
-			buildExactDomain(t, "insertForceParams");
-		} catch (Exception e) {
-			LOGGER.error(e.getLocalizedMessage());
-		}
-		return getDao().insertExact(t);
 	}
 
 	//========================================= 私有方法分界线 =========================================

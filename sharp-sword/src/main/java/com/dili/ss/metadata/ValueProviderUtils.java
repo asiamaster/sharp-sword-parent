@@ -2,10 +2,9 @@ package com.dili.ss.metadata;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
-import com.dili.ss.domain.BaseDomain;
 import com.dili.ss.dto.DTOUtils;
-import com.dili.ss.dto.IBaseDomain;
 import com.dili.ss.dto.IDTO;
+import com.dili.ss.dto.IDomain;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.POJOUtils;
 import com.dili.ss.util.SpringUtil;
@@ -44,7 +43,7 @@ public class ValueProviderUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static <T extends IBaseDomain> List<Map> buildDataByProvider(T domain, List list) throws Exception {
+	public static <T extends IDomain> List<Map> buildDataByProvider(T domain, List list) throws Exception {
 		Map metadata = null;
 		if (DTOUtils.isProxy(domain) || DTOUtils.isInstance(domain)) {
 			metadata = domain.mget();
@@ -63,7 +62,7 @@ public class ValueProviderUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static <T extends BaseDomain> List<Map> buildDataByProvider(Map medadata, List list) throws Exception {
+	public static <T extends IDomain> List<Map> buildDataByProvider(Map medadata, List list) throws Exception {
 		return buildDataByProvider(medadata, list, null);
 	}
 
@@ -76,7 +75,7 @@ public class ValueProviderUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static <T extends BaseDomain> List<Map> buildDataByProvider(Map medadata, List list, ObjectMeta objectMeta) throws Exception {
+	public static <T extends IDomain> List<Map> buildDataByProvider(Map medadata, List list, ObjectMeta objectMeta) throws Exception {
 		if(medadata == null){
 			medadata = Maps.newHashMap();
 		}
