@@ -43,7 +43,7 @@ public class OkHttpUtils {
     }
 
     /**
-     * 异步GET
+     * GET, 异步
      * @param url
      * @param paramsMap
      * @param headersMap
@@ -51,7 +51,7 @@ public class OkHttpUtils {
      * @return
      * @throws Exception
      */
-    public static void getAsync(String url, Map<String, String> paramsMap, Map<String, String> headersMap, Object tag, Callback callback) throws Exception {
+    public static void getAsync(String url, Map<String, String> paramsMap, Map<String, String> headersMap, Object tag, Callback callback) {
         Request request = new Request.Builder()
                 .url(appendParams(url, paramsMap))
                 .get()
@@ -112,6 +112,25 @@ public class OkHttpUtils {
     }
 
     /**
+     * POST 表单参数，异步
+     * @param url
+     * @param paramsMap
+     * @param headersMap
+     * @param tag
+     * @return
+     * @throws Exception
+     */
+    public static void postFormParametersAsync(String url, Map<String, String> paramsMap, Map<String, String> headersMap, Object tag, Callback callback) {
+        Request request = new Request.Builder()
+                .url(url)
+                .tag(tag)
+                .post(buildFormParams(paramsMap))
+                .headers(buildHeaders(headersMap))
+                .build();
+        okHttpClient.newCall(request).enqueue(callback);
+    }
+
+    /**
      * POST Body String参数
      * @param url
      * @param postBody
@@ -134,6 +153,25 @@ public class OkHttpUtils {
             }
             return response.body().string();
         }
+    }
+
+    /**
+     * POST Body String参数，异步
+     * @param url
+     * @param postBody
+     * @param headersMap
+     * @param tag
+     * @return
+     * @throws Exception
+     */
+    public static void postBodyStringAsync(String url, String postBody, Map<String, String> headersMap, Object tag, Callback callback) {
+        Request request = new Request.Builder()
+                .url(url)
+                .tag(tag)
+                .headers(buildHeaders(headersMap))
+                .post(RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postBody))
+                .build();
+        okHttpClient.newCall(request).enqueue(callback);
     }
 
     /**
@@ -237,7 +275,7 @@ public class OkHttpUtils {
      * @return
      */
     protected static Headers buildHeaders(Map<String, String> headersParams) {
-        Headers.Builder headersBuilder = new Headers.Builder();
+        okhttp3.Headers.Builder headersBuilder = new okhttp3.Headers.Builder();
         if (headersParams != null) {
             Iterator<String> iterator = headersParams.keySet().iterator();
             String key = "";
@@ -310,5 +348,32 @@ public class OkHttpUtils {
         return result;
     }
 
+//    public static void main(String[] args) throws Exception {
+//        String getUrl = "http://bpmc.diligrp.com:8617/api/runtime/listHistoricProcessInstance?processInstanceId=202012071449520760000000";
+//        OkHttpUtils.postFormParametersAsync(getUrl, null, null,  "test", new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//                System.out.println("failure...");
+//                e.printStackTrace();
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException {
+//                try (ResponseBody responseBody = response.body()) {
+//                    if (!response.isSuccessful()) {
+//                        throw new IOException("Unexpected code " + response);
+//                    }
+//                    Headers responseHeaders = response.headers();
+//                    for (int i = 0, size = responseHeaders.size(); i < size; i++) {
+//                        System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
+//                    }
+//                    System.out.println(responseBody.string());
+//                }
+//            }
+//        });
+//        Thread.sleep(1000L);
+//        OkHttpUtils.cancelTag("test");
+//        System.out.println("over");
+//    }
 
 }
