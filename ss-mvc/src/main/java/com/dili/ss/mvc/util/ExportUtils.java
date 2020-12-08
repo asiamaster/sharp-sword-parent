@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dili.ss.domain.ExportParam;
 import com.dili.ss.domain.TableHeader;
+import com.dili.ss.exception.AppException;
 import com.dili.ss.java.B;
 import com.dili.ss.metadata.ValueProvider;
 import com.dili.ss.util.BeanConver;
@@ -418,6 +419,11 @@ public class ExportUtils {
         queryParams.put("page", "1");
         queryParams.put("rows", "1");
         String json = syncExecute(url, contentType, queryParams, "POST", request);
+        if(json == null){
+            String exMsg = String.format("远程访问异常, url:%s, contentType:%s, queryParams:%s", url, contentType, queryParams);
+            log.error(exMsg);
+            throw new AppException(exMsg);
+        }
         //简单判断是JSONArray的话，就是不分页的list查询，总数直接取JSONArray的长度
         if (json.trim().startsWith("[") && json.trim().endsWith("]")) {
             return JSON.parseArray(json).size();
