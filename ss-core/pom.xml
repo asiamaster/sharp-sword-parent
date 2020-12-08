@@ -186,12 +186,21 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.70</version>
         </dependency>
-        <!-- okhttp -->
+        <!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>3.14.4</version>
+            <version>4.9.0</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.zhy/okhttputils -->
+        <!-- this artifact is located at Spring Plugins repository (https://repo.spring.io/plugins-release/) -->
+<!--        <dependency>-->
+<!--            <groupId>com.zhy</groupId>-->
+<!--            <artifactId>okhttputils</artifactId>-->
+<!--            <version>2.6.2</version>-->
+<!--        </dependency>-->
+
         <!-- https://mvnrepository.com/artifact/cglib/cglib -->
         <dependency>
             <groupId>cglib</groupId>

@@ -3,7 +3,6 @@ package com.dili.ss.mvc.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.dili.http.okhttp.OkHttpUtils;
 import com.dili.ss.domain.ExportParam;
 import com.dili.ss.domain.TableHeader;
 import com.dili.ss.java.B;
@@ -11,9 +10,6 @@ import com.dili.ss.metadata.ValueProvider;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.IExportThreadPoolExecutor;
 import com.dili.ss.util.SpringUtil;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.ss.usermodel.*;
@@ -48,7 +44,7 @@ public class ExportUtils {
 
     //每次去后台获取条数
     private final static int FETCH_COUNT = 20000;
-    private OkHttpClient okHttpClient = null;
+
     private static final String HEADER_HIDDEN = "hidden";
     private static final String HEADER_PROVIDER = "provider";
     private static final String HEADER_FIELD = "field";
@@ -75,12 +71,6 @@ public class ExportUtils {
 
     @PostConstruct
     public void init() {
-        okHttpClient = new OkHttpClient.Builder()
-                .connectTimeout(10000L, TimeUnit.MILLISECONDS)
-                .readTimeout(10000L, TimeUnit.MILLISECONDS)
-                //其他配置
-                .build();
-        OkHttpUtils.initClient(okHttpClient);
         try {
             executor = ((Class<IExportThreadPoolExecutor>) B.b.g("threadPoolExecutor")).newInstance().getCustomThreadPoolExecutor();
         } catch (Exception e) {
@@ -508,122 +498,80 @@ public class ExportUtils {
      * 同步调用远程方法
      *
      * @param url
-     * @param paramObj
+     * @param queryParams
      * @param httpMethod
      * @param contentType
      * @param request     为了数据权限
      * @return
      */
-    private String syncExecute(String url, String contentType, Object paramObj, String httpMethod, HttpServletRequest request) {
-        Response resp = null;
+    private String syncExecute(String url, String contentType, Map<String, String> queryParams, String httpMethod, HttpServletRequest request) {
         try {
             Map<String, String> headersMap = new HashMap<>();
 //            headersMap.put("Content-Type", "application/json;charset=utf-8");
 //	            传入权限的SessionConstants.SESSION_ID(值为SessionId，需要注意和权限系统同步，毕竟框架不依赖权限系统)
             if (request != null) {
                 Enumeration<String> enumeration = request.getHeaderNames();
-//		            param.put("SessionId", request.getHeader("SessionId"));
                 while (enumeration.hasMoreElements()) {
                     String key = enumeration.nextElement();
                     if ("Accept-Encoding".equalsIgnoreCase(key.trim())) {
                         continue;
-                        //解决nginx不用完整路径，用header中的Host的问题，可能导致导出器使用错误的host路径
+                        //解决nginx不用完整路径，用header中的Host的问题，可能导致导出器使用错误的host路径，这时取消Host Header
                     } else if ("Host".equalsIgnoreCase(key.trim())) {
                         continue;
                     }
                     headersMap.put(key, request.getHeader(key));
                 }
             }
-
             if ("POST".equalsIgnoreCase(httpMethod)) {
-                JSONObject paramJo = (JSONObject) JSONObject.toJSON(paramObj);
-//                FormBody.Builder builder = new FormBody.Builder();
-//                if (jo!=null&&!jo.isEmpty()){
-//                    for(Map.Entry<String,Object> entry:jo.entrySet()){
-//                        String value = entry.getValue() == null ? null : entry.getValue().toString();
-//                        builder.add(entry.getKey(),value);
-//                    }
-//                }
-//                RequestBody requestBody = builder.build();
-//                String json = paramObj instanceof String ? (String)paramObj : JSON.toJSONString(paramObj);
-
+                JSONObject paramJo = (JSONObject) JSONObject.toJSON(queryParams);
                 if (StringUtils.isBlank(contentType) || contentType.indexOf(CONTENT_TYPE_FORM) >= 0) {
                     //构建查询参数，主要是为了处理metadata信息以及其它类型的值转为String
-                    Map<String, String> param = new HashMap<>();
-                    if (paramJo != null && !paramJo.isEmpty()) {
-                        for (Map.Entry<String, Object> entry : paramJo.entrySet()) {
-                            if (entry.getValue() instanceof JSONObject) {
-                                JSONObject valueJo = (JSONObject) entry.getValue();
-                                //解决spring mvc参数注入@ModelAttribute Domain domain时，metadata作为Map类型的注入问题
-                                for (Map.Entry<String, Object> tmpEntry : valueJo.entrySet()) {
-                                    if (tmpEntry.getValue() == null) {
-                                        continue;
-                                    }
-                                    param.put(entry.getKey() + "[" + tmpEntry.getKey() + "]", tmpEntry.getValue().toString());
-                                }
-                            } else {
-                                //避免为空(null)的值(value)在okhttp调用时报错，这里就不传入了
-                                if (entry.getValue() == null) {
-                                    continue;
-                                }
-//                            String value = entry.getValue() == null ? null : entry.getValue().toString();
-                                param.put(entry.getKey(), entry.getValue().toString());
-                            }
-                        }
-                    }
-                    resp = OkHttpUtils
-                            .post().headers(headersMap)
-                            .url(url).params(param)
-//                        .mediaType(MediaType.parse("application/json; charset=utf-8"))
-//                            .mediaType(MediaType.parse("application/x-www-form-urlencoded; charset=UTF-8"))
-                            .build()
-                            //3小时过期
-                            .connTimeOut(1000L * 60L * 60L * 3)
-                            .readTimeOut(1000L * 60L * 60L * 3)
-                            .writeTimeOut(1000L * 60L * 60L * 3)
-                            .execute();
+                    Map<String, String> param = buildMetadataParams(paramJo);
+//                  MediaType.parse("application/x-www-form-urlencoded; charset=UTF-8")
+                    return com.dili.ss.mvc.util.OkHttpUtils.postFormParameters(url, param, headersMap, null);
                 } else if (contentType.indexOf(CONTENT_TYPE_JSON) >= 0) {
-                    resp = OkHttpUtils
-                            .postString().headers(headersMap)
-                            .url(url).content(paramJo.toJSONString())
-                            .mediaType(MediaType.parse("application/json; charset=utf-8"))
-//                        .mediaType(MediaType.parse("application/x-www-form-urlencoded; charset=UTF-8"))
-                            .build()
-                            //3小时过期
-                            .connTimeOut(1000L * 60L * 60L * 3)
-                            .readTimeOut(1000L * 60L * 60L * 3)
-                            .writeTimeOut(1000L * 60L * 60L * 3)
-                            .execute();
+                    return com.dili.ss.mvc.util.OkHttpUtils.postBodyString(url, paramJo.toJSONString(), headersMap, null);
                 } else {
                     log.error(String.format("不支持的contentType[%s]", contentType));
                     return null;
                 }
-            } else { //GET方式
-                resp = OkHttpUtils
-                        .get().headers(headersMap)
-                        .url(url).params((Map) JSON.toJSON(paramObj))
-                        .build()
-                        //3小时过期
-                        .connTimeOut(1000L * 60L * 60L * 3)
-                        .readTimeOut(1000L * 60L * 60L * 3)
-                        .writeTimeOut(1000L * 60L * 60L * 3)
-                        .execute();
-            }
-            if (resp.isSuccessful()) {
-                log.info(String.format("远程调用[%s]成功,code:[%s]", url, resp.code()));
-                return resp.body().string();
-//                String retVal = new String(resp.body().bytes(), "UTF-8");
-//                log.info("==============================================================");
-//	            log.info("远程调用结果:"+retVal);
-//                log.info("==============================================================");
-            } else {
-                log.error(String.format("远程调用[" + url + "]发生失败,code:[%s], message:[%s]", resp.code(), resp.message()));
-                return resp.body().string();
+            } else { //GET方式, 不支持metadata转换
+                return com.dili.ss.mvc.util.OkHttpUtils.get(url, queryParams, null, null);
             }
         } catch (Exception e) {
             log.error(String.format("远程调用[" + url + "]发生异常,message:[%s]", e.getMessage()), e);
+            return null;
         }
-        return null;
+    }
+
+    /**
+     * 构建查询参数，主要是为了处理metadata信息以及其它类型的值转为String
+     * @param paramJo
+     * @return
+     */
+    private Map<String, String> buildMetadataParams(JSONObject paramJo){
+        Map<String, String> param = new HashMap<>();
+        if (paramJo != null && !paramJo.isEmpty()) {
+            for (Map.Entry<String, Object> entry : paramJo.entrySet()) {
+                if (entry.getValue() instanceof JSONObject) {
+                    JSONObject valueJo = (JSONObject) entry.getValue();
+                    //解决spring mvc参数注入@ModelAttribute Domain domain时，metadata作为Map类型的注入问题
+                    for (Map.Entry<String, Object> tmpEntry : valueJo.entrySet()) {
+                        if (tmpEntry.getValue() == null) {
+                            continue;
+                        }
+                        param.put(entry.getKey() + "[" + tmpEntry.getKey() + "]", tmpEntry.getValue().toString());
+                    }
+                } else {
+                    //避免为空(null)的值(value)在okhttp调用时报错，这里就不传入了
+                    if (entry.getValue() == null) {
+                        continue;
+                    }
+                    param.put(entry.getKey(), entry.getValue().toString());
+                }
+            }
+        }
+        return param;
     }
 
     /**
@@ -645,13 +593,6 @@ public class ExportUtils {
                 OutputStream out = response.getOutputStream();
                 workbook.write(out);
                 out.close();
-//                    OutputStream out = response.getOutputStream();
-//                    response.reset();
-//                    response.setHeader("Content-disposition", "attachment; filename=details.xls");
-//                    response.setContentType("application/msexcel");
-//                    workbook.write(out);
-//                    out.close();
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
