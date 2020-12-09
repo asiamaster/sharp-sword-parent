@@ -26,8 +26,8 @@ public interface ValueProvider {
     String INDEX_KEY = "index";
     //提供者bean id
     String PROVIDER_KEY = "provider";
-    //列表查询参数key(需要手动设置， DTO是mset, BEAN是setMetadata)
-    String GRID_QUERY_PARAMS_KEY = "gridQueryParams";
+    //额外参数key(如列表查询参数，需要手动设置， DTO是mset, BEAN是setMetadata)
+    String EXTRA_PARAMS_KEY = "_extraParams";
     /**
      * 取下拉列表的选项
      * @param val 值对象

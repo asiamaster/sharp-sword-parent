@@ -83,11 +83,19 @@ public class ValueProviderUtils {
 		if (medadata.isEmpty()) {
 			return list;
 		}
+		//额外参数
+		Object extraParam = null;
+		//额外参数需要放到每一个provider对象中，这里先存起来
+		if(medadata.containsKey(ValueProvider.EXTRA_PARAMS_KEY)){
+			extraParam = medadata.get(ValueProvider.EXTRA_PARAMS_KEY);
+			medadata.remove(ValueProvider.EXTRA_PARAMS_KEY);
+		}
 		//复制一个出来，避免修改，这里用putAll进行简单的深拷贝就行了，因为只是删除元素进行性能优化
 		Map metadataCopy = new HashMap(medadata.size());
 		metadataCopy.putAll(medadata);
 //		构建metadata的字符串value
 		convertStringProvider(metadataCopy);
+
 		//将map.entrySet()转换成list，并进行排序
 		List<Map.Entry<String, Object>> metadataCopyList = sortedMetadataCopyList(metadataCopy);
 
@@ -96,7 +104,7 @@ public class ValueProviderUtils {
 		for (Object t : list) {
 			results.add(BeanConver.transformObjectToMap(t));
 		}
-		buildResultsByProvider(results, metadataCopyList, objectMeta);
+		buildResultsByProvider(results, metadataCopyList, objectMeta, extraParam);
 		return results;
 	}
 
@@ -125,8 +133,9 @@ public class ValueProviderUtils {
 	 * @param results
 	 * @param metadataCopyList
 	 * @param objectMeta
+	 * @param extraParam
 	 */
-	private static void buildResultsByProvider(List<Map> results, List<Map.Entry<String, Object>> metadataCopyList, ObjectMeta objectMeta){
+	private static void buildResultsByProvider(List<Map> results, List<Map.Entry<String, Object>> metadataCopyList, ObjectMeta objectMeta, Object extraParam){
 		Iterator<Map.Entry<String, Object>> metaCopyIt = metadataCopyList.iterator();
 		while(metaCopyIt.hasNext()){
 			Map.Entry<String, Object> entry = metaCopyIt.next();
@@ -143,6 +152,9 @@ public class ValueProviderUtils {
 			//meatadata放入当前行的数据
 			if(jsonValue.get(ValueProvider.FIELD_KEY) == null){
 				jsonValue.put(ValueProvider.FIELD_KEY, key) ;
+			}
+			if(extraParam != null){
+				jsonValue.put(ValueProvider.EXTRA_PARAMS_KEY, extraParam);
 			}
 			String providerBeanId = jsonValue.get("provider").toString();
 			Object bean = SpringUtil.getBean(providerBeanId);
@@ -393,13 +405,18 @@ public class ValueProviderUtils {
 		while(it.hasNext()){
 			Map.Entry<String, Object> entry = it.next();
 			if(!isJson(entry.getValue().toString())){
-				if(entry.getKey().equals(IDTO.NULL_VALUE_FIELD) || entry.getKey().equals(IDTO.AND_CONDITION_EXPR) || entry.getKey().equals(IDTO.OR_CONDITION_EXPR)){
+				if(entry.getKey().equals(IDTO.NULL_VALUE_FIELD)
+						|| entry.getKey().equals(IDTO.AND_CONDITION_EXPR)
+						|| entry.getKey().equals(IDTO.OR_CONDITION_EXPR)
+						|| entry.getKey().equals(ValueProvider.EXTRA_PARAMS_KEY)){
 					continue;
 				}
 				Map<String, Object> value = Maps.newHashMap();
 				value.put(ValueProvider.PROVIDER_KEY, entry.getValue());
 				value.put(ValueProvider.FIELD_KEY, entry.getKey());
 				value.put(ValueProvider.INDEX_KEY, 0);
+				//每一个provider添加额外参数
+				value.put(ValueProvider.EXTRA_PARAMS_KEY, medadata.get(ValueProvider.EXTRA_PARAMS_KEY));
 				entry.setValue(value);
 			}
 		}
