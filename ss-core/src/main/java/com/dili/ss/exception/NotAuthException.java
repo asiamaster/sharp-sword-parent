@@ -4,6 +4,8 @@
  */
 package com.dili.ss.exception;
 
+import com.dili.ss.constant.ResultCode;
+
 /**
  * NotAuthException
  * @author asiamastor
@@ -13,18 +15,23 @@ public class NotAuthException extends AppException{
 	private static final long serialVersionUID = 987123460090011111L;
 	public NotAuthException() {
 		super();
+		this.message = "未授权错误!";
+		this.code = ResultCode.NOT_AUTH_ERROR;
 	}
 	
 	public NotAuthException(String message) {
 		super(message);
+		this.code = ResultCode.NOT_AUTH_ERROR;
 	}
 	
 	public NotAuthException(String message, Throwable cause) {
 		super(message, cause);
+		this.code = ResultCode.NOT_AUTH_ERROR;
 	}
 	
 	public NotAuthException(Throwable cause) {
 		super(cause);
+		this.code = ResultCode.NOT_AUTH_ERROR;
 	}
 	
     public NotAuthException(String code, String errorData, String message) {

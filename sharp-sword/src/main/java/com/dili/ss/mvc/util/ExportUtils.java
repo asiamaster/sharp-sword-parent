@@ -10,6 +10,7 @@ import com.dili.ss.java.B;
 import com.dili.ss.metadata.ValueProvider;
 import com.dili.ss.util.BeanConver;
 import com.dili.ss.util.IExportThreadPoolExecutor;
+import com.dili.ss.util.OkHttpUtils;
 import com.dili.ss.util.SpringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
@@ -534,15 +535,15 @@ public class ExportUtils {
                     //构建查询参数，主要是为了处理metadata信息以及其它类型的值转为String
                     Map<String, String> param = buildMetadataParams(paramJo);
 //                  MediaType.parse("application/x-www-form-urlencoded; charset=UTF-8")
-                    return com.dili.ss.mvc.util.OkHttpUtils.postFormParameters(url, param, headersMap, null);
+                    return OkHttpUtils.postFormParameters(url, param, headersMap, null);
                 } else if (contentType.indexOf(CONTENT_TYPE_JSON) >= 0) {
-                    return com.dili.ss.mvc.util.OkHttpUtils.postBodyString(url, paramJo.toJSONString(), headersMap, null);
+                    return OkHttpUtils.postBodyString(url, paramJo.toJSONString(), headersMap, null);
                 } else {
                     log.error(String.format("不支持的contentType[%s]", contentType));
                     return null;
                 }
             } else { //GET方式, 不支持metadata转换
-                return com.dili.ss.mvc.util.OkHttpUtils.get(url, queryParams, null, null);
+                return OkHttpUtils.get(url, queryParams, null, null);
             }
         } catch (Exception e) {
             log.error(String.format("远程调用[" + url + "]发生异常,message:[%s]", e.getMessage()), e);

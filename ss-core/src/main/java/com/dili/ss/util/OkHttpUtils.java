@@ -1,4 +1,4 @@
-package com.dili.ss.mvc.util;
+package com.dili.ss.util;
 
 import okhttp3.*;
 import org.slf4j.Logger;
@@ -21,6 +21,7 @@ public class OkHttpUtils {
 
     public final static Logger log = LoggerFactory.getLogger(OkHttpUtils.class);
     private static OkHttpClient okHttpClient = null;
+    private static final String EX_STRING_FORMAT = "远程调用失败, URL:[%s],参数:[%s],code:[%s],消息:[%s]";
 
     static{
         //初始化okHttpClient
@@ -68,9 +69,9 @@ public class OkHttpUtils {
      * @param headersMap
      * @param tag
      * @return
-     * @throws Exception
+     * @throws IOException
      */
-    public static String get(String url, Map<String, String> paramsMap, Map<String, String> headersMap, Object tag) throws Exception {
+    public static String get(String url, Map<String, String> paramsMap, Map<String, String> headersMap, Object tag) throws IOException {
         Request request = new Request.Builder()
                 .url(appendParams(url, paramsMap))
                 .get()
@@ -79,8 +80,7 @@ public class OkHttpUtils {
                 .build();
         try (Response response = okHttpClient.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                log.error(String.format("远程GET调用[" + url + "]发生失败,code:[%s], message:[%s]", response.code(), response.message()));
-                throw new IOException("Unexpected code " + response);
+                throw new IOException(String.format(EX_STRING_FORMAT, url, paramsMap, response.code(), response.message()));
             }
             return response.body().string();
         }
@@ -93,9 +93,9 @@ public class OkHttpUtils {
      * @param headersMap
      * @param tag
      * @return
-     * @throws Exception
+     * @throws IOException
      */
-    public static String postFormParameters(String url, Map<String, String> paramsMap, Map<String, String> headersMap, Object tag) throws Exception {
+    public static String postFormParameters(String url, Map<String, String> paramsMap, Map<String, String> headersMap, Object tag) throws IOException {
         Request request = new Request.Builder()
                 .url(url)
                 .tag(tag)
@@ -104,8 +104,7 @@ public class OkHttpUtils {
                 .build();
         try (Response response = okHttpClient.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                log.error(String.format("远程POST调用[" + url + "]发生失败,code:[%s], message:[%s]", response.code(), response.message()));
-                throw new IOException("Unexpected code " + response);
+                throw new IOException(String.format(EX_STRING_FORMAT, url, paramsMap, response.code(), response.message()));
             }
             return response.body().string();
         }
@@ -137,9 +136,9 @@ public class OkHttpUtils {
      * @param headersMap
      * @param tag
      * @return
-     * @throws Exception
+     * @throws IOException
      */
-    public static String postBodyString(String url, String postBody, Map<String, String> headersMap, Object tag) throws Exception {
+    public static String postBodyString(String url, String postBody, Map<String, String> headersMap, Object tag) throws IOException {
         Request request = new Request.Builder()
                 .url(url)
                 .tag(tag)
@@ -148,8 +147,7 @@ public class OkHttpUtils {
                 .build();
         try (Response response = okHttpClient.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                log.error(String.format("远程POST调用[" + url + "]发生失败,code:[%s], message:[%s]", response.code(), response.message()));
-                throw new IOException("Unexpected code " + response);
+                throw new IOException(String.format(EX_STRING_FORMAT, url, postBody, response.code(), response.message()));
             }
             return response.body().string();
         }
@@ -162,7 +160,6 @@ public class OkHttpUtils {
      * @param headersMap
      * @param tag
      * @return
-     * @throws Exception
      */
     public static void postBodyStringAsync(String url, String postBody, Map<String, String> headersMap, Object tag, Callback callback) {
         Request request = new Request.Builder()
@@ -275,7 +272,7 @@ public class OkHttpUtils {
      * @return
      */
     protected static Headers buildHeaders(Map<String, String> headersParams) {
-        okhttp3.Headers.Builder headersBuilder = new okhttp3.Headers.Builder();
+        Headers.Builder headersBuilder = new Headers.Builder();
         if (headersParams != null) {
             Iterator<String> iterator = headersParams.keySet().iterator();
             String key = "";

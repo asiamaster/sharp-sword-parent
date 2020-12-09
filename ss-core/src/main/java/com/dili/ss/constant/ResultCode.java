@@ -140,6 +140,11 @@ public class ResultCode {
     public static final String IDEMPOTENT_ERROR = "5001";
 
     /**
+     * 5002 REMOTE_ERROR: 远程调用错误
+     */
+    public static final String REMOTE_ERROR="5002";
+
+    /**
      * 6000：权限错误(未登录，数据权限不满足，功能权限不满足等错误)<br/>
      */
     public static final String NOT_AUTH_ERROR="6000";

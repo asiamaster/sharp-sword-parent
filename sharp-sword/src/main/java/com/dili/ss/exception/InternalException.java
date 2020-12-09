@@ -13,13 +13,13 @@ public class InternalException extends RuntimeException {
 	private static final String DEFAULT_MESSAGE = "程序内部错误!";
 
 	/**
-     * 异常编码
+	 * 异常编码
 	 * 默认500
 	 */
 	protected String code = ResultCode.INTERNAL_SERVER_ERROR;
 
 	/**
-     * 异常消息
+	 * 异常消息
 	 */
 	protected String message = DEFAULT_MESSAGE;
 
