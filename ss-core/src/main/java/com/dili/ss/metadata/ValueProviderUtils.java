@@ -79,6 +79,33 @@ public class ValueProviderUtils {
 		if(medadata == null){
 			medadata = Maps.newHashMap();
 		}
+		buildMetadataByObjectMeta(medadata, objectMeta);
+		if (medadata.isEmpty()) {
+			return list;
+		}
+		//复制一个出来，避免修改，这里用putAll进行简单的深拷贝就行了，因为只是删除元素进行性能优化
+		Map metadataCopy = new HashMap(medadata.size());
+		metadataCopy.putAll(medadata);
+//		构建metadata的字符串value
+		convertStringProvider(metadataCopy);
+		//将map.entrySet()转换成list，并进行排序
+		List<Map.Entry<String, Object>> metadataCopyList = sortedMetadataCopyList(metadataCopy);
+
+		//返回提供者转义后的列表
+		List<Map> results = new ArrayList<>(list.size());
+		for (Object t : list) {
+			results.add(BeanConver.transformObjectToMap(t));
+		}
+		buildResultsByProvider(results, metadataCopyList, objectMeta);
+		return results;
+	}
+
+	/**
+	 * 构建objectMeta中的metadata
+	 * @param medadata
+	 * @param objectMeta
+	 */
+	private static void buildMetadataByObjectMeta(Map medadata, ObjectMeta objectMeta){
 		if(objectMeta != null) {
 			for (FieldMeta fieldMeta : objectMeta) {
 				if (StringUtils.isNotBlank(fieldMeta.getProvider())) {
@@ -91,37 +118,18 @@ public class ValueProviderUtils {
 				}
 			}
 		}
-		if (medadata.isEmpty()) {
-			return list;
-		}
-		//复制一个出来，避免修改，这里用putAll进行简单的深拷贝就行了，因为只是删除元素进行性能优化
-		Map metadataCopy = new HashMap(medadata.size());
-		metadataCopy.putAll(medadata);
-//		构建metadata的字符串value
-		convertStringProvider(metadataCopy);
-		//将map.entrySet()转换成list，再进行排序
-		List<Map.Entry<String, Object>> metadataCopyList = new ArrayList<Map.Entry<String, Object>>(metadataCopy.entrySet());
-		Collections.sort(metadataCopyList, (o1, o2) -> {
-			try {
-				JSONObject jsonValue1 = o1.getValue() instanceof JSONObject ? (JSONObject) o1.getValue() : JSONObject.parseObject(o1.getValue().toString());
-				JSONObject jsonValue2 = o2.getValue() instanceof JSONObject ? (JSONObject) o2.getValue() : JSONObject.parseObject(o2.getValue().toString());
-				int index1 = Integer.parseInt(jsonValue1.getOrDefault(ValueProvider.INDEX_KEY, "0").toString());
-				int index2 = Integer.parseInt(jsonValue2.getOrDefault(ValueProvider.INDEX_KEY, "0").toString());
-				return index1 > index2 ? 1 : index1 < index2 ? -1 : 0;
-			} catch (JSONException e) {
-				return 0;
-			} catch (Exception e){
-				return 0;
-			}
-		});
-		//返回提供者转义后的列表
-		List<Map> results = new ArrayList<>(list.size());
-		for (Object t : list) {
-			results.add(BeanConver.transformObjectToMap(t));
-		}
-		Iterator<Map.Entry<String, Object>> it = metadataCopyList.iterator();
-		while(it.hasNext()){
-			Map.Entry<String, Object> entry = it.next();
+	}
+
+	/**
+	 * 根据provider构建结果
+	 * @param results
+	 * @param metadataCopyList
+	 * @param objectMeta
+	 */
+	private static void buildResultsByProvider(List<Map> results, List<Map.Entry<String, Object>> metadataCopyList, ObjectMeta objectMeta){
+		Iterator<Map.Entry<String, Object>> metaCopyIt = metadataCopyList.iterator();
+		while(metaCopyIt.hasNext()){
+			Map.Entry<String, Object> entry = metaCopyIt.next();
 			BatchValueProvider batchValueProvider = null;
 			//key是字段field
 			String key = entry.getKey();
@@ -132,6 +140,7 @@ public class ValueProviderUtils {
 			} catch (JSONException e) {
 				continue;
 			}
+			//meatadata放入当前行的数据
 			if(jsonValue.get(ValueProvider.FIELD_KEY) == null){
 				jsonValue.put(ValueProvider.FIELD_KEY, key) ;
 			}
@@ -158,6 +167,7 @@ public class ValueProviderUtils {
 				for (Map dataMap : results) {
 					//处理provider中field为object.field的场景，只取一级对象，框架不主动获取未知对象的属性
 					String dataKey = key.contains(".") ? key.substring(0, key.indexOf(".")) : key;
+					//meatadata放入当前行的数据
 					jsonValue.put(ValueProvider.ROW_DATA_KEY, dataMap);
 					ValueProvider valueProvider = (ValueProvider) bean;
 					FieldMeta fieldMeta = objectMeta == null ? null : objectMeta.getFieldMetaById(dataKey);
@@ -195,9 +205,32 @@ public class ValueProviderUtils {
 					}
 				}//end of for
 			}// end of else
-		}
-		return results;
+		}// end of while
 	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private static List<Map.Entry<String, Object>> sortedMetadataCopyList(Map metadataCopy){
+		//将map.entrySet()转换成list，再进行排序
+		List<Map.Entry<String, Object>> metadataCopyList = new ArrayList<Map.Entry<String, Object>>(metadataCopy.entrySet());
+		Collections.sort(metadataCopyList, (o1, o2) -> {
+			try {
+				JSONObject jsonValue1 = o1.getValue() instanceof JSONObject ? (JSONObject) o1.getValue() : JSONObject.parseObject(o1.getValue().toString());
+				JSONObject jsonValue2 = o2.getValue() instanceof JSONObject ? (JSONObject) o2.getValue() : JSONObject.parseObject(o2.getValue().toString());
+				int index1 = Integer.parseInt(jsonValue1.getOrDefault(ValueProvider.INDEX_KEY, "0").toString());
+				int index2 = Integer.parseInt(jsonValue2.getOrDefault(ValueProvider.INDEX_KEY, "0").toString());
+				return index1 > index2 ? 1 : index1 < index2 ? -1 : 0;
+			} catch (JSONException e) {
+				return 0;
+			} catch (Exception e){
+				return 0;
+			}
+		});
+		return metadataCopyList;
+	}
+
 	/**
 	 * 根据key获取对象中的属性，key支持obj.field形式
 	 * @param obj
