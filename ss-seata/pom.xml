@@ -69,14 +69,17 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/io.seata/seata-spring -->
-<!--        <dependency>-->
-<!--            <groupId>io.seata</groupId>-->
-<!--            <artifactId>seata-spring</artifactId>-->
-<!--            <version>1.0.0</version>-->
-<!--        </dependency>-->
-
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-seata</artifactId>
+            <version>2.2.0.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.seata</groupId>
+                    <artifactId>seata-spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>io.seata</groupId>
             <artifactId>seata-spring-boot-starter</artifactId>

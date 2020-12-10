@@ -2,7 +2,6 @@ package com.dili.ss.seata.boot;
 
 import com.dili.ss.seata.consts.SeataConsts;
 import io.seata.core.context.RootContext;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -25,12 +24,14 @@ public class SeataXidFilter extends OncePerRequestFilter {
         String xid = RootContext.getXID();
         String restXid = request.getHeader(SeataConsts.XID);
         //没有设置restXid或者已有xid，直接放掉
-        if(StringUtils.isBlank(restXid) || StringUtils.isNotBlank(xid)){
+        if(null == restXid || null != xid){
             filterChain.doFilter(request, response);
             return;
         }
         RootContext.bind(restXid);
-        logger.debug("bind[{}] to RootContext", restXid);
+        if (logger.isDebugEnabled()) {
+            logger.debug("bind[{}] to RootContext", restXid);
+        }
         try{
             filterChain.doFilter(request, response);
         } finally {

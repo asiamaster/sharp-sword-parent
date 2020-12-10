@@ -1,13 +1,27 @@
 package com.dili.ss.seata.boot;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@Configuration
-@ConditionalOnExpression("'${seata.enable}'=='true'")
+/**
+ * 配置http请求过滤器，用于绑定xid
+ * 由于spring-cloud-alibaba-seata已经实现(SeataHandlerInterceptor)，该类停用
+ * <groupId>com.alibaba.cloud</groupId>
+ * <artifactId>spring-cloud-alibaba-seata</artifactId>
+ * <version>2.2.0.RELEASE</version>
+ */
+//@Configuration
+//@ConditionalOnExpression("'${seata.enabled}'=='true'")
 public class SeataAutoConfig {
+
+    /**
+     * http请求过滤器，用于绑定xid
+     * @return
+     */
+    @Bean(name="seataXidFilter")
+    public OncePerRequestFilter seataXidFilter(){
+        return new SeataXidFilter();
+    }
 
     /**
      * 初始化全局事务扫描器
@@ -21,12 +35,4 @@ public class SeataAutoConfig {
 //        return new GlobalTransactionScanner(env.getProperty("spring.application.name"), env.getProperty("spring.cloud.alibaba.seata.tx-service-group"));
 //    }
 
-    /**
-     * http请求拦截器，用于绑定xid
-     * @return
-     */
-    @Bean(name="seataXidFilter")
-    public OncePerRequestFilter seataXidFilter(){
-        return new SeataXidFilter();
-    }
 }
