@@ -12,6 +12,7 @@ import javax.annotation.PostConstruct;
 
 /**
  * 默认的restful拦截器，最后执行
+ * 按@Order从小到大排序，最后调用
  */
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE)

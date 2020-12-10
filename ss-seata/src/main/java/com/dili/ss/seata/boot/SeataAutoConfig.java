@@ -25,7 +25,7 @@ public class SeataAutoConfig {
      * http请求拦截器，用于绑定xid
      * @return
      */
-    @Bean
+    @Bean(name="seataXidFilter")
     public OncePerRequestFilter seataXidFilter(){
         return new SeataXidFilter();
     }

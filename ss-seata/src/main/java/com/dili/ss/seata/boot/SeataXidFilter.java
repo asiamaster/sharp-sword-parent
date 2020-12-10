@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 拦截每次http请求，判断header中是否有XID
+ * 被调用方拦截每次http请求，判断header中是否有XID
  * 有则调用RootContext.bind(restXid)绑定全局事务
  */
 public class SeataXidFilter extends OncePerRequestFilter {
@@ -24,28 +24,25 @@ public class SeataXidFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String xid = RootContext.getXID();
         String restXid = request.getHeader(SeataConsts.XID);
-        boolean bind = false;
-        if(StringUtils.isBlank(xid)&&StringUtils.isNotBlank(restXid)){
-            RootContext.bind(restXid);
-            bind = true;
-            if (logger.isDebugEnabled()) {
-                logger.debug("bind[" + restXid + "] to RootContext");
-            }
+        //没有设置restXid或者已有xid，直接放掉
+        if(StringUtils.isBlank(restXid) || StringUtils.isNotBlank(xid)){
+            filterChain.doFilter(request, response);
+            return;
         }
+        RootContext.bind(restXid);
+        logger.debug("bind[{}] to RootContext", restXid);
         try{
             filterChain.doFilter(request, response);
         } finally {
-            if (bind) {
-                String unbindXid = RootContext.unbind();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("unbind[" + unbindXid + "] from RootContext");
-                }
-                if (!restXid.equalsIgnoreCase(unbindXid)) {
-                    logger.warn("xid in change during http rest from " + restXid + " to " + unbindXid);
-                    if (unbindXid != null) {
-                        RootContext.bind(unbindXid);
-                        logger.warn("bind [" + unbindXid + "] back to RootContext");
-                    }
+            String unbindXid = RootContext.unbind();
+            if (logger.isDebugEnabled()) {
+                logger.debug("unbind[{}] from RootContext", unbindXid);
+            }
+            if (!restXid.equalsIgnoreCase(unbindXid)) {
+                logger.warn("xid in change during http rest from [{}] to [{}]", restXid, unbindXid);
+                if (unbindXid != null) {
+                    RootContext.bind(unbindXid);
+                    logger.warn("bind [{}] back to RootContext", unbindXid);
                 }
             }
         }

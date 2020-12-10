@@ -192,7 +192,11 @@
             <artifactId>okhttp</artifactId>
             <version>4.9.0</version>
         </dependency>
-
+<!--        <dependency>-->
+<!--            <groupId>io.netty</groupId>-->
+<!--            <artifactId>netty-all</artifactId>-->
+<!--            <version>4.1.45.Final</version>-->
+<!--        </dependency>-->
         <!-- https://mvnrepository.com/artifact/com.zhy/okhttputils -->
         <!-- this artifact is located at Spring Plugins repository (https://repo.spring.io/plugins-release/) -->
 <!--        <dependency>-->
