@@ -42,7 +42,7 @@ public class RestfulSeataXidFilter extends AbstractFilter {
         if(StringUtils.isEmpty(xid)){
             return super.invoke(invocation);
         }
-        //是否有header注解参数, TODO 后续优化，不需要传Header，放到ThreadLocal中
+        //是否有header注解参数, 不传Header，可以放到ThreadLocal中
         boolean hasHeader = false;
         retry:
         for(int i=0; i<ass.length; i++) {
