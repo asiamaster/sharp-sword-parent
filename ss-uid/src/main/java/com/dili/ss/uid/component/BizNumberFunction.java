@@ -40,6 +40,9 @@ public class BizNumberFunction {
         BizNumberRule bizNumberRule = BizNumberConstant.bizNumberCache.get(bizNumberType);
         if(bizNumberRule == null){
             BizNumberRuleDomain bizNumberRuleDomain = bizNumberRuleService.getByType(bizNumberType);
+            if(bizNumberRuleDomain == null){
+                return null;
+            }
             bizNumberRule = DTOUtils.asInstance(bizNumberRuleDomain, BizNumberRule.class);
             BizNumberConstant.bizNumberCache.put(bizNumberType, bizNumberRule);
         }
