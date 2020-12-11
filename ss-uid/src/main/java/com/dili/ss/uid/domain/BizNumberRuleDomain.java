@@ -15,7 +15,7 @@ import java.util.Date;
  * This file was generated on 2020-01-21 14:38:55.
  */
 @Table(name = "`biz_number_rule`")
-public interface BizNumberRuleDomain extends BizNumberRule, IBaseDomain, IMybatisForceParams {
+public interface BizNumberRuleDomain extends IBaseDomain, IMybatisForceParams {
     @Override
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

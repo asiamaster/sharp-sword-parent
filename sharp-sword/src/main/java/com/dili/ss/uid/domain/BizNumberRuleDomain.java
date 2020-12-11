@@ -11,11 +11,12 @@ import java.util.Date;
 
 /**
  * 由MyBatis Generator工具自动生成
- * 
+ *
  * This file was generated on 2020-01-21 14:38:55.
  */
 @Table(name = "`biz_number_rule`")
-public interface BizNumberRuleDomain extends BizNumberRule, IBaseDomain, IMybatisForceParams {
+public interface BizNumberRuleDomain extends IBaseDomain, IMybatisForceParams {
+    @Override
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "`id`")
@@ -23,6 +24,7 @@ public interface BizNumberRuleDomain extends BizNumberRule, IBaseDomain, IMybati
     @EditMode(editor = FieldEditor.Number, required = true)
     Long getId();
 
+    @Override
     void setId(Long id);
 
     @Column(name = "`name`")

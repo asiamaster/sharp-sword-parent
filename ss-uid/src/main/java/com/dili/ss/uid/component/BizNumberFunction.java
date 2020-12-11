@@ -1,5 +1,6 @@
 package com.dili.ss.uid.component;
 
+import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.uid.constants.BizNumberConstant;
 import com.dili.ss.uid.domain.BizNumberRule;
 import com.dili.ss.uid.domain.BizNumberRuleDomain;
@@ -39,7 +40,8 @@ public class BizNumberFunction {
         BizNumberRule bizNumberRule = BizNumberConstant.bizNumberCache.get(bizNumberType);
         if(bizNumberRule == null){
             BizNumberRuleDomain bizNumberRuleDomain = bizNumberRuleService.getByType(bizNumberType);
-            BizNumberConstant.bizNumberCache.put(bizNumberType, bizNumberRuleDomain);
+            bizNumberRule = DTOUtils.asInstance(bizNumberRuleDomain, BizNumberRule.class);
+            BizNumberConstant.bizNumberCache.put(bizNumberType, bizNumberRule);
         }
         return  bizNumberRule;
     }
