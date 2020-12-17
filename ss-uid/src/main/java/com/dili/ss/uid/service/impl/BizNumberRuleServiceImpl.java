@@ -4,7 +4,7 @@ import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.uid.domain.BizNumber;
-import com.dili.ss.uid.domain.BizNumberRuleDomain;
+import com.dili.ss.uid.domain.BizNumberRule;
 import com.dili.ss.uid.mapper.BizNumberRuleMapper;
 import com.dili.ss.uid.service.BizNumberRuleService;
 import com.dili.ss.uid.service.BizNumberService;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ConditionalOnExpression("'${uid.enable}'=='true'")
-public class BizNumberRuleServiceImpl extends BaseServiceImpl<BizNumberRuleDomain, Long> implements BizNumberRuleService {
+public class BizNumberRuleServiceImpl extends BaseServiceImpl<BizNumberRule, Long> implements BizNumberRuleService {
 
     @Autowired
     private BizNumberService bizNumberService;
@@ -30,28 +30,28 @@ public class BizNumberRuleServiceImpl extends BaseServiceImpl<BizNumberRuleDomai
     }
 
     @Override
-    public BizNumberRuleDomain getByType(String type){
-        BizNumberRuleDomain bizNumberRuleDomain = DTOUtils.newInstance(BizNumberRuleDomain.class);
+    public BizNumberRule getByType(String type){
+        BizNumberRule bizNumberRuleDomain = DTOUtils.newInstance(BizNumberRule.class);
         bizNumberRuleDomain.setType(type);
         return getActualDao().selectOne(bizNumberRuleDomain);
     }
 
     @Override
-    public int updateSelective(BizNumberRuleDomain bizNumberRuleDomain) {
+    public int updateSelective(BizNumberRule bizNumberRuleDomain) {
         int count = super.updateSelective(bizNumberRuleDomain);
 //        BizNumberConstant.bizNumberCache.put(get(bizNumberRuleDomain.getId()).getType(), bizNumberRuleDomain);
         return count;
     }
 
     @Override
-    public int updateExactSimple(BizNumberRuleDomain bizNumberRuleDomain) {
+    public int updateExactSimple(BizNumberRule bizNumberRuleDomain) {
         int count = super.updateExactSimple(bizNumberRuleDomain);
 //        BizNumberConstant.bizNumberCache.put(bizNumberRuleDomain.getType(), bizNumberRuleDomain);
         return count;
     }
 
     @Override
-    public int insertSelective(BizNumberRuleDomain bizNumberRuleDomain) {
+    public int insertSelective(BizNumberRule bizNumberRuleDomain) {
         int count = super.insertSelective(bizNumberRuleDomain);
         BizNumber condition = DTOUtils.newInstance(BizNumber.class);
         condition.setType(bizNumberRuleDomain.getType());
@@ -84,16 +84,10 @@ public class BizNumberRuleServiceImpl extends BaseServiceImpl<BizNumberRuleDomai
 
     @Override
     public BaseOutput updateEnable(Long id, Boolean enable) {
-        BizNumberRuleDomain bizNumberRuleDomain = DTOUtils.newInstance(BizNumberRuleDomain.class);
+        BizNumberRule bizNumberRuleDomain = DTOUtils.newInstance(BizNumberRule.class);
         bizNumberRuleDomain.setId(id);
         bizNumberRuleDomain.setIsEnable(enable);
         getActualDao().updateByPrimaryKeySelective(bizNumberRuleDomain);
-//        BizNumberRuleDomain domain = get(id);
-//        if(enable){
-//            BizNumberConstant.bizNumberCache.put(domain.getType(), domain);
-//        }else{
-//            BizNumberConstant.bizNumberCache.remove(domain.getType());
-//        }
         return BaseOutput.success();
     }
 }
