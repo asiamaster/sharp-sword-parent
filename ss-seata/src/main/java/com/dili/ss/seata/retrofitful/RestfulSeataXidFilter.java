@@ -54,7 +54,7 @@ public class RestfulSeataXidFilter extends AbstractFilter {
                         headerMap = new HashMap<>(2);
                         invocation.getArgs()[i] = headerMap;
                     }
-                    headerMap.put(SeataConsts.XID, xid);
+                    headerMap.put(RootContext.KEY_XID, xid);
                     hasHeader = true;
                     break retry;
                 }
