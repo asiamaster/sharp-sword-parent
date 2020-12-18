@@ -16,6 +16,7 @@ import java.util.Date;
  */
 @Table(name = "`biz_number`")
 public interface BizNumber extends IBaseDomain {
+    @Override
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "`id`")
@@ -23,6 +24,7 @@ public interface BizNumber extends IBaseDomain {
     @EditMode(editor = FieldEditor.Number, required = true)
     Long getId();
 
+    @Override
     void setId(Long id);
 
     @Column(name = "`type`")
