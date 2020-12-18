@@ -2,10 +2,12 @@ package com.dili.ss.uid.component;
 
 import com.dili.ss.dto.DTOUtils;
 import com.dili.ss.uid.constants.BizNumberConstant;
+import com.dili.ss.uid.domain.BizNumber;
 import com.dili.ss.uid.domain.BizNumberRule;
-import com.dili.ss.uid.domain.BizNumberRuleDomain;
 import com.dili.ss.uid.service.BizNumberRuleService;
 import com.dili.ss.uid.service.BizNumberService;
+import com.dili.ss.uid.util.BizNumberUtils;
+import com.dili.ss.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
@@ -39,11 +41,23 @@ public class BizNumberFunction {
     private BizNumberRule getBizNumberRule(String bizNumberType){
         BizNumberRule bizNumberRule = BizNumberConstant.bizNumberCache.get(bizNumberType);
         if(bizNumberRule == null){
-            BizNumberRuleDomain bizNumberRuleDomain = bizNumberRuleService.getByType(bizNumberType);
+            BizNumberRule bizNumberRuleDomain = bizNumberRuleService.getByType(bizNumberType);
             if(bizNumberRuleDomain == null){
                 return null;
             }
-            bizNumberRule = DTOUtils.asInstance(bizNumberRuleDomain, BizNumberRule.class);
+            BizNumber bizNumberCondition = DTOUtils.newInstance(BizNumber.class);
+            bizNumberCondition.setType(bizNumberType);
+            BizNumber bizNumber = bizNumberService.selectOne(bizNumberCondition);
+            //初始化biz_number表数据
+            if(bizNumber == null){
+                bizNumber = DTOUtils.newInstance(BizNumber.class);
+                bizNumber.setType(bizNumberRuleDomain.getType());
+                String dateStr = bizNumberRuleDomain.getDateFormat() == null ? null : DateUtils.format(bizNumberRuleDomain.getDateFormat());
+                bizNumber.setValue(BizNumberUtils.getInitBizNumber(dateStr, bizNumberRuleDomain.getLength()));
+                bizNumber.setMemo(bizNumberRuleDomain.getName());
+                bizNumber.setVersion(1L);
+                bizNumberService.insertSelective(bizNumber);
+            }
             BizNumberConstant.bizNumberCache.put(bizNumberType, bizNumberRule);
         }
         return  bizNumberRule;
