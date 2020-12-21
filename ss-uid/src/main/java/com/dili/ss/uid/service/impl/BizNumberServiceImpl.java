@@ -66,6 +66,9 @@ public class BizNumberServiceImpl extends BaseServiceImpl<BizNumber, Long> imple
     @Autowired
     private BizNumberComponent bizNumberComponent;
 
+    /**
+     * 全局缓存各业务类型对象的业务号
+     */
     protected ConcurrentHashMap<String, SequenceNo> bizNumberMap = new ConcurrentHashMap<>();
 
     //获取失败后的重试次数

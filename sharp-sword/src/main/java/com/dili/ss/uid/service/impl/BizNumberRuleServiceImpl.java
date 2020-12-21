@@ -3,6 +3,7 @@ package com.dili.ss.uid.service.impl;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.dto.DTOUtils;
+import com.dili.ss.uid.constants.BizNumberConstant;
 import com.dili.ss.uid.domain.BizNumber;
 import com.dili.ss.uid.domain.BizNumberRule;
 import com.dili.ss.uid.mapper.BizNumberRuleMapper;
@@ -37,36 +38,37 @@ public class BizNumberRuleServiceImpl extends BaseServiceImpl<BizNumberRule, Lon
     }
 
     @Override
-    public int updateSelective(BizNumberRule bizNumberRuleDomain) {
-        int count = super.updateSelective(bizNumberRuleDomain);
-//        BizNumberConstant.bizNumberCache.put(get(bizNumberRuleDomain.getId()).getType(), bizNumberRuleDomain);
+    public int updateSelective(BizNumberRule bizNumberRule) {
+        int count = super.updateSelective(bizNumberRule);
+        BizNumberConstant.bizNumberCache.put(get(bizNumberRule.getId()).getType(), bizNumberRule);
         return count;
     }
 
     @Override
-    public int updateExactSimple(BizNumberRule bizNumberRuleDomain) {
-        int count = super.updateExactSimple(bizNumberRuleDomain);
-//        BizNumberConstant.bizNumberCache.put(bizNumberRuleDomain.getType(), bizNumberRuleDomain);
+    public int updateExactSimple(BizNumberRule bizNumberRule) {
+        int count = super.updateExactSimple(bizNumberRule);
+        BizNumberConstant.bizNumberCache.put(bizNumberRule.getType(), bizNumberRule);
         return count;
     }
 
     @Override
-    public int insertSelective(BizNumberRule bizNumberRuleDomain) {
-        int count = super.insertSelective(bizNumberRuleDomain);
+    public int insertSelective(BizNumberRule bizNumberRule) {
+        int count = super.insertSelective(bizNumberRule);
         BizNumber condition = DTOUtils.newInstance(BizNumber.class);
-        condition.setType(bizNumberRuleDomain.getType());
+        condition.setType(bizNumberRule.getType());
         BizNumber bizNumber = bizNumberService.selectOne(condition);
         //初始化biz_number表数据
         if(bizNumber == null){
             bizNumber = DTOUtils.newInstance(BizNumber.class);
-            bizNumber.setType(bizNumberRuleDomain.getType());
-            String dateStr = bizNumberRuleDomain.getDateFormat() == null ? null : DateUtils.format(bizNumberRuleDomain.getDateFormat());
-            bizNumber.setValue(BizNumberUtils.getInitBizNumber(dateStr, bizNumberRuleDomain.getLength()));
-            bizNumber.setMemo(bizNumberRuleDomain.getName());
+            bizNumber.setType(bizNumberRule.getType());
+            String dateStr = bizNumberRule.getDateFormat() == null ? null : DateUtils.format(bizNumberRule.getDateFormat());
+            bizNumber.setValue(BizNumberUtils.getInitBizNumber(dateStr, bizNumberRule.getLength()));
+            bizNumber.setMemo(bizNumberRule.getName());
             bizNumber.setVersion(1L);
             bizNumberService.insertSelective(bizNumber);
         }
-//        BizNumberConstant.bizNumberCache.put(bizNumberRuleDomain.getType(), bizNumberRuleDomain);
+        //当前实例插入缓存，其它实例在调用时自动初始化
+        BizNumberConstant.bizNumberCache.put(bizNumberRule.getType(), bizNumberRule);
         return count;
     }
 
@@ -74,7 +76,7 @@ public class BizNumberRuleServiceImpl extends BaseServiceImpl<BizNumberRule, Lon
     public int delete(Long key) {
         String type = get(key).getType();
         int count = super.delete(key);
-//        BizNumberConstant.bizNumberCache.remove(type);
+        BizNumberConstant.bizNumberCache.remove(type);
         bizNumberService.clear(type);
         BizNumber bizNumber = DTOUtils.newInstance(BizNumber.class);
         bizNumber.setType(type);
@@ -84,10 +86,10 @@ public class BizNumberRuleServiceImpl extends BaseServiceImpl<BizNumberRule, Lon
 
     @Override
     public BaseOutput updateEnable(Long id, Boolean enable) {
-        BizNumberRule bizNumberRuleDomain = DTOUtils.newInstance(BizNumberRule.class);
-        bizNumberRuleDomain.setId(id);
-        bizNumberRuleDomain.setIsEnable(enable);
-        getActualDao().updateByPrimaryKeySelective(bizNumberRuleDomain);
+        BizNumberRule bizNumberRule = DTOUtils.newInstance(BizNumberRule.class);
+        bizNumberRule.setId(id);
+        bizNumberRule.setIsEnable(enable);
+        getActualDao().updateByPrimaryKeySelective(bizNumberRule);
         return BaseOutput.success();
     }
 }
