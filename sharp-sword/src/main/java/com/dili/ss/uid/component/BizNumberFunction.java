@@ -41,8 +41,8 @@ public class BizNumberFunction {
     private BizNumberRule getBizNumberRule(String bizNumberType){
         BizNumberRule bizNumberRule = BizNumberConstant.bizNumberCache.get(bizNumberType);
         if(bizNumberRule == null){
-            BizNumberRule bizNumberRuleDomain = bizNumberRuleService.getByType(bizNumberType);
-            if(bizNumberRuleDomain == null){
+            bizNumberRule = bizNumberRuleService.getByType(bizNumberType);
+            if(bizNumberRule == null){
                 return null;
             }
             BizNumber bizNumberCondition = DTOUtils.newInstance(BizNumber.class);
@@ -51,10 +51,10 @@ public class BizNumberFunction {
             //初始化biz_number表数据
             if(bizNumber == null){
                 bizNumber = DTOUtils.newInstance(BizNumber.class);
-                bizNumber.setType(bizNumberRuleDomain.getType());
-                String dateStr = bizNumberRuleDomain.getDateFormat() == null ? null : DateUtils.format(bizNumberRuleDomain.getDateFormat());
-                bizNumber.setValue(BizNumberUtils.getInitBizNumber(dateStr, bizNumberRuleDomain.getLength()));
-                bizNumber.setMemo(bizNumberRuleDomain.getName());
+                bizNumber.setType(bizNumberRule.getType());
+                String dateStr = bizNumberRule.getDateFormat() == null ? null : DateUtils.format(bizNumberRule.getDateFormat());
+                bizNumber.setValue(BizNumberUtils.getInitBizNumber(dateStr, bizNumberRule.getLength()));
+                bizNumber.setMemo(bizNumberRule.getName());
                 bizNumber.setVersion(1L);
                 bizNumberService.insertSelective(bizNumber);
             }
