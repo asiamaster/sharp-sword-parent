@@ -117,8 +117,9 @@ public class BizNumberComponent {
         }else{//如果达到步长，则取数据库当前编号
             tempStartSeq = bizNumberAndRule.getValue();
         }
-
-        bizNumberAndRule.setValue(tempStartSeq + bizNumberAndRule.getStep());
+        //这里是当前值加上外层方法根据range和step计算出的最终步长
+        //范围步长值取最大自增值的rangeStep倍, 固定步长值为固定值的fixedStep倍
+        bizNumberAndRule.setValue(tempStartSeq + step);
         try {
             //当更新失败后，返回空，外层进行重试
             int count = bizNumberMapper.updateByPrimaryKey(bizNumberAndRule);
