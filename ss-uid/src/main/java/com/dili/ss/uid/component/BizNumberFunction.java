@@ -68,13 +68,8 @@ public class BizNumberFunction {
      * @return
      */
     private synchronized BizNumberRule initBizNumberAndRule(String bizNumberType){
-        //进锁后再次判断，是否有其它线程已经初始化了
-        BizNumberRule bizNumberRule = BizNumberConstant.bizNumberCache.get(bizNumberType);
-        if(bizNumberRule != null){
-            return bizNumberRule;
-        }
         //查询数据库，没配置则直接返回null
-        bizNumberRule = bizNumberRuleService.getByType(bizNumberType);
+        BizNumberRule bizNumberRule = bizNumberRuleService.getByType(bizNumberType);
         if(bizNumberRule == null){
             return null;
         }
