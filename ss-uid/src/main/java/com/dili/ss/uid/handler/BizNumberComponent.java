@@ -118,7 +118,7 @@ public class BizNumberComponent {
             tempStartSeq = bizNumberAndRule.getValue();
         }
         //这里是当前值加上外层方法根据range和step计算出的最终步长
-        //范围步长值取最大自增值的rangeStep倍, 固定步长值为固定值的fixedStep倍
+        //范围步长值取最大自增值的rangeStep倍
         bizNumberAndRule.setValue(tempStartSeq + step);
         try {
             //当更新失败后，返回空，外层进行重试

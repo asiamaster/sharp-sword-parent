@@ -3,6 +3,7 @@ package com.dili.ss.uid.service.impl;
 import com.dili.ss.base.BaseServiceImpl;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.dto.DTOUtils;
+import com.dili.ss.exception.ParamErrorException;
 import com.dili.ss.uid.constants.BizNumberConstant;
 import com.dili.ss.uid.domain.BizNumber;
 import com.dili.ss.uid.domain.BizNumberRule;
@@ -39,6 +40,10 @@ public class BizNumberRuleServiceImpl extends BaseServiceImpl<BizNumberRule, Lon
 
     @Override
     public int updateSelective(BizNumberRule bizNumberRule) {
+        String[] ranges = bizNumberRule.getRange().split(",");
+        if(ranges.length == 1 && bizNumberRule.getStep() % Long.parseLong(ranges[0]) != 0){
+            throw new ParamErrorException("固定步长值必须是范围值的整数倍!");
+        }
         int count = super.updateSelective(bizNumberRule);
         BizNumberConstant.bizNumberCache.put(get(bizNumberRule.getId()).getType(), bizNumberRule);
         return count;
@@ -46,6 +51,10 @@ public class BizNumberRuleServiceImpl extends BaseServiceImpl<BizNumberRule, Lon
 
     @Override
     public int updateExactSimple(BizNumberRule bizNumberRule) {
+        String[] ranges = bizNumberRule.getRange().split(",");
+        if(ranges.length == 1 && bizNumberRule.getStep() % Long.parseLong(ranges[0]) != 0){
+            throw new ParamErrorException("固定步长值必须是范围值的整数倍!");
+        }
         int count = super.updateExactSimple(bizNumberRule);
         BizNumberConstant.bizNumberCache.put(bizNumberRule.getType(), bizNumberRule);
         return count;
@@ -53,6 +62,10 @@ public class BizNumberRuleServiceImpl extends BaseServiceImpl<BizNumberRule, Lon
 
     @Override
     public int insertSelective(BizNumberRule bizNumberRule) {
+        String[] ranges = bizNumberRule.getRange().split(",");
+        if(ranges.length == 1 && bizNumberRule.getStep() % Long.parseLong(ranges[0]) != 0){
+            throw new ParamErrorException("固定步长值必须是范围值的整数倍!");
+        }
         int count = super.insertSelective(bizNumberRule);
         BizNumber condition = DTOUtils.newInstance(BizNumber.class);
         condition.setType(bizNumberRule.getType());

@@ -116,8 +116,8 @@ public class BizNumberServiceImpl extends BaseServiceImpl<BizNumber, Long> imple
         if (ranges.length == 2) {
             finalStep = Long.parseLong(ranges[1]) * bizNumberRule.getStep();
         } else {
-            //固定步长值为固定值的fixedStep倍
-            finalStep = Long.parseLong(ranges[0]) * bizNumberRule.getStep();
+            //固定步长值必须是范围值的倍数，须在新增、修改规则时验证
+            finalStep = bizNumberRule.getStep();
         }
         return getBizNumberByType(bizNumberRule.getType(), bizNumberRule.getDateFormat(), bizNumberRule.getLength(), finalStep, increment);
     }
