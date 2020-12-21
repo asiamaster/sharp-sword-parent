@@ -34,36 +34,6 @@ public class BizNumberFunction {
     }
 
     /**
-     * 根据类型获取BizNumberRule
-     * @param bizNumberType
-     * @return
-     */
-    private BizNumberRule getBizNumberRule(String bizNumberType){
-        BizNumberRule bizNumberRule = BizNumberConstant.bizNumberCache.get(bizNumberType);
-        if(bizNumberRule == null){
-            bizNumberRule = bizNumberRuleService.getByType(bizNumberType);
-            if(bizNumberRule == null){
-                return null;
-            }
-            BizNumber bizNumberCondition = DTOUtils.newInstance(BizNumber.class);
-            bizNumberCondition.setType(bizNumberType);
-            BizNumber bizNumber = bizNumberService.selectOne(bizNumberCondition);
-            //初始化biz_number表数据
-            if(bizNumber == null){
-                bizNumber = DTOUtils.newInstance(BizNumber.class);
-                bizNumber.setType(bizNumberRule.getType());
-                String dateStr = bizNumberRule.getDateFormat() == null ? null : DateUtils.format(bizNumberRule.getDateFormat());
-                bizNumber.setValue(BizNumberUtils.getInitBizNumber(dateStr, bizNumberRule.getLength()));
-                bizNumber.setMemo(bizNumberRule.getName());
-                bizNumber.setVersion(1L);
-                bizNumberService.insertSelective(bizNumber);
-            }
-            BizNumberConstant.bizNumberCache.put(bizNumberType, bizNumberRule);
-        }
-        return  bizNumberRule;
-    }
-
-    /**
      * 当前日期格式化(时区为GMT+08:00)
      * @param format
      * @return
@@ -80,5 +50,48 @@ public class BizNumberFunction {
      */
     public static String format(LocalDateTime localDateTime, String format) {
         return DateTimeFormatter.ofPattern(format).format(localDateTime);
+    }
+
+    /**
+     * 根据类型获取BizNumberRule
+     * @param bizNumberType
+     * @return
+     */
+    private BizNumberRule getBizNumberRule(String bizNumberType){
+        BizNumberRule bizNumberRule = BizNumberConstant.bizNumberCache.get(bizNumberType);
+        return bizNumberRule == null ? initBizNumberAndRule(bizNumberType) : bizNumberRule;
+    }
+
+    /**
+     * 根据业务类型初始化业务规则和业务号
+     * @param bizNumberType
+     * @return
+     */
+    private synchronized BizNumberRule initBizNumberAndRule(String bizNumberType){
+        //进锁后再次判断，是否有其它线程已经初始化了
+        BizNumberRule bizNumberRule = BizNumberConstant.bizNumberCache.get(bizNumberType);
+        if(bizNumberRule != null){
+            return bizNumberRule;
+        }
+        //查询数据库，没配置则直接返回null
+        bizNumberRule = bizNumberRuleService.getByType(bizNumberType);
+        if(bizNumberRule == null){
+            return null;
+        }
+        BizNumber bizNumberCondition = DTOUtils.newInstance(BizNumber.class);
+        bizNumberCondition.setType(bizNumberType);
+        BizNumber bizNumber = bizNumberService.selectOne(bizNumberCondition);
+        //初始化biz_number表数据，多实例场景下须通过type字段添加唯一索引来保证
+        if(bizNumber == null){
+            bizNumber = DTOUtils.newInstance(BizNumber.class);
+            bizNumber.setType(bizNumberRule.getType());
+            String dateStr = bizNumberRule.getDateFormat() == null ? null : DateUtils.format(bizNumberRule.getDateFormat());
+            bizNumber.setValue(BizNumberUtils.getInitBizNumber(dateStr, bizNumberRule.getLength()));
+            bizNumber.setMemo(bizNumberRule.getName());
+            bizNumber.setVersion(1L);
+            bizNumberService.insertSelective(bizNumber);
+        }
+        BizNumberConstant.bizNumberCache.put(bizNumberType, bizNumberRule);
+        return bizNumberRule;
     }
 }
