@@ -135,7 +135,7 @@ public class BizNumberServiceImpl extends BaseServiceImpl<BizNumber, Long> imple
         String dateStr = dateFormat == null ? "" : DateUtils.format(dateFormat);
         Long orderId = getNextSequenceId(type, null, dateFormat, length, step, increment);
         //如果不是同天，重新获取从1开始的编号
-        if (StringUtils.isNotBlank(dateStr) && !dateStr.equals(StringUtils.substring(String.valueOf(orderId), 0, 8))) {
+        if (StringUtils.isNotBlank(dateStr) && !dateStr.equals(StringUtils.substring(String.valueOf(orderId), 0, dateStr.length()))) {
             orderId = getNextSequenceId(type, getInitBizNumber(dateStr, length), dateFormat, length, step, increment);
         }
         return orderId;

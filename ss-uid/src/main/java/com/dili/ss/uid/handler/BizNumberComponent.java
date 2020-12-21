@@ -92,13 +92,13 @@ public class BizNumberComponent {
         int max = new Double(Math.pow(10, bizNumberAndRule.getLength())).intValue();
         String dateStr = bizNumberAndRule.getDateFormat() == null ? null : DateUtils.format(bizNumberAndRule.getDateFormat());
         Long initBizNumber = BizNumberUtils.getInitBizNumber(dateStr, bizNumberAndRule.getLength());
-        //当前编号的日期部分，用于在新的日期变更步长
-        Long currentDateValue = dateStr == null ? bizNumberAndRule.getValue() : Long.parseLong(bizNumberAndRule.getValue().toString().substring(0,8));
         //开始序号
         Long tempStartSeq = 0L;
         //如果翻天， startSeq则不为空
         if(startSeq != null){
-            Long startSeqDateValue = dateStr == null ? startSeq : Long.parseLong(startSeq.toString().substring(0,8));
+            //当前编号的日期部分，用于在新的日期变更步长
+            Long currentDateValue = dateStr == null ? bizNumberAndRule.getValue() : Long.parseLong(bizNumberAndRule.getValue().toString().substring(0, dateStr.length()));
+            Long startSeqDateValue = dateStr == null ? startSeq : Long.parseLong(startSeq.toString().substring(0, dateStr.length()));
             //新的一天,新日期的值大于数据库中的值，则采用新算的值
             if(startSeqDateValue > currentDateValue){
                 tempStartSeq = startSeq;
