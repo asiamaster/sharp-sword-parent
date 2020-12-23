@@ -32,7 +32,8 @@ public abstract class BatchDisplayTextProviderSupport extends BatchDisplayTextPr
      */
     @Override
     protected boolean ignoreCaseToRef(Map metaMap){
-        return getBatchProviderMeta(metaMap).getIgnoreCaseToRef();
+        Boolean ignoreCaseToRef = getBatchProviderMeta(metaMap).getIgnoreCaseToRef();
+        return ignoreCaseToRef == null ? false : ignoreCaseToRef;
     }
 
     /**

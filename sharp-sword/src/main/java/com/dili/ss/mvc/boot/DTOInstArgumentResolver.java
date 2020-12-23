@@ -84,6 +84,11 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 		//构建fields Map，用于getParamValuesAndConvert()
 		Map<String, Class<?>> fields = new HashMap<>();
 		for(Method method : clazz.getMethods()){
+			//因为IDomain和IBaseDomain下都有对getId的实现，在eclipse下可能获取到返回值为Serializable的getId方法，导致无法正确注入类型
+			//可以用这段代码来做通用校验：method.equals(clazz.getMethod(method.getName()))，但是性能太低
+			if("getId".equals(method.getName()) && Serializable.class.equals(method.getReturnType())){
+				continue;
+			}
 			if(POJOUtils.isGetMethod(method) && method.getParameterTypes().length == 0){
 				fields.put(POJOUtils.getBeanField(method), method.getReturnType());
 			}
