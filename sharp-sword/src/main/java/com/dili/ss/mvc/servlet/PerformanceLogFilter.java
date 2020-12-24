@@ -171,10 +171,10 @@ public class PerformanceLogFilter implements Filter {
         timeBefore.append("            <td width=\"190\">上次访问时间</td>\n");
         timeBefore.append("        </tr>\n");
         List<RequestHandleInfo> infoList = new ArrayList(MAP.values());
-        Collections.sort(infoList, (PerformanceLogFilter.RequestHandleInfo r1, PerformanceLogFilter.RequestHandleInfo r2) ->  r1.averageCostSeconds < r2.averageCostSeconds?1:-1);
+        Collections.sort(infoList, (RequestHandleInfo r1, RequestHandleInfo r2) ->  r1.averageCostSeconds < r2.averageCostSeconds?1:-1);
         Iterator timeAfter = infoList.iterator();
         while(timeAfter.hasNext()) {
-            PerformanceLogFilter.RequestHandleInfo info = (PerformanceLogFilter.RequestHandleInfo)timeAfter.next();
+            RequestHandleInfo info = (RequestHandleInfo)timeAfter.next();
             timeBefore.append("    <tr>\n");
             timeBefore.append("        <td>").append(info.uri).append("</td>\n");
             timeBefore.append("        <td>").append(info.accessCount).append("</td>\n");
