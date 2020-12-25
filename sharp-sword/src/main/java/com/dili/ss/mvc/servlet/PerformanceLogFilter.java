@@ -2,6 +2,7 @@ package com.dili.ss.mvc.servlet;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.dili.ss.mvc.util.RequestUtils;
 import com.dili.ss.util.SpringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +63,7 @@ public class PerformanceLogFilter implements Filter {
         String requestURI = httpServletRequest.getRequestURI();
         if(VIEW_PERFORMANCE_URL.equals(requestURI)) {
             setTimeSpentThreshold(request);
-            show(response);
+            show(httpServletRequest, response);
             return;
         }
         long timeSpent = next(request, response, chain);
@@ -145,10 +146,11 @@ public class PerformanceLogFilter implements Filter {
 
     /**
      * 显示性能统计
+     * @param request
      * @param response
      * @throws IOException
      */
-    private void show(ServletResponse response) throws IOException {
+    private void show(HttpServletRequest request, ServletResponse response) throws IOException {
         StringBuilder timeBefore = new StringBuilder();
         timeBefore.append("<!DOCTYPE html>\n");
         timeBefore.append("<html>\n");
@@ -158,7 +160,8 @@ public class PerformanceLogFilter implements Filter {
         timeBefore.append("</head>\n");
         timeBefore.append("<body>\n");
         timeBefore.append("<div style=\" margin:0 auto; margin-top: 15px;\" align=\"center\">\n");
-        timeBefore.append("<h1>").append(applicationName).append("性能统计</h1>\n");
+        timeBefore.append("<div style=\"font-weight:bold; font-size:30px;\">").append(applicationName).append("性能统计</div>");
+        timeBefore.append(RequestUtils.getIpAddress(request)).append(":").append(request.getServerPort()).append("\n");
         timeBefore.append("    <table style=\"text-align: center;border-collapse: collapse; border: 1px #999999 solid;line-height:28px;\" border=\"1\">\n");
         timeBefore.append("        <tr style=\"background-color: lightskyblue;\">\n");
         timeBefore.append("            <td>URI</td>\n");
@@ -171,10 +174,10 @@ public class PerformanceLogFilter implements Filter {
         timeBefore.append("            <td width=\"190\">上次访问时间</td>\n");
         timeBefore.append("        </tr>\n");
         List<RequestHandleInfo> infoList = new ArrayList(MAP.values());
-        Collections.sort(infoList, (RequestHandleInfo r1, RequestHandleInfo r2) ->  r1.averageCostSeconds < r2.averageCostSeconds?1:-1);
+        Collections.sort(infoList, (PerformanceLogFilter.RequestHandleInfo r1, PerformanceLogFilter.RequestHandleInfo r2) ->  r1.averageCostSeconds < r2.averageCostSeconds?1:-1);
         Iterator timeAfter = infoList.iterator();
         while(timeAfter.hasNext()) {
-            RequestHandleInfo info = (RequestHandleInfo)timeAfter.next();
+            PerformanceLogFilter.RequestHandleInfo info = (PerformanceLogFilter.RequestHandleInfo)timeAfter.next();
             timeBefore.append("    <tr>\n");
             timeBefore.append("        <td>").append(info.uri).append("</td>\n");
             timeBefore.append("        <td>").append(info.accessCount).append("</td>\n");

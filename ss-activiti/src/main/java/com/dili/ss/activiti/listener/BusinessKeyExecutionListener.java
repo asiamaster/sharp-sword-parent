@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 /**
  * 业务编号执行监听
  * 支持从传递变量(businessKey)中获取指定业务编号，如果没有传递变量，则使用父流程实例的businessKey
- * 需要在流程执行监听器配置， 事件: start, 委托表达式:${businessKeyExecutionListener}
+ * 需要在子流程执行监听器配置， 事件: start, 委托表达式:${businessKeyExecutionListener}
  * @author: WM
  * @time: 2020/12/3 9:36
  */
@@ -20,7 +20,7 @@ public class BusinessKeyExecutionListener implements ExecutionListener {
     @Autowired
     RuntimeService runtimeService;
     @Override
-    public void notify(DelegateExecution execution) throws Exception {
+    public void notify(DelegateExecution execution){
         if(!StringUtils.isBlank(execution.getProcessBusinessKey())){
             return;
         }
