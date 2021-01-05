@@ -1,8 +1,11 @@
 package com.dili.ss.util;
 
 import org.apache.commons.codec.binary.Base64;
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 import javax.crypto.Cipher;
+import java.io.IOException;
 import java.security.*;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -22,25 +25,44 @@ import java.util.Map;
 public class RSAUtils {
     //非对称密钥算法
     public static final String KEY_ALGORITHM = "RSA";
-
-
+    //RSA密钥对
+    private static RSAKeyPair rsaKeyPair;
     /**
      * 密钥长度，DH算法的默认密钥长度是1024
      * 密钥长度必须是64的倍数，在512到65536位之间
+     * 512的长度为53，1024的长度为117，2048的长度为245
      */
-    private static final int KEY_SIZE = 512;
+    private static final int KEY_SIZE = 1024;
     //公钥
     private static final String PUBLIC_KEY = "RSAPublicKey";
-
     //私钥
     private static final String PRIVATE_KEY = "RSAPrivateKey";
 
     /**
-     * 初始化密钥对
+     * 获取并初始化公私钥
+     * @return
+     * @throws Exception
+     */
+    public static synchronized RSAKeyPair getRSAKeyPair() throws NoSuchAlgorithmException {
+        if(rsaKeyPair == null){
+            synchronized (RSAKeyPair.class){
+                if(rsaKeyPair == null) {
+                    rsaKeyPair = new RSAKeyPair();
+                    Map<String, Object> map = createKey();
+                    rsaKeyPair.setPrivateKey((RSAPrivateKey) map.get(PRIVATE_KEY));
+                    rsaKeyPair.setPublicKey((RSAPublicKey) map.get(PUBLIC_KEY));
+                }
+            }
+        }
+        return rsaKeyPair;
+    }
+
+    /**
+     * 创建密钥对
      *
      * @return Map 甲方密钥的Map
      */
-    public static Map<String, Object> initKey() throws Exception {
+    public static Map<String, Object> createKey() throws NoSuchAlgorithmException {
         //实例化密钥生成器
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM);
         //初始化密钥生成器
@@ -59,12 +81,12 @@ public class RSAUtils {
     }
 
     /**
-     * 初始化密钥对
+     * 创建密钥对
      * 指定密钥长度
      *
      * @return Map 甲方密钥的Map
      */
-    public static Map<String, Object> initKey(int KEY_SIZE) throws Exception {
+    public static Map<String, Object> createKey(int KEY_SIZE) throws Exception {
         //实例化密钥生成器
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM);
         //初始化密钥生成器
@@ -80,6 +102,95 @@ public class RSAUtils {
         keyMap.put(PUBLIC_KEY, publicKey);
         keyMap.put(PRIVATE_KEY, privateKey);
         return keyMap;
+    }
+
+
+    /**
+     * 获得公钥byte[]
+     * @param keyMap
+     * @return
+     * @throws Exception
+     */
+    public static byte[] getPublicKeyBytes(Map<String, Object> keyMap) throws Exception {
+        //获得map中的公钥对象 转为key对象
+        Key key = (Key) keyMap.get(PUBLIC_KEY);
+        //编码返回字符串
+        return key.getEncoded();
+    }
+
+    /**
+     * 获得私钥byte[]
+     * @param keyMap
+     * @return
+     * @throws Exception
+     */
+    public static byte[] getPrivateKeyBytes(Map<String, Object> keyMap) throws Exception {
+        //获得map中的私钥对象 转为key对象
+        Key key = (Key) keyMap.get(PRIVATE_KEY);
+        //编码返回字符串
+        return key.getEncoded();
+    }
+
+    /**
+     * 获得公钥String
+     * @param keyMap
+     * @return
+     * @throws Exception
+     */
+    public static String getPublicKey(Map<String, Object> keyMap) throws Exception {
+        //获得map中的公钥对象 转为key对象
+        Key key = (Key) keyMap.get(PUBLIC_KEY);
+        //编码返回字符串
+        return encryptBASE64(key.getEncoded());
+    }
+
+    /**
+     * 获得公钥String
+     * @param rsaKeyPair
+     * @return
+     * @throws Exception
+     */
+    public static String getPublicKey(RSAKeyPair rsaKeyPair) {
+        //获得map中的公钥对象 转为key对象
+        Key key = rsaKeyPair.getPublicKey();
+        //编码返回字符串
+        return encryptBASE64(key.getEncoded());
+    }
+
+    /**
+     * 获得私钥String
+     * @param keyMap
+     * @return
+     * @throws Exception
+     */
+    public static String getPrivateKey(Map<String, Object> keyMap) {
+        //获得map中的私钥对象 转为key对象
+        Key key = (Key) keyMap.get(PRIVATE_KEY);
+        //编码返回字符串
+        return encryptBASE64(key.getEncoded());
+    }
+
+    /**
+     * 获得私钥String
+     * @param rsaKeyPair
+     * @return
+     * @throws Exception
+     */
+    public static String getPrivateKey(RSAKeyPair rsaKeyPair) {
+        //获得map中的私钥对象 转为key对象
+        Key key = rsaKeyPair.getPrivateKey();
+        //编码返回字符串
+        return encryptBASE64(key.getEncoded());
+    }
+
+    //解码返回byte
+    public static byte[] decryptBASE64(String key) throws IOException {
+        return new BASE64Decoder().decodeBuffer(key);
+    }
+
+    //编码返回字符串
+    public static String encryptBASE64(byte[] key) {
+        return new BASE64Encoder().encodeBuffer(key);
     }
 
     /**
@@ -162,33 +273,17 @@ public class RSAUtils {
         return cipher.doFinal(data);
     }
 
-    /**
-     * 取得私钥
-     *
-     * @param keyMap 密钥map
-     * @return byte[] 私钥
-     */
-    public static byte[] getPrivateKey(Map<String, Object> keyMap) {
-        Key key = (Key) keyMap.get(PRIVATE_KEY);
-        return key.getEncoded();
-    }
 
     /**
-     * 取得公钥
-     *
-     * @param keyMap 密钥map
-     * @return byte[] 公钥
+     * 获取C#版的私钥
+     * @param encodedPrivkey
+     * @return
      */
-    public static byte[] getPublicKey(Map<String, Object> keyMap) throws Exception {
-        Key key = (Key) keyMap.get(PUBLIC_KEY);
-        return key.getEncoded();
-    }
-
     public static String getRSAPrivateKeyAsNetFormat(byte[] encodedPrivkey) {
         try {
             StringBuffer buff = new StringBuffer(1024);
             PKCS8EncodedKeySpec pvkKeySpec = new PKCS8EncodedKeySpec(encodedPrivkey);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
             RSAPrivateCrtKey pvkKey = (RSAPrivateCrtKey) keyFactory.generatePrivate(pvkKeySpec);
             buff.append("<RSAKeyValue>");
             buff.append("<Modulus>" + Base64.encodeBase64String(removeMSZero(pvkKey.getModulus().toByteArray())) + "</Modulus>");
@@ -207,34 +302,34 @@ public class RSAUtils {
         }
     }
 
+    /**
+     * 获取C#版的公钥
+     * @param encodedPrivkey
+     * @return
+     */
     public static String getRSAPublicKeyAsNetFormat(byte[] encodedPrivkey) {
         try {
-            StringBuffer buff = new StringBuffer(1024);
-//            PKCS8EncodedKeySpec pvkKeySpec = new PKCS8EncodedKeySpec(encodedPrivkey);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            RSAPublicKey pukKey = (RSAPublicKey) keyFactory.generatePublic(new X509EncodedKeySpec(encodedPrivkey));
-            buff.append("<RSAKeyValue>");
-            buff.append("<Modulus>" + Base64.encodeBase64String(removeMSZero(pukKey.getModulus().toByteArray())) + "</Modulus>");
-            buff.append("<Exponent>" + Base64.encodeBase64String(removeMSZero(pukKey.getPublicExponent().toByteArray())) + "</Exponent>");
-            buff.append("</RSAKeyValue>");
-            return buff.toString().replaceAll("[ \t\n\r]", "");
+            KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+            RSAPublicKey pubKey = (RSAPublicKey) keyFactory.generatePublic(new X509EncodedKeySpec(encodedPrivkey));
+            return getRSAPublicKeyAsNetFormat(pubKey);
         } catch (Exception e) {
             System.err.println(e);
             return null;
         }
     }
 
-    public static String encodePublicKeyToXml(PublicKey key) {
-        if (!RSAPublicKey.class.isInstance(key)) {
-            return null;
-        }
-        RSAPublicKey pubKey = (RSAPublicKey) key;
+    /**
+     * 获取C#版的公钥
+     * @param pubKey
+     * @return
+     */
+    public static String getRSAPublicKeyAsNetFormat(RSAPublicKey pubKey) {
         StringBuilder sb = new StringBuilder();
         sb.append("<RSAKeyValue>");
-        sb.append("<Modulus>").append(Base64.encodeBase64String(pubKey.getModulus().toByteArray())).append("</Modulus>");
-        sb.append("<Exponent>").append(Base64.encodeBase64String(pubKey.getPublicExponent().toByteArray())).append("</Exponent>");
+        sb.append("<Modulus>").append(Base64.encodeBase64String(removeMSZero(pubKey.getModulus().toByteArray()))).append("</Modulus>");
+        sb.append("<Exponent>").append(Base64.encodeBase64String(removeMSZero(pubKey.getPublicExponent().toByteArray()))).append("</Exponent>");
         sb.append("</RSAKeyValue>");
-        return sb.toString();
+        return sb.toString().replaceAll("[ \t\n\r]", "");
     }
 
     private static byte[] removeMSZero(byte[] data) {
@@ -249,6 +344,25 @@ public class RSAUtils {
         return data1;
     }
 
+    // ====================================================================================
+
+    /**
+     * 获取密钥
+     * @param args
+     */
+    public static void main0(String[] args) {
+        Map<String, Object> keyMap;
+        try {
+            keyMap = createKey();  // 使用 java.security.KeyPairGenerator 生成 公/私钥
+            String publicKey = getPublicKey(keyMap);
+            System.out.println("公钥：\n"+publicKey);
+            String privateKey = getPrivateKey(keyMap);
+            System.out.println("私钥：\n"+privateKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * @param args
      * @throws Exception
@@ -257,12 +371,12 @@ public class RSAUtils {
         //初始化密钥
         //生成密钥对
         //默认512的长度为53，1024的长度为117，2048的长度为245
-        Map<String, Object> keyMap = RSAUtils.initKey();
+        Map<String, Object> keyMap = RSAUtils.createKey();
         //公钥
-        byte[] publicKey = RSAUtils.getPublicKey(keyMap);
+        byte[] publicKey = RSAUtils.getPublicKeyBytes(keyMap);
         //私钥
-        byte[] privateKey = RSAUtils.getPrivateKey(keyMap);
-        System.out.println("公钥：" + Base64.encodeBase64String(publicKey));
+        byte[] privateKey = RSAUtils.getPrivateKeyBytes(keyMap);
+        System.out.println("公钥：" + publicKey);
         System.out.println("C#公钥：" + getRSAPublicKeyAsNetFormat(publicKey));
         System.out.println("私钥：" + Base64.encodeBase64String(privateKey));
         System.out.println("C#私钥：" + getRSAPrivateKeyAsNetFormat(privateKey));

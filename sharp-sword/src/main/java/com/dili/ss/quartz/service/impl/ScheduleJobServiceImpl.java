@@ -70,7 +70,7 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 				handleSchedulerException(e, scheduleJob);
 			}
 		}
-		return super.insert(scheduleJob);
+		return insert(scheduleJob);
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 				handleSchedulerException(e, scheduleJob);
 			}
 		}
-		return super.insertSelective(scheduleJob);
+		return insertSelective(scheduleJob);
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 				}
 			}
 		}
-		return super.batchInsert(list);
+		return batchInsert(list);
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 				handleSchedulerException(e, job);
 			}
 		}
-		return super.update(job);
+		return update(job);
 	}
 
 	@Override
@@ -138,7 +138,7 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 				handleSchedulerException(e, job);
 			}
 		}
-		return super.updateExactSimple(job);
+		return updateExactSimple(job);
 	}
 
 	@Override
@@ -153,7 +153,7 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 				}
 			}
 		}
-		return super.batchUpdateSelective(list);
+		return batchUpdateSelective(list);
 	}
 
 	@Override
@@ -168,7 +168,7 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 				throw new RuntimeException(e);
 			}
 		}
-		return super.delete(ids);
+		return delete(ids);
 	}
 
 	@Override
@@ -181,7 +181,7 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 				throw new RuntimeException(e);
 			}
 		}
-		return super.delete(id);
+		return delete(id);
 	}
 
 	@Override
@@ -197,7 +197,7 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 			ScheduleJob job = DTOUtils.newDTO(ScheduleJob.class);
 			job.setId(scheduleJob.getId());
 			job.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
-			super.updateSelective(job);
+			updateSelective(job);
 		} else {
 			List<ScheduleJob> jobs = list(scheduleJob);
 			if (ListUtils.emptyIfNull(jobs).isEmpty()) {
@@ -206,7 +206,7 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 			ScheduleJob job = DTOUtils.newDTO(ScheduleJob.class);
 			job.setId(jobs.get(0).getId());
 			job.setJobStatus(QuartzConstants.JobStatus.NORMAL.getCode());
-			super.updateSelective(job);
+			updateSelective(job);
 		}
 	}
 
@@ -223,7 +223,7 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 			ScheduleJob job = DTOUtils.newDTO(ScheduleJob.class);
 			job.setId(scheduleJob.getId());
 			job.setJobStatus(QuartzConstants.JobStatus.PAUSED.getCode());
-			super.updateSelective(job);
+			updateSelective(job);
 		} else {
 			List<ScheduleJob> jobs = list(scheduleJob);
 			if (ListUtils.emptyIfNull(jobs).isEmpty()) {
@@ -232,7 +232,7 @@ public class ScheduleJobServiceImpl extends BaseServiceImpl<ScheduleJob, Long> i
 			ScheduleJob job = DTOUtils.newDTO(ScheduleJob.class);
 			job.setId(jobs.get(0).getId());
 			job.setJobStatus(QuartzConstants.JobStatus.PAUSED.getCode());
-			super.updateSelective(job);
+			updateSelective(job);
 		}
 	}
 
