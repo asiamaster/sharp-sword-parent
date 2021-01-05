@@ -1,52 +1,52 @@
 <#body>
-    <div class="easyui-layout" fit="true">
-        <!-- ====================================================================================================================== -->
-        <!-- 上方布局 -->
-        <!-- ====================================================================================================================== -->
-        <div region="north" height="auto" align="center" border="false">
-            <div id="nav" style="padding-left:15px;padding-top:10px;" align="left">
-                <#nav/>
-            </div>
-            <!-- =========================================================表单========================================================= -->
-            <div class="easyui-panel" style="width:100%;border: 0px;" align="left" border="false">
-                <form id="form" class="easyui-form" method="post" fit="true">
-                    <table style="padding:10px;">
-                        <tr>
-                            <td style="padding:5px;">
-                                <input class="easyui-textbox" name="jobName" id="jobName" style="width:100%"
-                                       data-options="label:'任务名:', labelAlign:'right', validType:'length[0,40]'"/>
-                            </td>
-                            <td style="padding:5px;">
-                                <input class="easyui-textbox" name="jobGroup" id="jobGroup" style="width:100%"
-                                       data-options="label:'任务分组:', labelAlign:'right', validType:'length[0,40]'"/>
-                            </td>
-                            <td style="padding:5px;">
-                                <input name="jobStatus" id="jobStatus" style="width:100%;" panelWidth="auto" data-options="editable:false,labelAlign:'right'"
-                                       panelHeight="auto" label="任务状态:"/>
-                                <#comboProvider _id="jobStatus" _provider='jobStatusProvider' _queryParams='{emptyText:"-- 全部 --"}'/>
-                            </td>
-                            <td style="padding:5px;">
-                                <input name="isConcurrent" id="isConcurrent" style="width:100%;" panelWidth="auto" data-options="labelAlign:'right',editable:false"
-                                       panelHeight="auto" label="同步/异步:"/>
-                                <#comboProvider _id="isConcurrent" _provider='isConcurrentProvider' _queryParams='{emptyText:"-- 全部 --"}'/>
-                            </td>
-                            <td>
-                                <a href="#" class="easyui-linkbutton" iconCls="icon-search" id="queryBtn"
-                                   onclick="queryGrid()">查询</a>&nbsp;&nbsp;
-                                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="clearForm()">清除</a>
-                            </td>
-                        </tr>
-                    </table>
-                </form>
-            </div>
+<div class="easyui-layout" fit="true">
+    <!-- ====================================================================================================================== -->
+    <!-- 上方布局 -->
+    <!-- ====================================================================================================================== -->
+    <div region="north" height="auto" align="center" border="false">
+        <div id="nav" style="padding-left:15px;padding-top:10px;" align="left">
+            <#nav/>
         </div>
-        <!-- ====================================================================================================================== -->
-        <!-- 中央布局 -->
-        <!-- ====================================================================================================================== -->
-        <!-- 表格 -->
-        <div region="center" style="width:100%;border: 0px;" align="center" height="auto" border="false">
-            <!-- 两边留白 -->
-            <div class="easyui-panel" align="center" style="width:96%;height:100%;" border="false">
+        <!-- =========================================================表单========================================================= -->
+        <div class="easyui-panel" style="width:100%;border: 0px;" align="left" border="false">
+            <form id="form" class="easyui-form" method="post" fit="true">
+                <table style="padding:10px;">
+                    <tr>
+                        <td style="padding:5px;">
+                            <input class="easyui-textbox" name="jobName" id="jobName" style="width:100%"
+                                   data-options="label:'任务名:', labelAlign:'right', validType:'length[0,40]'"/>
+                        </td>
+                        <td style="padding:5px;">
+                            <input class="easyui-textbox" name="jobGroup" id="jobGroup" style="width:100%"
+                                   data-options="label:'任务分组:', labelAlign:'right', validType:'length[0,40]'"/>
+                        </td>
+                        <td style="padding:5px;">
+                            <input name="jobStatus" id="jobStatus" style="width:100%;" panelWidth="auto" data-options="editable:false,labelAlign:'right'"
+                                   panelHeight="auto" label="任务状态:"/>
+                            <#comboProvider _id="jobStatus" _provider='jobStatusProvider' _queryParams='{emptyText:"-- 全部 --"}'/>
+                        </td>
+                        <td style="padding:5px;">
+                            <input name="isConcurrent" id="isConcurrent" style="width:100%;" panelWidth="auto" data-options="labelAlign:'right',editable:false"
+                                   panelHeight="auto" label="同步/异步:"/>
+                            <#comboProvider _id="isConcurrent" _provider='isConcurrentProvider' _queryParams='{emptyText:"-- 全部 --"}'/>
+                        </td>
+                        <td>
+                            <a href="#" class="easyui-linkbutton" iconCls="icon-search" id="queryBtn"
+                               onclick="queryGrid()">查询</a>&nbsp;&nbsp;
+                            <a href="javascript:void(0)" class="easyui-linkbutton" onclick="clearForm()">清除</a>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <!-- ====================================================================================================================== -->
+    <!-- 中央布局 -->
+    <!-- ====================================================================================================================== -->
+    <!-- 表格 -->
+    <div region="center" style="width:100%;border: 0px;" align="center" height="auto" border="false">
+        <!-- 两边留白 -->
+        <div class="easyui-panel" align="center" style="width:96%;height:100%;" border="false">
             <!-- =========================================================表格========================================================= -->
             <table class="easyui-datagrid" title="调度器列表" id="grid" fitColumns="true" noheader="true"
                    pagination="true" pageSize="30" pageNumber="1" pagePosition="top"
@@ -89,6 +89,15 @@
                     <th data-options="field:'isConcurrent',  _provider:'isConcurrentProvider', sortable:'true', order:'asc', align:'center', resizable:'true', fixed:'false'">
                         同步/异步
                     </th>
+                    <th data-options="field:'retryCount', sortable:'true', order:'asc', align:'center', resizable:'true', fixed:'false'">
+                        重试次数
+                    </th>
+                    <th data-options="field:'retryInterval', sortable:'true', order:'asc', align:'center', resizable:'true', fixed:'false'">
+                        重试间隔/毫秒
+                    </th>
+                    <th data-options="field:'recoveryCallback', sortable:'true', order:'asc', align:'center', resizable:'true', fixed:'false'">
+                        兜底回调
+                    </th>
                     <th data-options="field:'description',   sortable:'true', order:'asc', align:'center', resizable:'true', fixed:'false'">
                         描述
                     </th>
@@ -101,18 +110,17 @@
                     <th data-options="field:'modified',  _provider:'datetimeProvider', sortable:'true', order:'asc', align:'center', resizable:'true', fixed:'false'">
                         修改时间
                     </th>
-
                 </tr>
                 </thead>
             </table>
-            </div>
         </div>
     </div>
-    <!-- 隐藏编辑框 -->
-    <div id="dlg" class="easyui-dialog" resizable="false" constrain="true" shadow="true" draggable="false"
-         title="调度器" style="padding:20px" modal="true" border="thin" closed="true"
-         data-options="
-				height: 560,
+</div>
+<!-- 隐藏编辑框 -->
+<div id="dlg" class="easyui-dialog" resizable="false" constrain="true" shadow="true" draggable="false"
+     title="调度器" style="padding:20px" modal="true" border="thin" closed="true"
+     data-options="
+				height: 563,
 				buttons: [{
 					text:'确认',
 					iconCls:'icon-ok',
@@ -120,356 +128,364 @@
 				}
 				]
 			">
-        <form id="_form" class="easyui-form" method="post" fit="true">
-            <input name="_id" id="_id" type="hidden">
-            <table width="420px">
-                <tr>
-                    <td style="padding:5px;">
-                        <input class="easyui-textbox" name="_jobName" id="_jobName" style="width:100%"
-                               data-options="label:'*任务名:', labelAlign:'right', required:true, validType:'length[0,40]'"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding:5px;">
-                        <input class="easyui-textbox" name="_jobGroup" id="_jobGroup" style="width:100%"
-                               data-options="label:'*任务分组:', labelAlign:'right', required:true, validType:'length[0,40]'"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding:5px;">
-                        <input class="easyui-textbox" name="_cronExpression" id="_cronExpression" style="width:100%"
-                               data-options="label:'cron表达式:', labelWidth:100, labelAlign:'right', validType:'length[0,40]'"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding:5px;">
-                        <input class="easyui-numberbox" name="_repeatInterval" id="_repeatInterval" style="width:100%"
-                               data-options="labelAlign:'right', labelWidth:100, label:'重复间隔(s):'"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding:5px;">
-                        <input class="easyui-numberbox" name="_startDelay" id="_startDelay" style="width:100%"
-                               data-options="labelAlign:'right', labelWidth:100, label:'启动间隔(s):'"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding:5px;">
-                        <input class="easyui-textbox" name="_beanClass" id="_beanClass" style="width:100%"
-                               data-options="labelAlign:'right', label:'任务调用类:', validType:'length[0,100]'"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding:5px;">
-                        <input class="easyui-textbox" name="_springId" id="_springId" style="width:100%"
-                               data-options="labelAlign:'right', labelWidth:100, label:'SpringBeanId:', validType:'length[0,40]'"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding:5px;">
-                        <input class="easyui-textbox" name="_url" id="_url" style="width:100%"
-                               data-options="labelAlign:'right', label:'url:', validType:'length[0,100]'"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding:5px;">
-                        <input class="easyui-textbox" name="_methodName" id="_methodName" style="width:100%"
-                               data-options="labelAlign:'right', label:'方法名:', validType:'length[0,40]'"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding:5px;">
-                        <input class="easyui-textbox" name="_description" id="_description" style="width:100%"
-                               data-options="labelAlign:'right', label:'描述:', validType:'length[0,200]'"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding:5px;">
-                        <input name="_isConcurrent" id="_isConcurrent" style="width:100%;" panelWidth="auto"
-                               panelHeight="auto" data-options="labelAlign:'right', required:true, editable:false" label="*同步/异步:"/>
-                        <#comboProvider _id="_isConcurrent" _provider='isConcurrentProvider'/>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding:5px;">
-                        <input class="easyui-textbox" name="_jobData" id="_jobData" style="width:100%"
-                               data-options="labelAlign:'right', label:'json:', validType:'length[0,1000]', multiline:true, height:100"/>
-                    </td>
-                </tr>
-            </table>
-        </form>
+    <form id="_form" class="easyui-form" method="post" fit="true">
+        <input name="_id" id="_id" type="hidden">
+        <table width="750px">
+            <tr>
+                <td style="padding:5px;">
+                    <input class="easyui-textbox" name="_jobGroup" id="_jobGroup" style="width:100%"
+                           data-options="label:'*任务分组:', labelWidth:100, labelAlign:'right', required:true, validType:'length[0,40]'"/>
+                </td>
+                <td style="padding:5px;">
+                    <input class="easyui-textbox" name="_jobName" id="_jobName" style="width:100%"
+                           data-options="label:'*任务名:', labelWidth:100, labelAlign:'right', required:true, validType:'length[0,40]'"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:5px;">
+                    <input class="easyui-numberbox" name="_repeatInterval" id="_repeatInterval" style="width:100%"
+                           data-options="labelAlign:'right', labelWidth:100, label:'重复间隔(s):'"/>
+                </td>
+                <td style="padding:5px;">
+                    <input class="easyui-numberbox" name="_startDelay" id="_startDelay" style="width:100%"
+                           data-options="labelAlign:'right', labelWidth:100, label:'启动间隔(s):'"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:5px;">
+                    <input class="easyui-textbox" name="_beanClass" id="_beanClass" style="width:100%"
+                           data-options="labelAlign:'right', labelWidth:100, label:'任务调用类:', validType:'length[0,100]'"/>
+                </td>
+                <td style="padding:5px;">
+                    <input class="easyui-textbox" name="_methodName" id="_methodName" style="width:100%"
+                           data-options="labelAlign:'right', labelWidth:100, label:'方法名:', validType:'length[0,40]'"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:5px;">
+                    <input class="easyui-textbox" name="_springId" id="_springId" style="width:100%"
+                           data-options="labelAlign:'right', labelWidth:100, label:'SpringBeanId:', validType:'length[0,40]'"/>
+                </td>
+                <td style="padding:5px;">
+                    <input class="easyui-textbox" name="_cronExpression" id="_cronExpression" style="width:100%"
+                           data-options="label:'cron表达式:', labelWidth:100, labelAlign:'right', validType:'length[0,40]'"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:5px;" colspan="2">
+                    <input class="easyui-textbox" name="_url" id="_url" style="width:100%"
+                           data-options="labelAlign:'right', labelWidth:100, label:'url:', validType:'length[0,100]'"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:5px;">
+                    <input class="easyui-numberbox" name="_retryCount" id="_retryCount" style="width:100%"
+                           data-options="labelAlign:'right', labelWidth:100, label:'重试次数:', validType:'length[0,5]'"/>
+                </td>
+                <td style="padding:5px;">
+                    <input class="easyui-numberbox" name="_retryInterval" id="_retryInterval" style="width:100%"
+                           data-options="labelAlign:'right', labelWidth:100, label:'重试间隔/毫秒:', validType:'length[0,10]'"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:5px;">
+                    <input class="easyui-textbox" name="_recoveryCallback" id="_recoveryCallback" style="width:100%"
+                           data-options="labelAlign:'right', labelWidth:100, label:'兜底回调:', validType:'length[0,40]'"/>
+                </td>
+                <td style="padding:5px;">
+                    <input name="_isConcurrent" id="_isConcurrent" style="width:100%;" panelWidth="auto"
+                           panelHeight="auto" data-options="labelAlign:'right', labelWidth:100, required:true, editable:false" label="*同步/异步:"/>
+                    <#comboProvider _id="_isConcurrent" _provider='isConcurrentProvider'/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:5px;" colspan="2">
+                    <input class="easyui-textbox" name="_description" id="_description" style="width:100%"
+                           data-options="labelAlign:'right', labelWidth:100, label:'描述:', validType:'length[0,200]'"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:5px;" colspan="2">
+                    <input class="easyui-textbox" name="_jobData" id="_jobData" style="width:100%"
+                           data-options="labelAlign:'right', labelWidth:100, label:'json:', validType:'length[0,1000]', multiline:true, height:85"/>
+                </td>
+            </tr>
+        </table>
+    </form>
 
-    </div>
-    <!-- ====================================================================================================================== -->
-    <!-- style & script 分隔线 -->
-    <!-- ====================================================================================================================== -->
-    <script type="text/javascript">
+</div>
+<!-- ====================================================================================================================== -->
+<!-- style & script 分隔线 -->
+<!-- ====================================================================================================================== -->
+<script type="text/javascript">
 
-        //暂停
-        function pause() {
+    //暂停
+    function pause() {
+        var selected = $("#grid").datagrid("getSelected");
+        if (null == selected) {
+            $.messager.alert('警告', '请选中一条数据');
+            return;
+        }
+        $.messager.confirm('确认', '您确认想要暂停吗？', function (r) {
+            if (r) {
+                $.ajax({
+                    type: "POST",
+                    url: "${contextPath}/scheduleJob/pause.action",
+                    data: {id: selected.id, jobName: selected.jobName, jobGroup: selected.jobGroup},
+                    processData: true,
+                    dataType: "json",
+                    async: true,
+                    success: function (data) {
+                        if (data.code == "200") {
+                            $("#grid").datagrid("reload");
+                            $('#dlg').dialog('close');
+                        } else {
+                            $.messager.alert('错误', data.message);
+                        }
+                    },
+                    error: function () {
+                        $.messager.alert('错误', '远程访问失败');
+                    }
+                });
+            }
+        });
+    }
+    //恢复
+    function resume() {
+        var selected = $("#grid").datagrid("getSelected");
+        if (null == selected) {
+            $.messager.alert('警告', '请选中一条数据');
+            return;
+        }
+        $.messager.confirm('确认', '您确认想要恢复吗？', function (r) {
+            if (r) {
+                $.ajax({
+                    type: "POST",
+                    url: "${contextPath}/scheduleJob/resume.action",
+                    data: {id: selected.id, jobName: selected.jobName, jobGroup: selected.jobGroup},
+                    processData: true,
+                    dataType: "json",
+                    async: true,
+                    success: function (data) {
+                        if (data.code == "200") {
+                            $("#grid").datagrid("reload");
+                            $('#dlg').dialog('close');
+                        } else {
+                            $.messager.alert('错误', data.message);
+                        }
+                    },
+                    error: function () {
+                        $.messager.alert('错误', '远程访问失败');
+                    }
+                });
+            }
+        });
+    }
+    //打开新增窗口
+    function openInsert() {
+        $('#dlg').dialog('open');
+        $('#dlg').dialog('center');
+        $('#_form').form('clear');
+        $("#_isConcurrent").combobox("setValue", "0");
+        formFocus("_form", "_jobName");
+    }
+
+    //打开修改窗口
+    function openUpdate() {
+        $('#_form').form('clear');
+        var selected = $("#grid").datagrid("getSelected");
+        if (null == selected) {
+            $.messager.alert('警告', '请选中一条数据');
+            return;
+        }
+        $('#dlg').dialog('open');
+        $('#dlg').dialog('center');
+        formFocus("_form", "_jobName");
+        var formData = $.extend({}, selected);
+        formData = addKeyStartWith(getOriginalData(formData), "_");
+        //js的0和1必须是字符串才能加载到控件中
+        formData["_isConcurrent"] = formData["_isConcurrent"] + "";
+        $('#_form').form('load', formData);
+    }
+
+    function saveOrUpdate() {
+        if (!$('#_form').form("validate")) {
+            return;
+        }
+        var _formData = removeKeyStartWith($("#_form").serializeObject(true), "_");
+        var _url = null;
+        //没有id就新增
+        if (_formData.id == null || _formData.id == "") {
+            _url = "${contextPath}/scheduleJob/insert.action";
+        } else {//有id就修改
+            _url = "${contextPath}/scheduleJob/update.action";
+        }
+        $.ajax({
+            type: "POST",
+            url: _url,
+            data: _formData,
+            processData: true,
+            dataType: "json",
+            async: true,
+            success: function (data) {
+                if (data.code == "200") {
+                    $("#grid").datagrid("reload");
+                    $('#dlg').dialog('close');
+                } else {
+                    $.messager.alert('错误', data.message);
+                }
+            },
+            error: function () {
+                $.messager.alert('错误', '远程访问失败');
+            }
+        });
+    }
+
+    //根据主键删除
+    function del() {
+        var selected = $("#grid").datagrid("getSelected");
+        if (null == selected) {
+            $.messager.alert('警告', '请选中一条数据');
+            return;
+        }
+        $.messager.confirm('确认', '您确认想要删除记录吗？', function (r) {
+            if (r) {
+                $.ajax({
+                    type: "POST",
+                    url: "${contextPath}/scheduleJob/delete.action",
+                    data: {id: selected.id},
+                    processData: true,
+                    dataType: "json",
+                    async: true,
+                    success: function (data) {
+                        if (data.code == "200") {
+                            $("#grid").datagrid("reload");
+                            $('#dlg').dialog('close');
+                        } else {
+                            $.messager.alert('错误', data.message);
+                        }
+                    },
+                    error: function () {
+                        $.messager.alert('错误', '远程访问失败');
+                    }
+                });
+            }
+        });
+    }
+    //表格查询
+    function queryGrid() {
+        var opts = $("#grid").datagrid("options");
+        if (null == opts.url || "" == opts.url) {
+            opts.url = "${contextPath}/scheduleJob/listPage.action";
+        }
+        if (!$('#form').form("validate")) {
+            return;
+        }
+        $("#grid").datagrid("load", bindGridMeta2Form("grid", "form"));
+    }
+
+
+    //清空表单
+    function clearForm() {
+        $('#form').form('clear');
+    }
+
+    //表格表头右键菜单
+    function headerContextMenu(e, field) {
+        e.preventDefault();
+        if (!cmenu) {
+            createColumnMenu("grid");
+        }
+        cmenu.menu('show', {
+            left: e.pageX,
+            top: e.pageY
+        });
+    }
+
+    //全局按键事件
+    function getKey(e) {
+        e = e || window.event;
+        var keycode = e.which ? e.which : e.keyCode;
+        if (keycode == 46) { //如果按下删除键
             var selected = $("#grid").datagrid("getSelected");
-            if (null == selected) {
-                $.messager.alert('警告', '请选中一条数据');
-                return;
+            if (selected && selected != null) {
+                del();
             }
-            $.messager.confirm('确认', '您确认想要暂停吗？', function (r) {
-                if (r) {
-                    $.ajax({
-                        type: "POST",
-                        url: "${contextPath}/scheduleJob/pause.action",
-                        data: {id: selected.id, jobName: selected.jobName, jobGroup: selected.jobGroup},
-                        processData: true,
-                        dataType: "json",
-                        async: true,
-                        success: function (data) {
-                            if (data.code == "200") {
-                                $("#grid").datagrid("reload");
-                                $('#dlg').dialog('close');
-                            } else {
-                                $.messager.alert('错误', data.message);
-                            }
-                        },
-                        error: function () {
-                            $.messager.alert('错误', '远程访问失败');
-                        }
-                    });
-                }
-            });
         }
-        //恢复
-        function resume() {
-            var selected = $("#grid").datagrid("getSelected");
-            if (null == selected) {
-                $.messager.alert('警告', '请选中一条数据');
-                return;
-            }
-            $.messager.confirm('确认', '您确认想要恢复吗？', function (r) {
-                if (r) {
-                    $.ajax({
-                        type: "POST",
-                        url: "${contextPath}/scheduleJob/resume.action",
-                        data: {id: selected.id, jobName: selected.jobName, jobGroup: selected.jobGroup},
-                        processData: true,
-                        dataType: "json",
-                        async: true,
-                        success: function (data) {
-                            if (data.code == "200") {
-                                $("#grid").datagrid("reload");
-                                $('#dlg').dialog('close');
-                            } else {
-                                $.messager.alert('错误', data.message);
-                            }
-                        },
-                        error: function () {
-                            $.messager.alert('错误', '远程访问失败');
-                        }
-                    });
-                }
-            });
-        }
-        //打开新增窗口
-        function openInsert() {
-            $('#dlg').dialog('open');
-            $('#dlg').dialog('center');
-            $('#_form').form('clear');
-            $("#_isConcurrent").combobox("setValue", "0");
-            formFocus("_form", "_jobName");
+    }
+
+    /**
+     * 绑定页面回车事件，以及初始化页面时的光标定位
+     * @formId
+     *          表单ID
+     * @elementName
+     *          光标定位在指点表单元素的name属性的值
+     * @submitFun
+     *          表单提交需执行的任务
+     */
+    $(function () {
+        bindFormEvent("form", "jobName", queryGrid);
+        bindFormEvent("_form", "_jobName", saveOrUpdate, function () {
+            $('#dlg').dialog('close');
+        });
+        if (document.addEventListener) {
+            document.addEventListener("keyup", getKey, false);
+        } else if (document.attachEvent) {
+            document.attachEvent("onkeyup", getKey);
+        } else {
+            document.onkeyup = getKey;
         }
 
-        //打开修改窗口
-        function openUpdate() {
-            $('#_form').form('clear');
-            var selected = $("#grid").datagrid("getSelected");
-            if (null == selected) {
-                $.messager.alert('警告', '请选中一条数据');
-                return;
-            }
-            $('#dlg').dialog('open');
-            $('#dlg').dialog('center');
-            formFocus("_form", "_jobName");
-            var formData = $.extend({}, selected);
-            formData = addKeyStartWith(getOriginalData(formData), "_");
-            $('#_form').form('load', formData);
-        }
-
-        function saveOrUpdate() {
-            if (!$('#_form').form("validate")) {
-                return;
-            }
-            var _formData = removeKeyStartWith($("#_form").serializeObject(true), "_");
-            var _url = null;
-            //没有id就新增
-            if (_formData.id == null || _formData.id == "") {
-                _url = "${contextPath}/scheduleJob/insert.action";
-            } else {//有id就修改
-                _url = "${contextPath}/scheduleJob/update.action";
-            }
-            $.ajax({
-                type: "POST",
-                url: _url,
-                data: _formData,
-                processData: true,
-                dataType: "json",
-                async: true,
-                success: function (data) {
-                    if (data.code == "200") {
-                        $("#grid").datagrid("reload");
-                        $('#dlg').dialog('close');
-                    } else {
-                        $.messager.alert('错误', data.message);
+        var pager = $('#grid').datagrid('getPager');
+        pager.pagination({
+            layout: ['list', 'first', 'prev', 'links', 'next', 'last', 'manual', 'refresh', 'info'],
+            links: 5
+            , buttons: [
+                {
+                    iconCls: 'icon-add',
+                    text: '新增',
+                    handler: function () {
+                        openInsert();
                     }
-                },
-                error: function () {
-                    $.messager.alert('错误', '远程访问失败');
                 }
-            });
-        }
-
-        //根据主键删除
-        function del() {
-            var selected = $("#grid").datagrid("getSelected");
-            if (null == selected) {
-                $.messager.alert('警告', '请选中一条数据');
-                return;
-            }
-            $.messager.confirm('确认', '您确认想要删除记录吗？', function (r) {
-                if (r) {
-                    $.ajax({
-                        type: "POST",
-                        url: "${contextPath}/scheduleJob/delete.action",
-                        data: {id: selected.id},
-                        processData: true,
-                        dataType: "json",
-                        async: true,
-                        success: function (data) {
-                            if (data.code == "200") {
-                                $("#grid").datagrid("reload");
-                                $('#dlg').dialog('close');
-                            } else {
-                                $.messager.alert('错误', data.message);
-                            }
-                        },
-                        error: function () {
-                            $.messager.alert('错误', '远程访问失败');
-                        }
-                    });
+                , {
+                    iconCls: 'icon-edit',
+                    text: '修改',
+                    handler: function () {
+                        openUpdate();
+                    }
                 }
-            });
-        }
-        //表格查询
-        function queryGrid() {
-            var opts = $("#grid").datagrid("options");
-            if (null == opts.url || "" == opts.url) {
-                opts.url = "${contextPath}/scheduleJob/listPage.action";
-            }
-            if (!$('#form').form("validate")) {
-                return;
-            }
-            $("#grid").datagrid("load", bindGridMeta2Form("grid", "form"));
-        }
-
-
-        //清空表单
-        function clearForm() {
-            $('#form').form('clear');
-        }
-
-        //表格表头右键菜单
-        function headerContextMenu(e, field) {
-            e.preventDefault();
-            if (!cmenu) {
-                createColumnMenu("grid");
-            }
-            cmenu.menu('show', {
-                left: e.pageX,
-                top: e.pageY
-            });
-        }
-
-        //全局按键事件
-        function getKey(e) {
-            e = e || window.event;
-            var keycode = e.which ? e.which : e.keyCode;
-            if (keycode == 46) { //如果按下删除键
-                var selected = $("#grid").datagrid("getSelected");
-                if (selected && selected != null) {
-                    del();
+                , {
+                    iconCls: 'icon-remove',
+                    text: '删除',
+                    handler: function () {
+                        del();
+                    }
+                }, {
+                    iconCls: 'icon-remove',
+                    text: '暂停',
+                    handler: function () {
+                        pause();
+                    }
+                }, {
+                    iconCls: 'icon-remove',
+                    text: '恢复',
+                    handler: function () {
+                        resume();
+                    }
                 }
-            }
-        }
-
-        /**
-         * 绑定页面回车事件，以及初始化页面时的光标定位
-         * @formId
-         *          表单ID
-         * @elementName
-         *          光标定位在指点表单元素的name属性的值
-         * @submitFun
-         *          表单提交需执行的任务
-         */
-        $(function () {
-            bindFormEvent("form", "jobName", queryGrid);
-            bindFormEvent("_form", "_jobName", saveOrUpdate, function () {
-                $('#dlg').dialog('close');
-            });
-            if (document.addEventListener) {
-                document.addEventListener("keyup", getKey, false);
-            } else if (document.attachEvent) {
-                document.attachEvent("onkeyup", getKey);
-            } else {
-                document.onkeyup = getKey;
-            }
-
-            var pager = $('#grid').datagrid('getPager');
-            pager.pagination({
-                layout: ['list', 'first', 'prev', 'links', 'next', 'last', 'manual', 'refresh', 'info'],
-                links: 5
-                , buttons: [
-                    {
-                        iconCls: 'icon-add',
-                        text: '新增',
-                        handler: function () {
-                            openInsert();
-                        }
+                , {
+                    iconCls: 'icon-export',
+                    text: '导出',
+                    handler: function () {
+                        doExport('grid');
                     }
-                    , {
-                        iconCls: 'icon-edit',
-                        text: '修改',
-                        handler: function () {
-                            openUpdate();
-                        }
-                    }
-                    , {
-                        iconCls: 'icon-remove',
-                        text: '删除',
-                        handler: function () {
-                            del();
-                        }
-                    }, {
-                        iconCls: 'icon-remove',
-                        text: '暂停',
-                        handler: function () {
-                            pause();
-                        }
-                    }, {
-                        iconCls: 'icon-remove',
-                        text: '恢复',
-                        handler: function () {
-                            resume();
-                        }
-                    }
-                    , {
-                        iconCls: 'icon-export',
-                        text: '导出',
-                        handler: function () {
-                            doExport('grid');
-                        }
-                    }
-                ]
-            });
-            //表格仅显示下边框
-            $('#grid').datagrid('getPanel').removeClass('lines-both lines-no lines-right lines-bottom').addClass("lines-bottom");
-            queryGrid();
-        })
-    </script>
+                }
+            ]
+        });
+        //表格仅显示下边框
+        $('#grid').datagrid('getPanel').removeClass('lines-both lines-no lines-right lines-bottom').addClass("lines-bottom");
+        queryGrid();
+    })
+</script>
 </#body>

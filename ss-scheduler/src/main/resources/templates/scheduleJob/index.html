@@ -120,7 +120,7 @@
 <div id="dlg" class="easyui-dialog" resizable="false" constrain="true" shadow="true" draggable="false"
      title="调度器" style="padding:20px" modal="true" border="thin" closed="true"
      data-options="
-				height: 660,
+				height: 563,
 				buttons: [{
 					text:'确认',
 					iconCls:'icon-ok',
@@ -130,8 +130,12 @@
 			">
     <form id="_form" class="easyui-form" method="post" fit="true">
         <input name="_id" id="_id" type="hidden">
-        <table width="520px">
+        <table width="750px">
             <tr>
+                <td style="padding:5px;">
+                    <input class="easyui-textbox" name="_jobGroup" id="_jobGroup" style="width:100%"
+                           data-options="label:'*任务分组:', labelWidth:100, labelAlign:'right', required:true, validType:'length[0,40]'"/>
+                </td>
                 <td style="padding:5px;">
                     <input class="easyui-textbox" name="_jobName" id="_jobName" style="width:100%"
                            data-options="label:'*任务名:', labelWidth:100, labelAlign:'right', required:true, validType:'length[0,40]'"/>
@@ -139,23 +143,9 @@
             </tr>
             <tr>
                 <td style="padding:5px;">
-                    <input class="easyui-textbox" name="_jobGroup" id="_jobGroup" style="width:100%"
-                           data-options="label:'*任务分组:', labelWidth:100, labelAlign:'right', required:true, validType:'length[0,40]'"/>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding:5px;">
-                    <input class="easyui-textbox" name="_cronExpression" id="_cronExpression" style="width:100%"
-                           data-options="label:'cron表达式:', labelWidth:100, labelAlign:'right', validType:'length[0,40]'"/>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding:5px;">
                     <input class="easyui-numberbox" name="_repeatInterval" id="_repeatInterval" style="width:100%"
                            data-options="labelAlign:'right', labelWidth:100, label:'重复间隔(s):'"/>
                 </td>
-            </tr>
-            <tr>
                 <td style="padding:5px;">
                     <input class="easyui-numberbox" name="_startDelay" id="_startDelay" style="width:100%"
                            data-options="labelAlign:'right', labelWidth:100, label:'启动间隔(s):'"/>
@@ -166,20 +156,6 @@
                     <input class="easyui-textbox" name="_beanClass" id="_beanClass" style="width:100%"
                            data-options="labelAlign:'right', labelWidth:100, label:'任务调用类:', validType:'length[0,100]'"/>
                 </td>
-            </tr>
-            <tr>
-                <td style="padding:5px;">
-                    <input class="easyui-textbox" name="_springId" id="_springId" style="width:100%"
-                           data-options="labelAlign:'right', labelWidth:100, label:'SpringBeanId:', validType:'length[0,40]'"/>
-                </td>
-            </tr>
-            <tr>
-                <td style="padding:5px;">
-                    <input class="easyui-textbox" name="_url" id="_url" style="width:100%"
-                           data-options="labelAlign:'right', labelWidth:100, label:'url:', validType:'length[0,100]'"/>
-                </td>
-            </tr>
-            <tr>
                 <td style="padding:5px;">
                     <input class="easyui-textbox" name="_methodName" id="_methodName" style="width:100%"
                            data-options="labelAlign:'right', labelWidth:100, label:'方法名:', validType:'length[0,40]'"/>
@@ -187,15 +163,18 @@
             </tr>
             <tr>
                 <td style="padding:5px;">
-                    <input class="easyui-textbox" name="_description" id="_description" style="width:100%"
-                           data-options="labelAlign:'right', labelWidth:100, label:'描述:', validType:'length[0,200]'"/>
+                    <input class="easyui-textbox" name="_springId" id="_springId" style="width:100%"
+                           data-options="labelAlign:'right', labelWidth:100, label:'SpringBeanId:', validType:'length[0,40]'"/>
+                </td>
+                <td style="padding:5px;">
+                    <input class="easyui-textbox" name="_cronExpression" id="_cronExpression" style="width:100%"
+                           data-options="label:'cron表达式:', labelWidth:100, labelAlign:'right', validType:'length[0,40]'"/>
                 </td>
             </tr>
             <tr>
-                <td style="padding:5px;">
-                    <input name="_isConcurrent" id="_isConcurrent" style="width:100%;" panelWidth="auto"
-                           panelHeight="auto" data-options="labelAlign:'right', labelWidth:100, required:true, editable:false" label="*同步/异步:"/>
-                    <#comboProvider _id="_isConcurrent" _provider='isConcurrentProvider'/>
+                <td style="padding:5px;" colspan="2">
+                    <input class="easyui-textbox" name="_url" id="_url" style="width:100%"
+                           data-options="labelAlign:'right', labelWidth:100, label:'url:', validType:'length[0,100]'"/>
                 </td>
             </tr>
             <tr>
@@ -203,8 +182,6 @@
                     <input class="easyui-numberbox" name="_retryCount" id="_retryCount" style="width:100%"
                            data-options="labelAlign:'right', labelWidth:100, label:'重试次数:', validType:'length[0,5]'"/>
                 </td>
-            </tr>
-            <tr>
                 <td style="padding:5px;">
                     <input class="easyui-numberbox" name="_retryInterval" id="_retryInterval" style="width:100%"
                            data-options="labelAlign:'right', labelWidth:100, label:'重试间隔/毫秒:', validType:'length[0,10]'"/>
@@ -215,12 +192,22 @@
                     <input class="easyui-textbox" name="_recoveryCallback" id="_recoveryCallback" style="width:100%"
                            data-options="labelAlign:'right', labelWidth:100, label:'兜底回调:', validType:'length[0,40]'"/>
                 </td>
-            </tr>
-
-            <tr>
                 <td style="padding:5px;">
+                    <input name="_isConcurrent" id="_isConcurrent" style="width:100%;" panelWidth="auto"
+                           panelHeight="auto" data-options="labelAlign:'right', labelWidth:100, required:true, editable:false" label="*同步/异步:"/>
+                    <#comboProvider _id="_isConcurrent" _provider='isConcurrentProvider'/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:5px;" colspan="2">
+                    <input class="easyui-textbox" name="_description" id="_description" style="width:100%"
+                           data-options="labelAlign:'right', labelWidth:100, label:'描述:', validType:'length[0,200]'"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:5px;" colspan="2">
                     <input class="easyui-textbox" name="_jobData" id="_jobData" style="width:100%"
-                           data-options="labelAlign:'right', labelWidth:100, label:'json:', validType:'length[0,1000]', multiline:true, height:100"/>
+                           data-options="labelAlign:'right', labelWidth:100, label:'json:', validType:'length[0,1000]', multiline:true, height:85"/>
                 </td>
             </tr>
         </table>
