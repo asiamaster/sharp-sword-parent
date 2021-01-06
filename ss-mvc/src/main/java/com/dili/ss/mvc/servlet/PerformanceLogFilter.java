@@ -37,6 +37,8 @@ public class PerformanceLogFilter implements Filter {
     private static final String REFRESH_KEY = "r";
     //超时临界值(毫秒)URI设置参数
     private static final String TIME_SPENT_THRESHOLD_KEY = "t";
+    //清空缓存URI设置参数
+    private static final String CLEAR_KEY = "c";
     private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     //spring.application.name配置的应用名称
     private String applicationName;
@@ -63,11 +65,30 @@ public class PerformanceLogFilter implements Filter {
         String requestURI = httpServletRequest.getRequestURI();
         if(VIEW_PERFORMANCE_URL.equals(requestURI)) {
             setTimeSpentThreshold(request);
+            clearPerformanceLog(request);
             show(httpServletRequest, response);
             return;
         }
         long timeSpent = next(request, response, chain);
         saveTimeSpent(request, timeSpent);
+    }
+
+    /**
+     * 获取性能日志缓存
+     * @return
+     */
+    public static Map<String, RequestHandleInfo> getPerformanceLogMap(){
+        return MAP;
+    }
+
+    /**
+     * 清空性能日志缓存
+     */
+    private void clearPerformanceLog(ServletRequest request){
+        String CLEAR = request.getParameter(CLEAR_KEY);
+        if(CLEAR != null && CLEAR.equals("clear")){
+            MAP.clear();
+        }
     }
 
     /**
