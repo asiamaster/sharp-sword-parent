@@ -74,7 +74,6 @@
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
             <version>1.0-rc6</version>
-            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
@@ -86,7 +85,6 @@
             <groupId>com.dili</groupId>
             <artifactId>ss-core</artifactId>
             <version>${project.parent.version}</version>
-            <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.squareup/javapoet -->
         <dependency>
