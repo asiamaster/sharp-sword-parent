@@ -4,28 +4,28 @@
         position: relative;
     }
     #${_containerId!"swiperContainer"} {
-        height: 42px;
-    }
+         height: 42px;
+     }
 
     @media only screen and (min-width: 1360px) {
-        #${_containerId!"swiperContainer"} {
-            width: 820px;
-        }
+    #${_containerId!"swiperContainer"} {
+        width: 780px;
+    }
     }
     @media only screen and (min-width: 1440px) {
-        #${_containerId!"swiperContainer"} {
-            width: 900px;
-        }
+    #${_containerId!"swiperContainer"} {
+        width: 860px;
+    }
     }
     @media only screen and (min-width: 1900px) {
-        #${_containerId!"swiperContainer"} {
-            width: 1400px;
-        }
+    #${_containerId!"swiperContainer"} {
+        width: 1360px;
+    }
     }
     @media only screen and (min-width: 2500px) {
-        #${_containerId!"swiperContainer"} {
-            width: 1600px;
-        }
+    #${_containerId!"swiperContainer"} {
+        width: 1560px;
+    }
     }
     .swiper-slide {
         text-align: center;
