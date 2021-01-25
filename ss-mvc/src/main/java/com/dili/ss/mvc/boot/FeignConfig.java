@@ -6,7 +6,6 @@ import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.alibaba.fastjson.support.springfox.SwaggerJsonSerializer;
 import feign.Feign;
-import feign.Logger;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
 import org.springframework.beans.factory.ObjectFactory;
@@ -31,11 +30,11 @@ import java.util.List;
 @ConditionalOnClass(Feign.class)
 public class FeignConfig {
 
-    @Bean
-    Logger.Level feignLoggerLevel() {
-        //这里记录所有，根据实际情况选择合适的日志level
-        return Logger.Level.FULL;
-    }
+//    @Bean
+//    Logger.Level feignLoggerLevel() {
+//        //这里记录所有，根据实际情况选择合适的日志level
+//        return Logger.Level.FULL;
+//    }
 
     @Bean
     public Encoder feignEncoder() {
