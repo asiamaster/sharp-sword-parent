@@ -1,27 +1,23 @@
 package com.dili.ss.redis.delayqueue.task;
 
 import com.alibaba.fastjson.JSON;
+import com.dili.ss.component.CustomThreadPoolExecutor;
 import com.dili.ss.redis.delayqueue.DelayMessage;
 import com.dili.ss.redis.delayqueue.annotation.StreamListener;
+import com.dili.ss.redis.delayqueue.component.BeanMethodCacheComponent;
+import com.dili.ss.redis.delayqueue.consts.DelayQueueConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import static com.dili.ss.redis.delayqueue.RedisDelayQueue.META_TOPIC;
 
 /**
  * 单实例版消息出列处理器
@@ -32,11 +28,10 @@ public class StandaloneTopicDequeueTask {
     private Logger logger = LoggerFactory.getLogger(getClass());
     @Resource(name = "stringRedisTemplate")
     private StringRedisTemplate redisTemplate;
-    @Autowired
-    private ApplicationContext applicationContext;
-    private ExecutorService executors = Executors.newFixedThreadPool(8);
-    // key为bean， value为@StreamListener注解的method
-    private Map<Object, Method> map = new HashMap<>();
+    @Resource
+    private BeanMethodCacheComponent beanMethodCacheComponent;
+    @Resource
+    private CustomThreadPoolExecutor customThreadPoolExecutor;
 
     /**
      * 每秒执行一次
@@ -45,12 +40,12 @@ public class StandaloneTopicDequeueTask {
     public void scheduledTask() {
         try {
             //获取所有的topic，再根据topic查询已到期的
-            Set<String> topics = redisTemplate.opsForSet().members(META_TOPIC);
-            Map<Object, Method> map = getBean(StreamListener.class);
+            Set<String> topics = redisTemplate.opsForSet().members(DelayQueueConstants.META_TOPIC);
+            Map<Object, Method> map = beanMethodCacheComponent.getBeanMethod(StreamListener.class);
             for (String topic : topics) {
                 if (!redisTemplate.hasKey(topic)) {
                     // 如果 KEY 不存在元数据中删除
-                    redisTemplate.opsForSet().remove(META_TOPIC, topic);
+                    redisTemplate.opsForSet().remove(DelayQueueConstants.META_TOPIC, topic);
                     continue;
                 }
                 Long startTime = System.currentTimeMillis();
@@ -71,13 +66,13 @@ public class StandaloneTopicDequeueTask {
                                 continue;
                             }
                             String finalDelayMessageJson = delayMessageJson;
-                            executors.submit(() -> {
+                            customThreadPoolExecutor.getExecutor().submit(() -> {
                                 try {
                                     entry.getValue().invoke(entry.getKey(), message);
                                 } catch (Throwable t) {
                                     // 失败重新放入失败队列
-//                                String failKey = topic.replace("delay:active", "delay:fail");
-//                                redisTemplate.opsForList().rightPush(failKey, finalDelayMessageJson);
+                                    String failKey = topic.replace(DelayQueueConstants.DELAY_QUEUE_KEY, DelayQueueConstants.DELAY_QUEUE_FAIL_KEY);
+                                    redisTemplate.opsForList().rightPush(failKey, finalDelayMessageJson);
                                     logger.warn("延时队列任务处理异常: ", t);
                                 }
                             });
@@ -95,29 +90,5 @@ public class StandaloneTopicDequeueTask {
         }
     }
 
-    /**
-     * 构建key为bean， value为@StreamListener注解的method的map
-     * @param annotationClass
-     * @return
-     */
-    private Map<Object, Method> getBean(Class<? extends Annotation> annotationClass) {
-        if (!this.map.isEmpty()) {
-            return this.map;
-        }
-        Map<Object, Method> map = new HashMap<>();
-        String[] beans = applicationContext.getBeanDefinitionNames();
-        for (String beanName : beans) {
-            Class<?> clazz = applicationContext.getType(beanName);
-            Method[] methods = clazz.getMethods();
-            for (Method method : methods) {
-                boolean present = method.isAnnotationPresent(annotationClass);
-                if (present) {
-                    map.put(applicationContext.getBean(beanName), method);
-                    break;
-                }
-            }
-        }
-        this.map = map;
-        return map;
-    }
+
 }

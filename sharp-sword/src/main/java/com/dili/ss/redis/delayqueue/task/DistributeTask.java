@@ -1,5 +1,6 @@
 package com.dili.ss.redis.delayqueue.task;
 
+import com.dili.ss.redis.delayqueue.consts.DelayQueueConstants;
 import io.lettuce.core.ScriptOutputType;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.cluster.api.async.RedisAdvancedClusterAsyncCommands;
@@ -13,9 +14,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Set;
-
-import static com.dili.ss.redis.delayqueue.RedisDelayQueue.META_TOPIC_ACTIVE;
-import static com.dili.ss.redis.delayqueue.RedisDelayQueue.META_TOPIC_WAIT;
 
 
 /**
@@ -86,16 +84,16 @@ public class DistributeTask {
     public void scheduledTask() {
         try {
             //waitTopics为String.format("delay:wait:%s", topic)
-            Set<String> waitTopics = redisTemplate.opsForSet().members(META_TOPIC_WAIT);
+            Set<String> waitTopics = redisTemplate.opsForSet().members(DelayQueueConstants.META_TOPIC_WAIT);
             assert waitTopics != null;
             for (String waitTopic : waitTopics) {
                 if (!redisTemplate.hasKey(waitTopic)) {
                     // 如果 KEY 不存在元数据中删除
-                    redisTemplate.opsForSet().remove(META_TOPIC_WAIT, waitTopic);
+                    redisTemplate.opsForSet().remove(DelayQueueConstants.META_TOPIC_WAIT, waitTopic);
                     continue;
                 }
-                String activeTopic = waitTopic.replace("delay:wait", "delay:active");
-                Object[] keys = new Object[]{serialize(waitTopic), serialize(META_TOPIC_ACTIVE), serialize(activeTopic)};
+                String activeTopic = waitTopic.replace(DelayQueueConstants.DELAY_WAIT_KEY, DelayQueueConstants.DELAY_ACTIVE_KEY);
+                Object[] keys = new Object[]{serialize(waitTopic), serialize(DelayQueueConstants.META_TOPIC_ACTIVE), serialize(activeTopic)};
                 Object[] values = new Object[]{serialize(String.valueOf(System.currentTimeMillis())), serialize(activeTopic)};
                 Long result = redisTemplate.execute((RedisCallback<Long>) connection -> {
                     Object nativeConnection = connection.getNativeConnection();
@@ -117,6 +115,11 @@ public class DistributeTask {
         }
     }
 
+    /**
+     * serialize
+     * @param key
+     * @return
+     */
     private byte[] serialize(String key) {
         RedisSerializer<String> stringRedisSerializer =
                 (RedisSerializer<String>) redisTemplate.getKeySerializer();

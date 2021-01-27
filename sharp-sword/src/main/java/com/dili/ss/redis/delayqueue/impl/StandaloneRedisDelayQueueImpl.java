@@ -3,6 +3,7 @@ package com.dili.ss.redis.delayqueue.impl;
 import com.alibaba.fastjson.JSON;
 import com.dili.ss.redis.delayqueue.DelayMessage;
 import com.dili.ss.redis.delayqueue.RedisDelayQueue;
+import com.dili.ss.redis.delayqueue.consts.DelayQueueConstants;
 import io.lettuce.core.ScriptOutputType;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.cluster.api.async.RedisAdvancedClusterAsyncCommands;
@@ -28,6 +29,9 @@ public class StandaloneRedisDelayQueueImpl<E extends DelayMessage> implements Re
     @Resource(name = "stringRedisTemplate")
     private StringRedisTemplate redisTemplate;
 
+    /**
+     * 取消息，未使用
+     */
     @Override
     public void poll() {
         // todo
@@ -43,12 +47,12 @@ public class StandaloneRedisDelayQueueImpl<E extends DelayMessage> implements Re
         try {
             String jsonStr = JSON.toJSONString(e);
             String topic = e.getTopic();
-            String zkey = String.format("delay:wait:%s", topic);
+            String zkey =  DelayQueueConstants.DELAY_QUEUE_KEY + topic;
 //            Boolean result = redisTemplate.opsForZSet().add(zkey, jsonStr, e.getDelayTime());
             String script = "redis.call('sadd', KEYS[1], ARGV[1])\n" +
                             "redis.call('zadd', KEYS[2], ARGV[2], ARGV[3])\n" +
                             "return 1";
-            Object[] keys = new Object[]{serialize(META_TOPIC), serialize(zkey)};
+            Object[] keys = new Object[]{serialize(DelayQueueConstants.META_TOPIC), serialize(zkey)};
             Object[] values = new Object[]{ serialize(zkey), serialize(String.valueOf(e.getDelayTime())), serialize(jsonStr)};
 
             Long result = redisTemplate.execute((RedisCallback<Long>) connection -> {

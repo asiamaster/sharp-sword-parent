@@ -23,13 +23,25 @@ public class UserColumnController {
 	@Autowired
 	UserColumnService userColumnService;
 
+	/**
+	 * 保存用户列
+	 * @param userColumn
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/save.action", method = { RequestMethod.GET, RequestMethod.POST })
 	public @ResponseBody
-	BaseOutput save(@ModelAttribute UserColumn userColumn) throws Exception {
+	BaseOutput saveStreamListenerComponent(@ModelAttribute UserColumn userColumn) throws Exception {
 		userColumnService.saveUserColumns(userColumn);
 		return BaseOutput.success("保存列成功");
 	}
 
+	/**
+	 * 获取用户列
+	 * @param userColumn
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/get.action", method = { RequestMethod.GET, RequestMethod.POST })
 	public @ResponseBody
 	BaseOutput get(@ModelAttribute UserColumn userColumn) throws Exception {

@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,42 +78,54 @@ public class MainsiteErrorController implements ErrorController {
 		return SpringUtil.getProperty("error.page.404", "error/404");
 	}
 
-	//未登录
+	/**
+	 * 未登录
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("/noLogin.do")
 	public String noLogin(HttpServletRequest request, HttpServletResponse response){
 		return SpringUtil.getProperty("error.page.noLogin", "error/noLogin");
 	}
 
-//	页面没有权限
+	/**
+	 * 页面没有权限
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("/noAccess.do")
 	public String noAccess(HttpServletRequest request, HttpServletResponse response){
 		return SpringUtil.getProperty("error.page.noAccess", "error/noAccess");
 	}
 
+	/**
+	 * 错误页面路径
+	 * @return
+	 */
 	@Override
 	public String getErrorPath() {
 		return ERROR_PATH+"/default";
 	}
 
+	/**
+	 * 获取错误属性
+	 * @param request
+	 * @param includeStackTrace
+	 * @return
+	 */
 	private Map<String, Object> getErrorAttributes(WebRequest request, boolean includeStackTrace) {
 //		RequestAttributes requestAttributes = new ServletRequestAttributes(request);
 		return errorAttributes.getErrorAttributes(request, includeStackTrace);
 	}
 
-	private HttpStatus getStatus(WebRequest request) {
-		Integer statusCode = (Integer) request
-				.getAttribute("javax.servlet.error.status_code", 0);
-		if (statusCode == null) {
-			return HttpStatus.INTERNAL_SERVER_ERROR;
-		}
-		try {
-			return HttpStatus.valueOf(statusCode);
-		}
-		catch (Exception ex) {
-			return HttpStatus.INTERNAL_SERVER_ERROR;
-		}
-	}
-
+	/**
+	 * 构建ajax请求错误的http body
+	 * @param request
+	 * @param includeStackTrace
+	 * @return
+	 */
 	private BaseOutput buildBody(WebRequest request,Boolean includeStackTrace){
 		Map<String,Object> errorAttributes = getErrorAttributes(request, includeStackTrace);
 		Integer status=(Integer)errorAttributes.get("status");

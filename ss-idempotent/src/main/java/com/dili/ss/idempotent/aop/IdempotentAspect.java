@@ -25,6 +25,10 @@ public class IdempotentAspect {
     RedisDistributedLock redisDistributedLock;
 
     IdempotentAspectHandler idempotentAspectHandler;
+
+    /**
+     * 初始化
+     */
     @PostConstruct
     public void init() {
         idempotentAspectHandler = new IdempotentAspectHandlerImpl();

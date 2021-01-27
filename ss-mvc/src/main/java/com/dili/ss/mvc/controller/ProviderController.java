@@ -27,6 +27,14 @@ public class ProviderController {
     @Autowired
     private ValueProviderUtils valueProviderUtils;
 
+    /**
+     * 获取下拉数据
+     * @param request
+     * @param response
+     * @param queryParams
+     * @return
+     * @throws UnsupportedEncodingException
+     */
     @RequestMapping("/getLookupList.action")
     public @ResponseBody
     List<ValuePair<?>> getLookupList(HttpServletRequest request, HttpServletResponse response, @RequestBody String queryParams) throws UnsupportedEncodingException {
@@ -38,6 +46,11 @@ public class ProviderController {
         return valueProviderUtils.getLookupList(provider, queryMap.get("value"), queryMap);
     }
 
+    /**
+     * 转义query
+     * @param queryParams
+     * @return
+     */
     private Map<String, Object> parseQuery(String queryParams) {
         String[] params = queryParams.split("&");
         Map<String, Object> map = new LinkedHashMap<String, Object>(params.length);

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.dili.ss.component.CustomThreadPoolExecutor;
 import com.dili.ss.redis.delayqueue.DelayMessage;
 import com.dili.ss.redis.delayqueue.annotation.StreamListener;
+import com.dili.ss.redis.delayqueue.consts.DelayQueueConstants;
 import com.dili.ss.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static com.dili.ss.redis.delayqueue.RedisDelayQueue.META_TOPIC_ACTIVE;
 
 /**
  * 分布式延时队列任务处理器
@@ -38,7 +38,6 @@ public class HandleTask {
     // key为bean， value为@StreamListener注解的method
     private Map<Object, Method> map = new HashMap<>();
 
-    //    多线程执行器
     @Resource
     private CustomThreadPoolExecutor customThreadPoolExecutor;
 
@@ -48,12 +47,12 @@ public class HandleTask {
     @Scheduled(cron = "${ss.handleTask.scheduled:0/3 * * * * ?}")
     public void scheduledTask() {
         try {
-            Set<String> activeTopics = redisTemplate.opsForSet().members(META_TOPIC_ACTIVE);
+            Set<String> activeTopics = redisTemplate.opsForSet().members(DelayQueueConstants.META_TOPIC_ACTIVE);
             Map<Object, Method> map = getBean(StreamListener.class);
             for (String activeTopic : activeTopics) {
                 if (!redisTemplate.hasKey(activeTopic)) {
                     // 如果 KEY 不存在元数据中删除
-                    redisTemplate.opsForSet().remove(META_TOPIC_ACTIVE, activeTopic);
+                    redisTemplate.opsForSet().remove(DelayQueueConstants.META_TOPIC_ACTIVE, activeTopic);
                     continue;
                 }
                 //这句代码有缺陷，一次只能捞一条出来，有多条数据只能等@Scheduled注解的下一个周期

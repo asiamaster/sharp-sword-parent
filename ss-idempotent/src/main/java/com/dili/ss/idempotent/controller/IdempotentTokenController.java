@@ -17,6 +17,11 @@ public class IdempotentTokenController {
     @Autowired
     private IdempotentTokenService idempotentTokenService;
 
+    /**
+     * 根据url获取TokenPair
+     * @param url
+     * @return
+     */
     @ResponseBody
     @GetMapping("/getToken.api")
     public TokenPair getToken(@RequestParam("url") String url) {

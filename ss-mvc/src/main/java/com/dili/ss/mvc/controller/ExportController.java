@@ -40,7 +40,14 @@ public class ExportController {
     @Value("${maxWait:1800000}")
     private Long maxWait;
 
-
+    /**
+     * 判断导出是否完成
+     * @param request
+     * @param response
+     * @param token
+     * @return
+     * @throws InterruptedException
+     */
     @RequestMapping("/isFinished.action")
     public @ResponseBody String isFinished(HttpServletRequest request, HttpServletResponse response, @RequestParam("token") String token) throws InterruptedException {
         //合计阻塞时间，默认为1秒，避免出现后台死循环
