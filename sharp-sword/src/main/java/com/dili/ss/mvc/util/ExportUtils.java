@@ -3,13 +3,12 @@ package com.dili.ss.mvc.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.dili.ss.component.CustomThreadPoolExecutor;
 import com.dili.ss.domain.ExportParam;
 import com.dili.ss.domain.TableHeader;
 import com.dili.ss.exception.AppException;
-import com.dili.ss.java.B;
 import com.dili.ss.metadata.ValueProvider;
 import com.dili.ss.util.BeanConver;
-import com.dili.ss.util.IExportThreadPoolExecutor;
 import com.dili.ss.util.OkHttpUtils;
 import com.dili.ss.util.SpringUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -32,7 +31,10 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.Future;
 
 /**
  * 通用导出工具
@@ -65,19 +67,9 @@ public class ExportUtils {
      */
     private final static String CONTENT_TYPE_JSON = "application/json";
 
-
     //    多线程执行器
-    private ExecutorService executor;
-
-    private CompletionService completionService;
-
-    @PostConstruct
-    public void init() {
-        try {
-            executor = ((Class<IExportThreadPoolExecutor>) B.b.g("threadPoolExecutor")).newInstance().getCustomThreadPoolExecutor();
-        } catch (Exception e) {
-        }
-    }
+    @Resource
+    private CustomThreadPoolExecutor customThreadPoolExecutor;
 
     /**
      * 通用beans导出方法
@@ -220,7 +212,7 @@ public class ExportUtils {
                 //注意这里直接使用exportParam.getQueryParams()会产生多线程并发缺陷，所有深putAll进行半深拷贝
                 //然而putAll也不完全是深拷贝，但它的性能优于字节拷贝，它只能深拷贝基本类型，不过这里也只有基本类型
                 queryParams.putAll(exportParam.getQueryParams());
-                CompletionService<JSONArray> completionService = new ExecutorCompletionService<JSONArray>(executor);
+                CompletionService<JSONArray> completionService = new ExecutorCompletionService<JSONArray>(customThreadPoolExecutor.getExecutor());
                 Future<JSONArray> future = completionService.submit(new ExportDataThread(current, queryParams, url, exportParam.getContentType(), request));
 //                Future<JSONArray> future = executor.submit(new ExportDataThread(current, queryParams, url, exportParam.getContentType(), request));
                 futures.add(future);

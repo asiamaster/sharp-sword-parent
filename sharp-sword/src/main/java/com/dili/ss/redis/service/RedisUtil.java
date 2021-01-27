@@ -1,11 +1,12 @@
 package com.dili.ss.redis.service;
 
 import com.alibaba.fastjson.JSON;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * redicache 工具类
+ * redis 工具类
  *
  */
 @SuppressWarnings("unchecked")
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 @ConditionalOnExpression("'${redis.enable}'=='true'")
 public class RedisUtil {
     @SuppressWarnings("rawtypes")
-    @Autowired
+    @Resource(name="redisTemplate")
     protected RedisTemplate redisTemplate;
 
     /**
@@ -69,7 +70,7 @@ public class RedisUtil {
      * @param key
      * @return
      */
-    public boolean exists(final String key) {
+    public Boolean exists(final String key) {
         return redisTemplate.hasKey(key);
     }
     /**
@@ -91,9 +92,8 @@ public class RedisUtil {
      * @param k
      * @param v
      */
-    public void lPush(String k, Object v) {
-        ListOperations<String, Object> list = redisTemplate.opsForList();
-        list.rightPush(k, v);
+    public Long lPush(String k, Object v) {
+        return redisTemplate.opsForList().rightPush(k, v);
     }
 
     /**
@@ -105,8 +105,7 @@ public class RedisUtil {
      * @return
      */
     public List<Object> lRange(String k, long start, long end) {
-        ListOperations<String, Object> list = redisTemplate.opsForList();
-        return list.range(k, start, end);
+        return redisTemplate.opsForList().range(k, start, end);
     }
 
     /**
@@ -131,9 +130,8 @@ public class RedisUtil {
      * @param value
      * @return
      */
-    public long increment(String key, Long value){
-        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-        return operations.increment(key, value);
+    public Long increment(String key, Long value){
+        return redisTemplate.opsForValue().increment(key, value);
     }
 
     /**
@@ -143,15 +141,8 @@ public class RedisUtil {
      * @param value
      * @return
      */
-    public boolean set(final String key, Object value) {
-        try {
-            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-            operations.set(key, value);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+    public void set(final String key, Object value) {
+        redisTemplate.opsForValue().set(key, value);
     }
 
     /**
@@ -160,9 +151,8 @@ public class RedisUtil {
      * @param key
      * @param value
      */
-    public void add(String key, Object value) {
-        SetOperations<String, Object> set = redisTemplate.opsForSet();
-        set.add(key, value);
+    public Long add(String key, Object value) {
+        return redisTemplate.opsForSet().add(key, value);
     }
 
     /**
@@ -172,8 +162,7 @@ public class RedisUtil {
      * @return
      */
     public Set<Object> setMembers(String key) {
-        SetOperations<String, Object> set = redisTemplate.opsForSet();
-        return set.members(key);
+        return redisTemplate.opsForSet().members(key);
     }
 
     /**
@@ -183,22 +172,20 @@ public class RedisUtil {
      * @param value
      * @param scoure
      */
-    public void zAdd(String key, Object value, double scoure) {
-        ZSetOperations<String, Object> zset = redisTemplate.opsForZSet();
-        zset.add(key, value, scoure);
+    public Boolean zAdd(String key, Object value, double scoure) {
+        return redisTemplate.opsForZSet().add(key, value, scoure);
     }
 
     /**
      * 有序集合获取
      *
      * @param key
-     * @param scoure
-     * @param scoure1
+     * @param min
+     * @param max
      * @return
      */
-    public Set<Object> rangeByScore(String key, double scoure, double scoure1) {
-        ZSetOperations<String, Object> zset = redisTemplate.opsForZSet();
-        return zset.rangeByScore(key, scoure, scoure1);
+    public Set<Object> rangeByScore(String key, double min, double max) {
+        return redisTemplate.opsForZSet().rangeByScore(key, min, max);
     }
 
     /**
@@ -209,8 +196,8 @@ public class RedisUtil {
      * @param expireTime 过期时间，单位秒
      * @return
      */
-    public boolean set(final String key, Object value, Long expireTime) {
-        return set(key, value, expireTime, TimeUnit.SECONDS);
+    public void set(final String key, Object value, Long expireTime) {
+        set(key, value, expireTime, TimeUnit.SECONDS);
     }
 
     /**
@@ -222,15 +209,8 @@ public class RedisUtil {
      * @param timeUnit 过期时间单位枚举
      * @return
      */
-    public boolean set(final String key, Object value, Long expireTime, TimeUnit timeUnit) {
-        try {
-            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-            operations.set(key, value, expireTime, timeUnit);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+    public void set(final String key, Object value, Long expireTime, TimeUnit timeUnit) {
+        redisTemplate.opsForValue().set(key, value, expireTime, timeUnit);
     }
 
     /**
@@ -240,14 +220,8 @@ public class RedisUtil {
      * @param value
      * @return 是否获取成功
      */
-    public boolean setIfAbsent(final String key, Object value) {
-        try {
-            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-            return operations.setIfAbsent(key, value);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+    public Boolean setIfAbsent(final String key, Object value) {
+        return redisTemplate.opsForValue().setIfAbsent(key, value);
     }
 
     /**
@@ -271,14 +245,8 @@ public class RedisUtil {
      * @param timeUnit 过期时间单位枚举
      * @return 是否获取成功
      */
-    public boolean setIfAbsent(final String key, Object value, Long expireTime, TimeUnit timeUnit) {
-        try {
-            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-            return operations.setIfAbsent(key, value, expireTime, timeUnit);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+    public Boolean setIfAbsent(final String key, Object value, Long expireTime, TimeUnit timeUnit) {
+        return redisTemplate.opsForValue().setIfAbsent(key, value, expireTime, timeUnit);
     }
 
     /**

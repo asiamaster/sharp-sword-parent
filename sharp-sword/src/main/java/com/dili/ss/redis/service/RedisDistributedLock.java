@@ -41,10 +41,18 @@ public class RedisDistributedLock{
         UNLOCK_LUA = sb.toString();
     }
 
+    /**
+     * redisTemplate getter
+     * @return
+     */
     public RedisTemplate getRedisTemplate() {
         return redisTemplate;
     }
 
+    /**
+     * redisTemplate setter
+     * @param redisTemplate
+     */
     @Resource
     public void setRedisTemplate(RedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -70,6 +78,11 @@ public class RedisDistributedLock{
         return redisTemplate.hasKey(key);
     }
 
+    /**
+     * get by key
+     * @param key
+     * @return
+     */
     public Object get(String key) {
         return redisTemplate.opsForValue().get(key);
     }
