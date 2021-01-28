@@ -122,7 +122,7 @@ public class BizNumberComponent {
         bizNumberAndRule.setValue(tempStartSeq + step);
         try {
             //当更新失败后，返回空，外层进行重试
-            int count = bizNumberMapper.updateByPrimaryKey(bizNumberAndRule);
+            int count = bizNumberMapper.updateByPrimaryKeySelective(bizNumberAndRule);
             if (count < 1) {
                 log.info("乐观锁更新失败后，返回空，外层进行重试!");
                 return null;
