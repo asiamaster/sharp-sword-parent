@@ -1,7 +1,7 @@
 package com.dili.ss.redis.delayqueue.task;
 
 import com.alibaba.fastjson.JSON;
-import com.dili.ss.component.CustomThreadPoolExecutor;
+import com.dili.ss.component.CustomThreadPoolExecutorCache;
 import com.dili.ss.redis.delayqueue.annotation.StreamListener;
 import com.dili.ss.redis.delayqueue.component.BeanMethodCacheComponent;
 import com.dili.ss.redis.delayqueue.consts.DelayQueueConstants;
@@ -35,7 +35,7 @@ public class StandaloneTopicDequeueTask {
     @Resource
     private BeanMethodCacheComponent beanMethodCacheComponent;
     @Resource
-    private CustomThreadPoolExecutor customThreadPoolExecutor;
+    private CustomThreadPoolExecutorCache customThreadPoolExecutorCache;
 
     /**
      * 每秒执行一次
@@ -70,7 +70,7 @@ public class StandaloneTopicDequeueTask {
                                 continue;
                             }
                             String finalDelayMessageJson = delayMessageJson;
-                            customThreadPoolExecutor.getExecutor(DelayQueueConstants.DELAY_QUEUE_EXECUTOR_KEY).submit(() -> {
+                            customThreadPoolExecutorCache.getExecutor(DelayQueueConstants.DELAY_QUEUE_EXECUTOR_KEY).submit(() -> {
                                 try {
                                     logger.debug("消息到期发送到消息监听器, topic: {}", message.getTopic());
                                     entry.getValue().invoke(entry.getKey(), message);
