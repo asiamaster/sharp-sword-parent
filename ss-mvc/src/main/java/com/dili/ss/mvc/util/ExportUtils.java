@@ -3,7 +3,7 @@ package com.dili.ss.mvc.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.dili.ss.component.CustomThreadPoolExecutor;
+import com.dili.ss.component.CustomThreadPoolExecutorCache;
 import com.dili.ss.domain.ExportParam;
 import com.dili.ss.domain.TableHeader;
 import com.dili.ss.exception.AppException;
@@ -69,7 +69,7 @@ public class ExportUtils {
 
     //    多线程执行器
     @Resource
-    private CustomThreadPoolExecutor customThreadPoolExecutor;
+    private CustomThreadPoolExecutorCache customThreadPoolExecutor;
 
     /**
      * 通用beans导出方法

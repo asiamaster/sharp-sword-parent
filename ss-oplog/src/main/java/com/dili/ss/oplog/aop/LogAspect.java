@@ -10,7 +10,7 @@ import com.dili.ss.oplog.base.LogHandler;
 import com.dili.ss.oplog.base.LogInitializer;
 import com.dili.ss.oplog.dto.LogContext;
 import com.dili.ss.util.BeanConver;
-import com.dili.ss.util.IExportThreadPoolExecutor;
+import com.dili.ss.util.ICustomThreadPoolExecutor;
 import com.dili.ss.util.SpringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -68,7 +68,7 @@ public class LogAspect {
     @PostConstruct
     public void init() throws IllegalAccessException, InstantiationException {
         System.out.println("操作日志启动");
-        executor = ((Class<IExportThreadPoolExecutor>) B.b.g("threadPoolExecutor")).newInstance().getCustomThreadPoolExecutor();
+        executor = ((Class<ICustomThreadPoolExecutor>) B.b.g("threadPoolExecutor")).newInstance().getCustomThreadPoolExecutor();
     }
 
     /**
