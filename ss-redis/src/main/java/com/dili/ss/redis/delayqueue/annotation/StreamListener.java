@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * 延迟队列方法标记
- *
+ * 方法入参为DelayMessage, 返回void
  * @author wm
  * @date 2021-01-26
  */

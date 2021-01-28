@@ -36,4 +36,9 @@ public interface DelayQueueConstants {
      * 单机延时失败队列
      */
     String DELAY_QUEUE_FAIL_KEY = "delay:queue:fail:";
+
+    /**
+     * 延时队列线程池
+     */
+    String DELAY_QUEUE_EXECUTOR_KEY = "delay_queue_executor";
 }

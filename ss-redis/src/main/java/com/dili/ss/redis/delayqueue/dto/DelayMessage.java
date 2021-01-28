@@ -1,4 +1,4 @@
-package com.dili.ss.redis.delayqueue;
+package com.dili.ss.redis.delayqueue.dto;
 
 import com.dili.ss.dto.IDTO;
 
@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 /**
  *  消息体
  *
- *  @author zhengsh
- *  @date 2020-03-27
+ *  @author asiamaster
+ *  @date 2021-01-26
  */
 public interface DelayMessage extends IDTO {
   /**
@@ -36,6 +36,13 @@ public interface DelayMessage extends IDTO {
    */
   Long getDelayTime();
   void setDelayTime(Long delayTime);
+
+  /**
+   *  延时时长，单位秒
+   *  当前时间往后延时秒数
+   */
+  Long getDelayDuration();
+  void setDelayDuration(Long delayDuration);
 
   /**
    *  消息发送时间

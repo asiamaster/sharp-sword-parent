@@ -6,6 +6,7 @@ import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.cluster.api.async.RedisAdvancedClusterAsyncCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -18,9 +19,11 @@ import java.util.Set;
 
 /**
  * 分布式延时队列分发任务，先把数据捞出来，扔到处理队列
- *
+ * @author asiamaster
+ * date 2021-01-27
  */
 @Component
+@ConditionalOnExpression("'${ss.delayqueue.distributed.enable}'=='true'")
 public class DistributeTask {
 
     private static final String LUA_SCRIPT;
@@ -107,7 +110,7 @@ public class DistributeTask {
                     return 0L;
                 });
                 if(result != null && result > 0) {
-                    logger.info("延迟队列[2]，消息到期进入执行队列({}): {}", activeTopic);
+                    logger.debug("消息到期进入执行队列({})", activeTopic);
                 }
             }
         } catch (Throwable t) {

@@ -1,14 +1,15 @@
 package com.dili.ss.redis.delayqueue.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.dili.ss.redis.delayqueue.DelayMessage;
 import com.dili.ss.redis.delayqueue.RedisDelayQueue;
 import com.dili.ss.redis.delayqueue.consts.DelayQueueConstants;
+import com.dili.ss.redis.delayqueue.dto.DelayMessage;
 import io.lettuce.core.ScriptOutputType;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.cluster.api.async.RedisAdvancedClusterAsyncCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -23,6 +24,7 @@ import javax.annotation.Resource;
  * @date 2021-01-26
  */
 @Component
+@ConditionalOnExpression("'${ss.delayqueue.distributed.enable}'=='true'")
 public class DistributedRedisDelayQueueImpl<E extends DelayMessage> implements RedisDelayQueue<E> {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -54,8 +56,9 @@ public class DistributedRedisDelayQueueImpl<E extends DelayMessage> implements R
                             "return 1";
 
             Object[] keys = new Object[]{serialize(DelayQueueConstants.META_TOPIC_WAIT), serialize(zkey)};
-            Object[] values = new Object[]{ serialize(zkey), serialize(String.valueOf(e.getDelayTime())), serialize(jsonStr)};
-
+            //优先使用延时时间，没有则根据延时时长计算(当前时间往后的延时秒数)
+            Long score = e.getDelayTime() != null ? e.getDelayTime() : System.currentTimeMillis() + (e.getDelayDuration() * 1000);
+            Object[] values = new Object[]{ serialize(zkey), serialize(String.valueOf(score)), serialize(jsonStr)};
             Long result = redisTemplate.execute((RedisCallback<Long>) connection -> {
                 Object nativeConnection = connection.getNativeConnection();
 
@@ -68,7 +71,9 @@ public class DistributedRedisDelayQueueImpl<E extends DelayMessage> implements R
                 }
                 return 0L;
             });
-            logger.info("延迟队列[1]，消息推送成功进入等待队列({}), topic: {}", result != null && result > 0, e.getTopic());
+            if(result != null && result > 0) {
+                logger.debug("消息推送成功进入等待队列, topic: {}", e.getTopic());
+            }
         } catch (Throwable t) {
             t.printStackTrace();
         }

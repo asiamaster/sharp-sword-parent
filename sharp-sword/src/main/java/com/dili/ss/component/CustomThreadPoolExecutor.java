@@ -5,6 +5,8 @@ import com.dili.ss.util.IExportThreadPoolExecutor;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -15,18 +17,54 @@ import java.util.concurrent.ExecutorService;
  */
 @Component
 public class CustomThreadPoolExecutor {
-    //    多线程执行器
-    private ExecutorService executor;
+    public static final String DEFAULT_KEY = "default";
 
+    private Map<String, ExecutorService> executorServiceMap = new HashMap<>();
+
+    /**
+     * 初始化默认线程池
+     */
     @PostConstruct
     public void init() {
         try {
-            executor = ((Class<IExportThreadPoolExecutor>) B.b.g("threadPoolExecutor")).newInstance().getCustomThreadPoolExecutor();
+            executorServiceMap.put(DEFAULT_KEY, ((Class<IExportThreadPoolExecutor>) B.b.g("threadPoolExecutor")).newInstance().getCustomThreadPoolExecutor());
         } catch (Exception e) {
         }
     }
 
+    /**
+     * 获取默认key的缓存线程池
+     * @return
+     */
     public ExecutorService getExecutor() {
-        return executor;
+        return executorServiceMap.get(DEFAULT_KEY);
+    }
+
+    /**
+     * 获取指定key的缓存线程池
+     * @return
+     */
+    public ExecutorService getExecutor(String key) {
+        if(executorServiceMap.containsKey(key)) {
+            return executorServiceMap.get(key);
+        }
+        synchronized(this){
+            if(executorServiceMap.containsKey(key)) {
+                return executorServiceMap.get(key);
+            }
+            try {
+                executorServiceMap.put(key, ((Class<IExportThreadPoolExecutor>) B.b.g("threadPoolExecutor")).newInstance().getCustomThreadPoolExecutor());
+            } catch (Exception e) {
+            }
+        }
+        return executorServiceMap.get(key);
+    }
+
+    /**
+     * 获取线程池缓存
+     * @return
+     */
+    public Map<String, ExecutorService> getExecutorServiceMap() {
+        return executorServiceMap;
     }
 }
