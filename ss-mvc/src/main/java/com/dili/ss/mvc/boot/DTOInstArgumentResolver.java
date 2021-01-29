@@ -559,6 +559,7 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 		DTO dto = new DTO();
 		try {
 //			ServletInputStream servletInputStream = ((RequestFacade)webRequest.getNativeRequest()).getInputStream();
+			//如果webRequest.getNativeRequest() instanceof RequestReaderHttpServletRequestWrapper，则一般是http RPC以@RequestBody方式调用
 			String inputString = webRequest.getNativeRequest() instanceof RequestReaderHttpServletRequestWrapper ? getBodyString((RequestReaderHttpServletRequestWrapper)webRequest.getNativeRequest()) : "";
 			//下面的方法不能重复读取
 //			ServletInputStream servletInputStream = (((RequestReaderHttpServletRequestWrapper)webRequest.getNativeRequest()).getInputStream());
@@ -578,6 +579,9 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 					//单独处理metadata
 					if(entry.getKey().startsWith("metadata[") && entry.getKey().endsWith("]")){
 						dto.setMetadata(entry.getKey().substring(9, entry.getKey().length()-1), entry.getValue());
+					}//http RPC以@RequestBody方式调用时，metadata[*]会被json转义为metadata.*，所以为了方便，这里直接把metadata属性视为元数据
+					else if(entry.getKey().equals("metadata")){
+						dto.setMetadata(entry.getKey(), entry.getValue());
 					}else{
 						dto.put(entry.getKey(), getParamValueAndConvert(entry, fields));
 					}
