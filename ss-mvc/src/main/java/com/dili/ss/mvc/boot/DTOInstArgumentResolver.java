@@ -580,8 +580,8 @@ public class DTOInstArgumentResolver implements HandlerMethodArgumentResolver {
 					if(entry.getKey().startsWith("metadata[") && entry.getKey().endsWith("]")){
 						dto.setMetadata(entry.getKey().substring(9, entry.getKey().length()-1), entry.getValue());
 					}//http RPC以@RequestBody方式调用时，metadata[*]会被json转义为metadata.*，所以为了方便，这里直接把metadata属性视为元数据
-					else if(entry.getKey().equals("metadata")){
-						dto.setMetadata(entry.getKey(), entry.getValue());
+					else if(entry.getKey().equals("metadata") && entry.getValue() instanceof Map){
+						dto.setMetadata((Map)entry.getValue());
 					}else{
 						dto.put(entry.getKey(), getParamValueAndConvert(entry, fields));
 					}
