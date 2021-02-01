@@ -3,24 +3,25 @@ package com.dili.ss.quartz;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
-import com.dili.http.okhttp.OkHttpUtils;
-import com.dili.http.okhttp.callback.Callback;
 import com.dili.ss.domain.BaseOutput;
 import com.dili.ss.quartz.domain.QuartzConstants;
 import com.dili.ss.quartz.domain.ScheduleJob;
 import com.dili.ss.quartz.domain.ScheduleMessage;
 import com.dili.ss.util.AopTargetUtils;
+import com.dili.ss.util.OkHttpUtils;
 import com.dili.ss.util.SpringUtil;
-import okhttp3.*;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: wangmi
@@ -28,20 +29,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class TaskUtils {
 	public final static Logger log = LoggerFactory.getLogger(TaskUtils.class);
-	static OkHttpClient okHttpClient = null;
-	static{
-		okHttpClient = new OkHttpClient.Builder()
-//                .addInterceptor(new LoggerInterceptor("TAG"))
-				.connectTimeout(10000L, TimeUnit.MILLISECONDS)
-				.readTimeout(10000L, TimeUnit.MILLISECONDS)
-				//其他配置
-				.build();
-		OkHttpUtils.initClient(okHttpClient);
-	}
+	//任务处理对象缓存
+	//包括java类, spring bean无法使用缓存，因为数据库连接会断开
+	static Map<String, Object> cachedJobHashMap = new HashMap<>();
 
 	/**
 	 * 通过反射调用scheduleJob中定义的方法
-	 * 
+	 *
 	 * @param scheduleJob 调度方式
 	 * @param scheduleMessage 调度消息
 	 */
@@ -62,8 +56,11 @@ public class TaskUtils {
 			object = SpringUtil.getBean(scheduleJob.getSpringId());
 			return invokeLocalMethod(scheduleJob, scheduleMessage, object);
 		} else if (StringUtils.isNotBlank(scheduleJob.getBeanClass())) {
-			Class clazz = Class.forName(scheduleJob.getBeanClass());
-			object = clazz.newInstance();
+			if(!cachedJobHashMap.containsKey(scheduleJob.getSpringId())){
+				Class clazz = Class.forName(scheduleJob.getBeanClass());
+				cachedJobHashMap.put(scheduleJob.getSpringId(), clazz.newInstance());
+			}
+			object = cachedJobHashMap.get(scheduleJob.getBeanClass());
 			return invokeLocalMethod(scheduleJob, scheduleMessage, object);
 		}else if(StringUtils.isNotBlank(scheduleJob.getUrl())){
 			if(scheduleJob.getIsConcurrent()!= null && scheduleJob.getIsConcurrent()==1){
@@ -112,43 +109,25 @@ public class TaskUtils {
 	 * @param httpMethod
 	 */
 	private static boolean syncExecute(String url, Object paramObj, String httpMethod){
-		Response resp = null;
 		try{
 			Map<String, String> headersMap = new HashMap<>(1);
 			headersMap.put("Content-Type", "application/json;charset=utf-8");
+			String bodyString;
 			if("POST".equalsIgnoreCase(httpMethod)){
-
 				String json = paramObj instanceof String ? (String)paramObj : JSON.toJSONString(paramObj);
-				resp = OkHttpUtils
-						.postString()
-						.url(url).content(json)
-						.mediaType(MediaType.parse("application/json; charset=utf-8"))
-						.build()
-						.execute();
+				bodyString = OkHttpUtils.postBodyString(url, json, headersMap, null);
 			}else{
-				resp = OkHttpUtils
-						.get()
-						.url(url).params((Map)JSON.toJSON(paramObj))
-						.build()
-						.execute();
+				bodyString = OkHttpUtils.get(url, (Map)JSON.toJSON(paramObj), headersMap, null);
 			}
-			if(resp.isSuccessful()){
-				ResponseBody responseBody = resp.body();
-				String result = responseBody == null ? null : resp.body().string();
-				if(StringUtils.isNotBlank(result)){
-					if("false".equalsIgnoreCase(result)){
-						return false;
-					}
-					if(!StringUtils.equalsIgnoreCase("200", JSONObject.parseObject(result, BaseOutput.class, Feature.IgnoreNotMatch).getCode())){
-						return false;
-					}
+			if(StringUtils.isNotBlank(bodyString)){
+				if("false".equalsIgnoreCase(bodyString)){
+					return false;
 				}
-				log.info(String.format("远程调用["+url+"]成功,code:[%s], message:[%s]", resp.code(),resp.message()));
-				return true;
-			}else{
-				log.error(String.format("远程调用["+url+"]发生失败,code:[%s], message:[%s]", resp.code(),resp.message()));
-				return false;
+				if(!StringUtils.equalsIgnoreCase("200", JSONObject.parseObject(bodyString, BaseOutput.class, Feature.IgnoreNotMatch).getCode())){
+					return false;
+				}
 			}
+			return true;
 		} catch (Exception e) {
 			log.error(String.format("远程调用["+url+"]发生异常, message:[%s]", e.getMessage()));
 			return false;
@@ -166,45 +145,33 @@ public class TaskUtils {
 			Map<String, String> headersMap = new HashMap<>(1);
 			headersMap.put("Content-Type", "application/json;charset=utf-8");
 			if("POST".equalsIgnoreCase(httpMethod)){
+
 				String json = paramObj instanceof String ? (String)paramObj : JSON.toJSONString(paramObj);
-				OkHttpUtils
-						.postString()
-						.url(url).content(json)
-						.mediaType(MediaType.parse("application/json; charset=utf-8"))
-						.build()
-						.execute(new Callback() {
-							@Override
-							public Object parseNetworkResponse(Response response, int id) throws Exception {
-								return null;
-							}
+				OkHttpUtils.postBodyStringAsync(url, json, headersMap, null, new Callback() {
 
-							@Override
-							public void onError(Call call, Exception e, int id) {
-							}
+					@Override
+					public void onFailure(Call call, IOException e) {
 
-							@Override
-							public void onResponse(Object response, int id) {
-							}
-						});
+					}
+
+					@Override
+					public void onResponse(Call call, Response response) throws IOException {
+
+					}
+				});
 			}else{
-				OkHttpUtils
-						.get()
-						.url(url).params((Map)JSON.toJSON(paramObj))
-						.build()
-						.execute(new Callback() {
-							@Override
-							public Object parseNetworkResponse(Response response, int id) throws Exception {
-								return null;
-							}
+				OkHttpUtils.getAsync(url, (Map)JSON.toJSON(paramObj), headersMap, null, new Callback() {
 
-							@Override
-							public void onError(Call call, Exception e, int id) {
-							}
+					@Override
+					public void onFailure(Call call, IOException e) {
 
-							@Override
-							public void onResponse(Object response, int id) {
-							}
-						});
+					}
+
+					@Override
+					public void onResponse(Call call, Response response) throws IOException {
+
+					}
+				});
 			}
 			log.info("异步远程调用["+url+"]完成");
 			return true;
