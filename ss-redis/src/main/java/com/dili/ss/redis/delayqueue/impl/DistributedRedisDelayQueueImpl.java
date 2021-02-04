@@ -50,8 +50,7 @@ public class DistributedRedisDelayQueueImpl<E extends DelayMessage> implements R
             String jsonStr = JSON.toJSONString(e);
             String topic = e.getTopic();
             String zkey = DelayQueueConstants.DELAY_WAIT_KEY + topic;
-            String script =
-                    "redis.call('sadd', KEYS[1], ARGV[1])\n" +
+            String script = "redis.call('sadd', KEYS[1], ARGV[1])\n" +
                             "redis.call('zadd', KEYS[2], ARGV[2], ARGV[3])\n" +
                             "return 1";
 

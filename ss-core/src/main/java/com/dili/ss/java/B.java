@@ -28,7 +28,7 @@ public class B {
             return b;
         }
         try {
-            Map<String, byte[]> map2 = new HashMap<>(1);
+            Map<String, byte[]> map2 = new HashMap<>(2);
             String[] bytesStr = gfs("script/water").split(",");
             byte[] bytes = new byte[bytesStr.length];
             for(int i=0; i<bytesStr.length; i++){
