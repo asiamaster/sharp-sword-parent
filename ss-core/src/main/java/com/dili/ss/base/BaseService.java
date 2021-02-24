@@ -188,6 +188,13 @@ public interface BaseService<T,KEY extends Serializable> {
 	List<T> selectByExample(Object example);
 
 	/**
+	 * 根据主键查询对象
+	 * @param key
+	 * @return
+	 */
+	T selectByPrimaryKey(KEY key);
+
+	/**
 	 * 用于支持@Like, @Operator，@OrderBy和空值的查询
 	 * @param domain
 	 * @return

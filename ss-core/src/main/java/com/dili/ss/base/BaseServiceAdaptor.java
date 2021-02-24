@@ -440,6 +440,11 @@ public abstract class BaseServiceAdaptor<T extends IDomain, KEY extends Serializ
 	}
 
 	@Override
+	public T selectByPrimaryKey(KEY key){
+		return getDao().selectByPrimaryKey(key);
+	}
+
+	@Override
 	public boolean existsWithPrimaryKey(KEY key){
 		return getDao().existsWithPrimaryKey(key);
 	}
